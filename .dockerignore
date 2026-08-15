@@ -1,0 +1,55 @@
+# ── Next-Gen-Reco — .dockerignore ─────────────────────────────────────
+
+# VCS metadata
+.git
+.gitignore
+.gitattributes
+
+# Python caches / artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+.env.template
+*.pem
+*.key
+
+# Streamlit scratch cache (regenerated at runtime)
+.cache/
+
+# IDE / editor config
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# CI / agent config
+.github/
+.gemini/
+.cursorrules
+AGENTS.md
+PROJECT_ANALYSIS.md
+.devcontainer/
+
+# Logs & scratch
+*.log
+logs/
+latest_logs/
+archived_logs/
+.movie_user_data.json

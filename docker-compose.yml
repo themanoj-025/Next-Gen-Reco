@@ -1,0 +1,35 @@
+# ═══════════════════════════════════════════════════════════════════════
+# Next-Gen-Reco (MovieLens AI) — Docker Compose (base)
+#
+# Single-service Streamlit app. All data + models are baked into the
+# image (they ship with the repo). No external services required.
+#
+# Usage:
+#   docker compose up -d
+# ═══════════════════════════════════════════════════════════════════════
+
+name: movielens-ai
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    environment:
+      # Optional TMDB API key for movie posters (see .env.example)
+      TMDB_API_KEY: "${TMDB_API_KEY:-}"
+    volumes:
+      - cache:/app/.cache
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+
+volumes:
+  cache:  # Streamlit/.cache scratch — safe to delete

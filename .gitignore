@@ -1,0 +1,54 @@
+__pycache__/
+*.py[cod]
+*.class
+.cache/
+env/
+.env
+venv/
+.venv/
+.vscode/*
+!.vscode/settings.json
+.idea/
+*.ipynb
+.DS_Store
+nul
+checksums.txt
+README.txt
+split_app.py
+
+# ═══ Streamlit Cloud specific ignores ═══════════════════════════════════
+# Ignore secrets file (contains API keys) — NEVER commit this!
+.streamlit/secrets.toml
+# Ignore local user data (generated at runtime)
+.movie_user_data.json
+
+# ═══ Model files ════════════════════════════════════════════════════════
+# Only ignore specific generated/junk model files, NOT production models
+# Production models in models/v1_test/ are tracked in git for deployment
+*.bak.joblib
+*.tmp.joblib
+models/scratch*
+
+# ═══ Large data files ═══════════════════════════════════════════════════
+# ratings.csv is 857MB — must NOT be tracked in git
+data/ratings.csv
+# Full MovieLens 32M dataset (not used by the app, only for training)
+data/rating_*.csv
+data/genome*
+
+# ═══ Local config (not secrets) — .streamlit/config.toml IS tracked ════
+.streamlit/*.local.toml
+
+.gemini/
+.cursorrules
+
+CLAUDE.md
+
+# === ML model artifacts (general patterns) ===
+*.pkl
+*.joblib
+*.h5
+*.pt
+*.ckpt
+*.parquet
+mlruns/
