@@ -56,7 +56,7 @@ None.
 - Test suite: `pytest` collects no tests (`testpaths=["tests"]` files are data-guarded harnesses, unrelated to this change).
 
 ## 15. Remaining Manual Review Items (Tier 2/3)
-None. The previous Tier 2 item (print-based logging in `app/enrichment.py`) was resolved by the migration in §6. Optional future work: the sibling module `app/recommender.py` still uses the same `_LOG_PREFIX` print pattern (~8 sites) — migrating it would follow the same recipe.
+None. Both print-based logging patterns are now resolved: `app/enrichment.py` (migrated in §6) and `app/recommender.py` (migrated 2026-08-16 — the 11 operational `print(f"[Recommender]…")` calls became `logger.info/warning/error` via `logging.getLogger(__name__)`, matching the enrichment recipe; only the `__main__` CLI report prints remain, and `logging.basicConfig` in the entry points keeps status lines visible). Verified: `py_compile` + import-path check + black/isort clean.
 
 ## 16. Final Production-Readiness Score
-**95/100** — clean audit; the print-based logging pattern is resolved (deduction lifted); minor headroom for the optional `recommender.py` follow-up.
+**96/100** — clean audit; both print-based logging patterns resolved (deduction lifted); no remaining actionable findings.
