@@ -90,9 +90,7 @@ def render_watchlist_button(movie_id: int):
     in_wl = movie_id in st.session_state.watchlist
 
     if not in_wl:
-        if st.button(
-            "📋 Add to Watchlist", key=f"wl_add_{movie_id}", use_container_width=True
-        ):
+        if st.button("📋 Add to Watchlist", key=f"wl_add_{movie_id}", use_container_width=True):
             st.session_state.watchlist[movie_id] = "Want to Watch"
             _save_user_data()
             st.rerun()
@@ -107,9 +105,11 @@ def render_watchlist_button(movie_id: int):
         new_cat = st.selectbox(
             "Status",
             WATCHLIST_CATEGORIES,
-            index=WATCHLIST_CATEGORIES.index(current_cat)
-            if current_cat in WATCHLIST_CATEGORIES
-            else 0,
+            index=(
+                WATCHLIST_CATEGORIES.index(current_cat)
+                if current_cat in WATCHLIST_CATEGORIES
+                else 0
+            ),
             key=f"wl_cat_{movie_id}",
             label_visibility="collapsed",
         )
@@ -233,9 +233,7 @@ def render_movie_detail(movie_id: int):
             )
         if budget and budget > 0:
             budget_str = (
-                f"${budget / 1_000_000:.0f}M"
-                if budget >= 1_000_000
-                else f"${budget / 1_000:.0f}K"
+                f"${budget / 1_000_000:.0f}M" if budget >= 1_000_000 else f"${budget / 1_000:.0f}K"
             )
             stat_parts.append(
                 f'<span class="detail-stat-chip"><span class="chip-icon">💰</span> {budget_str}</span>'
@@ -250,13 +248,7 @@ def render_movie_detail(movie_id: int):
                 f'<span class="detail-stat-chip"><span class="chip-icon">💵</span> {rev_str}</span>'
             )
         if vote_avg:
-            tmdb_color = (
-                "#01b4e4"
-                if vote_avg >= 7
-                else "#fbbf24"
-                if vote_avg >= 5
-                else "#ef4444"
-            )
+            tmdb_color = "#01b4e4" if vote_avg >= 7 else "#fbbf24" if vote_avg >= 5 else "#ef4444"
             stat_parts.append(
                 f'<span class="detail-stat-chip" style="color:{tmdb_color};"><span class="chip-icon">🎬</span> TMDB: {vote_avg:.1f}</span>'
             )
@@ -313,9 +305,7 @@ def render_movie_detail(movie_id: int):
         if keywords and keywords.lower() != "nan":
             kw_list = [k.strip() for k in keywords.split(",") if k.strip()][:12]
             if kw_list:
-                kw_chips = "".join(
-                    f'<span class="detail-kw-chip">{k}</span>' for k in kw_list
-                )
+                kw_chips = "".join(f'<span class="detail-kw-chip">{k}</span>' for k in kw_list)
                 st.markdown(
                     f'<div class="detail-kw-grid">{kw_chips}</div>',
                     unsafe_allow_html=True,
@@ -382,11 +372,7 @@ def render_movie_detail(movie_id: int):
     # ── Actors: Featuring this actor ─────────────────────────────────────
     shown_actors = set()
     for actor in actors[:3]:
-        if (
-            actor
-            and actor.lower() not in ("unknown", "nan", "")
-            and actor not in shown_actors
-        ):
+        if actor and actor.lower() not in ("unknown", "nan", "") and actor not in shown_actors:
             shown_actors.add(actor)
             act_movies = rec.get_movies_by_actor(actor)
             act_movies = [m for m in act_movies if m != movie_id][:6]
@@ -407,9 +393,7 @@ def render_movie_detail(movie_id: int):
                     if act_info:
                         a_pred = act_info["predicted_rating"]
                         a_col = _rating_color(a_pred)
-                        a_year = (
-                            f"({act_info['year']})" if act_info.get("year") else "—"
-                        )
+                        a_year = f"({act_info['year']})" if act_info.get("year") else "—"
                         a_title = (
                             act_info["title"][:28] + "…"
                             if len(act_info["title"]) > 28
@@ -475,7 +459,9 @@ def render_similar_movies(movie_id: int, info: dict, recs: list):
         )
         ur_badge = ""
         if r["movieId"] in st.session_state.user_ratings:
-            ur_badge = f' <span class="sc-badge">⭐{st.session_state.user_ratings[r["movieId"]]}</span>'
+            ur_badge = (
+                f' <span class="sc-badge">⭐{st.session_state.user_ratings[r["movieId"]]}</span>'
+            )
 
         st.markdown(
             f"""
@@ -499,9 +485,7 @@ def render_similar_movies(movie_id: int, info: dict, recs: list):
                 st.rerun()
         with act_cols[1]:
             wl_label = "➖" if r["movieId"] in st.session_state.watchlist else "➕"
-            if st.button(
-                wl_label, key=f"rec_wl_{r['movieId']}_{i}", help="Toggle watchlist"
-            ):
+            if st.button(wl_label, key=f"rec_wl_{r['movieId']}_{i}", help="Toggle watchlist"):
                 if r["movieId"] in st.session_state.watchlist:
                     del st.session_state.watchlist[r["movieId"]]
                 else:
@@ -661,13 +645,9 @@ def render_visualization_charts(movie_id: int, info: dict, recs: list):
                 x=1,
                 font=dict(color="rgba(255,255,255,0.6)", size=10),
             ),
-            xaxis=dict(
-                showgrid=True, gridcolor="rgba(255,255,255,0.05)", title="Count"
-            ),
+            xaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.05)", title="Count"),
             yaxis=dict(title="", gridcolor="rgba(255,255,255,0.05)"),
-            hoverlabel=dict(
-                bgcolor="rgba(30,30,60,0.95)", font=dict(color="white", size=12)
-            ),
+            hoverlabel=dict(bgcolor="rgba(30,30,60,0.95)", font=dict(color="white", size=12)),
         )
         st.plotly_chart(fig, use_container_width=True)
 
@@ -676,9 +656,7 @@ def render_visualization_charts(movie_id: int, info: dict, recs: list):
             st.info("No recommendations to compare.")
         else:
             rec_df = pd.DataFrame(recs)
-            rec_df["display"] = rec_df["title"].apply(
-                lambda x: x[:30] + "…" if len(x) > 30 else x
-            )
+            rec_df["display"] = rec_df["title"].apply(lambda x: x[:30] + "…" if len(x) > 30 else x)
 
             this_pred = info["predicted_rating"]
             all_data = pd.DataFrame(
@@ -702,8 +680,7 @@ def render_visualization_charts(movie_id: int, info: dict, recs: list):
 
             fig2 = go.Figure()
             colors_list = [
-                "#f7971e" if t == "This Movie" else "rgba(96,165,250,0.5)"
-                for t in all_data["Type"]
+                "#f7971e" if t == "This Movie" else "rgba(96,165,250,0.5)" for t in all_data["Type"]
             ]
             fig2.add_trace(
                 go.Bar(
@@ -731,9 +708,7 @@ def render_visualization_charts(movie_id: int, info: dict, recs: list):
                     title="Predicted Rating",
                     range=[0, 5.5],
                 ),
-                hoverlabel=dict(
-                    bgcolor="rgba(30,30,60,0.95)", font=dict(color="white", size=12)
-                ),
+                hoverlabel=dict(bgcolor="rgba(30,30,60,0.95)", font=dict(color="white", size=12)),
             )
             st.plotly_chart(fig2, use_container_width=True)
 
@@ -810,9 +785,7 @@ def render_similarity_breakdown(movie_id: int, recs: list):
             tickformat=".0%",
             range=[0, 1.1],
         ),
-        hoverlabel=dict(
-            bgcolor="rgba(30,30,60,0.95)", font=dict(color="white", size=12)
-        ),
+        hoverlabel=dict(bgcolor="rgba(30,30,60,0.95)", font=dict(color="white", size=12)),
     )
     st.plotly_chart(fig, use_container_width=True)
 
@@ -861,9 +834,7 @@ def render_export(movie_id: int, info: dict, recs: list):
                 r["year"] or "",
                 "; ".join(r["genres"]),
                 f"{r['similarity']:.2%}",
-                f"{r['predicted_rating']:.2f}"
-                if r["predicted_rating"] is not None
-                else "N/A",
+                f"{r['predicted_rating']:.2f}" if r["predicted_rating"] is not None else "N/A",
                 f"{r['genre_similarity']:.2%}",
                 f"{r['tag_similarity']:.2%}",
                 f"{r['year_proximity']:.2%}",

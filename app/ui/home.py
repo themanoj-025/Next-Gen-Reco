@@ -109,14 +109,9 @@ def render_home():
                 r_pred = info.get("predicted_rating")
                 r_pred_str = f"{r_pred:.2f}" if r_pred is not None else "N/A"
                 r_year = f"({info['year']})" if info.get("year") else ""
-                r_title = (
-                    info["title"][:27] + "..."
-                    if len(info["title"]) > 30
-                    else info["title"]
-                )
+                r_title = info["title"][:27] + "..." if len(info["title"]) > 30 else info["title"]
                 gcs = "".join(
-                    f'<span class="imdb-card-genre-chip">{g[:6]}</span>'
-                    for g in info["genres"][:2]
+                    f'<span class="imdb-card-genre-chip">{g[:6]}</span>' for g in info["genres"][:2]
                 )
                 wl_badge = " &#128203;" if mid in st.session_state.watchlist else ""
 
@@ -163,9 +158,7 @@ def render_home():
     for i, g in enumerate(pop_genres):
         if g in all_genres:
             with gcols[i % 4]:
-                if st.button(
-                    f"&#127916; {g}", key=f"home_genre_{g}", use_container_width=True
-                ):
+                if st.button(f"&#127916; {g}", key=f"home_genre_{g}", use_container_width=True):
                     st.session_state.mood_genres = [g]
                     st.session_state.active_tab = "Genre"
                     st.rerun()
@@ -177,9 +170,7 @@ def render_home():
     )
     ca, cb = st.columns(2)
     with ca:
-        if st.button(
-            "&#127922; Surprise Me!", use_container_width=True, type="primary"
-        ):
+        if st.button("&#127922; Surprise Me!", use_container_width=True, type="primary"):
             rm = rec.movies.sample(1).iloc[0]
             st.session_state.selected_movie_id = rm["movieId"]
             st.session_state.search_query = rm["title"]

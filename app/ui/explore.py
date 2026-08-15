@@ -72,9 +72,7 @@ def render_mood_explorer():
             is_active = genre in selected
             btn_type = "primary" if is_active else "secondary"
             label = f"✅ {genre}" if is_active else genre
-            if st.button(
-                label, key=f"mood_{genre}", use_container_width=True, type=btn_type
-            ):
+            if st.button(label, key=f"mood_{genre}", use_container_width=True, type=btn_type):
                 if is_active:
                     selected.remove(genre)
                 else:
@@ -112,9 +110,7 @@ def render_mood_explorer():
                         info = rec.get_movie_info(mid)
                         if info:
                             r_pred = info["predicted_rating"]
-                            r_pred_str = (
-                                f"{r_pred:.2f}" if r_pred is not None else "N/A"
-                            )
+                            r_pred_str = f"{r_pred:.2f}" if r_pred is not None else "N/A"
                             r_color = _rating_color(r_pred)
                             r_year = f"({info['year']})" if info.get("year") else ""
 
@@ -146,9 +142,7 @@ def render_mood_explorer():
                                 st.session_state.search_query = info["title"]
                                 st.rerun()
             else:
-                st.info(
-                    "No movies found matching all selected genres. Try fewer genres."
-                )
+                st.info("No movies found matching all selected genres. Try fewer genres.")
 
     # Reset button
     if selected:

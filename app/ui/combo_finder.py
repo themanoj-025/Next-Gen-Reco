@@ -77,9 +77,7 @@ def render_combo_finder():
                 key="combo_limit",
             )
         with sort_col3:
-            search_clicked = st.button(
-                "🔍 Search Combos", use_container_width=True, type="primary"
-            )
+            search_clicked = st.button("🔍 Search Combos", use_container_width=True, type="primary")
 
     if search_clicked:
         sort_map = {

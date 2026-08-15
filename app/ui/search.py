@@ -40,12 +40,11 @@ def render_search():
                 selected_genre = st.selectbox(
                     "Genre",
                     ["All Genres"] + all_genres,
-                    index=(["All Genres"] + all_genres).index(
-                        st.session_state.search_genre_filter
-                    )
-                    if st.session_state.search_genre_filter
-                    in ["All Genres"] + all_genres
-                    else 0,
+                    index=(
+                        (["All Genres"] + all_genres).index(st.session_state.search_genre_filter)
+                        if st.session_state.search_genre_filter in ["All Genres"] + all_genres
+                        else 0
+                    ),
                     key="sf_genre",
                 )
                 st.session_state.search_genre_filter = selected_genre
@@ -60,9 +59,7 @@ def render_search():
                     ),
                     key="sf_year",
                 )
-                st.session_state.search_year_min, st.session_state.search_year_max = (
-                    year_range
-                )
+                st.session_state.search_year_min, st.session_state.search_year_max = year_range
             with filt_col3:
                 rating_min = st.slider(
                     "Min Predicted Rating",
@@ -76,19 +73,13 @@ def render_search():
 
         genre_param = selected_genre if selected_genre != "All Genres" else None
         year_min_param = (
-            st.session_state.search_year_min
-            if st.session_state.search_year_min > 1900
-            else None
+            st.session_state.search_year_min if st.session_state.search_year_min > 1900 else None
         )
         year_max_param = (
-            st.session_state.search_year_max
-            if st.session_state.search_year_max < 2026
-            else None
+            st.session_state.search_year_max if st.session_state.search_year_max < 2026 else None
         )
         rating_min_param = (
-            st.session_state.search_rating_min
-            if st.session_state.search_rating_min > 1.0
-            else None
+            st.session_state.search_rating_min if st.session_state.search_rating_min > 1.0 else None
         )
 
         results = rec.search_movies_advanced(
@@ -119,9 +110,7 @@ def render_search():
                     )
 
                     # Show if in watchlist
-                    wl_badge = (
-                        " 📋" if r["movieId"] in st.session_state.watchlist else ""
-                    )
+                    wl_badge = " 📋" if r["movieId"] in st.session_state.watchlist else ""
                     wl_cat = ""
                     if r["movieId"] in st.session_state.watchlist:
                         wl_cat = f' <span style=" color:var(--text-muted-2);font-size:0.7rem;">({st.session_state.watchlist[r["movieId"]]})</span>'
@@ -189,9 +178,7 @@ def render_search():
                     unsafe_allow_html=True,
                 )
                 for s in suggestions:
-                    if st.button(
-                        f"🔎 {s}", key=f"suggest_{hash(s)}", use_container_width=False
-                    ):
+                    if st.button(f"🔎 {s}", key=f"suggest_{hash(s)}", use_container_width=False):
                         st.session_state.search_query = s
                         st.rerun()
 
@@ -218,9 +205,7 @@ def render_search_history():
     for query, ts in st.session_state.search_history:
         if query not in shown and len(shown) < 5:
             shown.add(query)
-            if st.button(
-                f"🔎 {query}", key=f"hist_{hash(query)}", use_container_width=True
-            ):
+            if st.button(f"🔎 {query}", key=f"hist_{hash(query)}", use_container_width=True):
                 st.session_state.search_query = query
                 st.rerun()
 

@@ -121,9 +121,7 @@ def render_dashboard():
             )
 
             # Rating distribution — animated mini bars
-            dist_counts = {
-                r: sum(1 for v in ratings.values() if v == r) for r in range(5, 0, -1)
-            }
+            dist_counts = {r: sum(1 for v in ratings.values() if v == r) for r in range(5, 0, -1)}
             bars_html = ""
             for rval in range(5, 0, -1):
                 count = dist_counts.get(rval, 0)
@@ -131,11 +129,7 @@ def render_dashboard():
                 bar_color = (
                     "#22c55e"
                     if rval >= 4
-                    else "#fbbf24"
-                    if rval >= 3
-                    else "#f97316"
-                    if rval >= 2
-                    else "#ef4444"
+                    else "#fbbf24" if rval >= 3 else "#f97316" if rval >= 2 else "#ef4444"
                 )
                 bars_html += f"""
                 <figure class="dash-dist-bar">
@@ -160,11 +154,7 @@ def render_dashboard():
                     continue
                 r_color = _rating_color(rval)
                 r_year = f"({info['year']})" if info.get("year") else ""
-                r_title = (
-                    info["title"][:30] + "…"
-                    if len(info["title"]) > 30
-                    else info["title"]
-                )
+                r_title = info["title"][:30] + "…" if len(info["title"]) > 30 else info["title"]
                 pred = info["predicted_rating"]
                 stars = "★" * rval + "☆" * (5 - rval)
                 gcs = "".join(
@@ -191,9 +181,7 @@ def render_dashboard():
             )
 
             for mid, title, i in buttons_data:
-                if st.button(
-                    "View", key=f"dash_rate_{mid}_{i}", use_container_width=True
-                ):
+                if st.button("View", key=f"dash_rate_{mid}_{i}", use_container_width=True):
                     st.session_state.selected_movie_id = mid
                     st.session_state.search_query = title
                     st.rerun()
@@ -238,11 +226,7 @@ def render_dashboard():
                     r_pred = info["predicted_rating"]
                     r_color = _rating_color(r_pred)
                     r_year = f"({info['year']})" if info.get("year") else ""
-                    r_title = (
-                        info["title"][:30] + "…"
-                        if len(info["title"]) > 30
-                        else info["title"]
-                    )
+                    r_title = info["title"][:30] + "…" if len(info["title"]) > 30 else info["title"]
                     stars = _stars_display(r_pred) if r_pred else ""
                     gcs = "".join(
                         f'<span class="genre-chip {_genre_chip_class(g)} dash-chip-mini">{g[:5]}</span>'
@@ -356,9 +340,11 @@ def render_dashboard():
                             cat,
                             info.get("year", ""),
                             "; ".join(info["genres"]),
-                            f"{info['predicted_rating']:.2f}"
-                            if info["predicted_rating"]
-                            else "N/A",
+                            (
+                                f"{info['predicted_rating']:.2f}"
+                                if info["predicted_rating"]
+                                else "N/A"
+                            ),
                         ]
                     )
             st.download_button(
@@ -395,9 +381,11 @@ def render_dashboard():
                             mid,
                             info["title"],
                             rval,
-                            f"{info['predicted_rating']:.2f}"
-                            if info["predicted_rating"]
-                            else "N/A",
+                            (
+                                f"{info['predicted_rating']:.2f}"
+                                if info["predicted_rating"]
+                                else "N/A"
+                            ),
                             info.get("year", ""),
                             "; ".join(info["genres"]),
                         ]

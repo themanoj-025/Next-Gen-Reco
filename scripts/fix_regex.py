@@ -3,9 +3,9 @@ Fix regex patterns in create_notebook1.py and create_notebook2.py.
 
 The current file has too many backslashes. The outer triple-quoted string
 needs:  r'\\(\\d{4}\\)'
-to produce the cell code: r'\((\d{4})\)'
+to produce the cell code: r'\\((\\d{4})\\)'
 
-Which is a raw string whose value is: \((\d{4})\)
+Which is a raw string whose value is: \\((\\d{4})\\)
 This regex matches (YYYY) and captures YYYY.
 """
 
@@ -67,7 +67,7 @@ with open("create_notebook1.py", "r", encoding="utf-8") as f:
             m_inner = re.search(r"r'(.+?)'", line)
             if m_inner:
                 inner = m_inner.group(1)
-                print(f"  Inner pattern: {repr(inner)}")
+                print(f"  Inner pattern: {inner!r}")
 
 with open("create_notebook2.py", "r", encoding="utf-8") as f:
     for line in f:
@@ -77,7 +77,7 @@ with open("create_notebook2.py", "r", encoding="utf-8") as f:
             m_inner = re.search(r"r'(.+?)'", line)
             if m_inner:
                 inner = m_inner.group(1)
-                print(f"  Inner pattern: {repr(inner)}")
+                print(f"  Inner pattern: {inner!r}")
 
 print()
 print("Done!")

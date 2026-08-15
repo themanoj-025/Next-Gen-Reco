@@ -92,12 +92,12 @@ class NDEnrichment:
         self._metadata_map: dict[int, dict[str, Any]] = {}  # movieId -> tmdb metadata
         self._cast_map: dict[int, dict[str, Any]] = {}  # movieId -> director + actors
         self._reviews_map: dict[int, list[str]] = {}  # movieId -> list of review texts
-        self._director_to_movies: dict[
-            str, list[int]
-        ] = {}  # director name -> list of movieIds (sorted after index_data)
-        self._actor_to_movies: dict[
-            str, list[int]
-        ] = {}  # actor name -> list of movieIds (sorted after index_data)
+        self._director_to_movies: dict[str, list[int]] = (
+            {}
+        )  # director name -> list of movieIds (sorted after index_data)
+        self._actor_to_movies: dict[str, list[int]] = (
+            {}
+        )  # actor name -> list of movieIds (sorted after index_data)
 
         self._loaded = False
         self._tfidf = None  # For keyword-based similarity (future)
@@ -124,9 +124,7 @@ class NDEnrichment:
         try:
             df = pd.read_csv(TMDB_CSV, low_memory=False)
             if "title" not in df.columns:
-                print(
-                    f"{_LOG_PREFIX} TMDB CSV missing 'title' column. Columns: {list(df.columns)}"
-                )
+                print(f"{_LOG_PREFIX} TMDB CSV missing 'title' column. Columns: {list(df.columns)}")
                 return pd.DataFrame()
 
             # Normalize titles for matching
@@ -199,9 +197,7 @@ class NDEnrichment:
         cache_mtime = _ENRICHMENT_CACHE.stat().st_mtime
         for sp in source_paths:
             if sp.exists() and sp.stat().st_mtime > cache_mtime:
-                print(
-                    f"{_LOG_PREFIX} Source file {sp.name} changed, invalidating cache"
-                )
+                print(f"{_LOG_PREFIX} Source file {sp.name} changed, invalidating cache")
                 return False
 
         # Load full data from cache
@@ -284,12 +280,8 @@ class NDEnrichment:
                         "vote_count": self._safe_int(tmdb_row.get("vote_count")),
                         "homepage": str(tmdb_row.get("homepage", "")),
                         "original_language": str(tmdb_row.get("original_language", "")),
-                        "production_companies": str(
-                            tmdb_row.get("production_companies", "")
-                        ),
-                        "production_countries": str(
-                            tmdb_row.get("production_countries", "")
-                        ),
+                        "production_companies": str(tmdb_row.get("production_companies", "")),
+                        "production_countries": str(tmdb_row.get("production_countries", "")),
                         "keywords": str(tmdb_row.get("keywords", "")),
                         "status": str(tmdb_row.get("status", "")),
                         "tmdb_id": self._safe_int(tmdb_row.get("id")),
@@ -302,9 +294,7 @@ class NDEnrichment:
                             self._metadata_map[mid] = metadata
                     tmdb_matched += len(matched_ids)
 
-        print(
-            f"{_LOG_PREFIX} TMDB: {tmdb_matched} movies matched out of {len(tmdb_df)}"
-        )
+        print(f"{_LOG_PREFIX} TMDB: {tmdb_matched} movies matched out of {len(tmdb_df)}")
 
         # ── 2. Index director / actor data ────────────────────────────────
         cast_df = self._load_main_data()
@@ -328,11 +318,7 @@ class NDEnrichment:
                     actor1 = str(cast_row.get("actor_1_name", "")).strip()
                     actor2 = str(cast_row.get("actor_2_name", "")).strip()
                     actor3 = str(cast_row.get("actor_3_name", "")).strip()
-                    actors = [
-                        a
-                        for a in [actor1, actor2, actor3]
-                        if a and a.lower() != "unknown"
-                    ]
+                    actors = [a for a in [actor1, actor2, actor3] if a and a.lower() != "unknown"]
 
                     for mid in matched_ids:
                         if mid not in self._cast_map:
@@ -342,9 +328,7 @@ class NDEnrichment:
                                 "actors_raw": [actor1, actor2, actor3],
                             }
                         if director and director.lower() != "unknown":
-                            self._director_to_movies.setdefault(director, set()).add(
-                                mid
-                            )
+                            self._director_to_movies.setdefault(director, set()).add(mid)
                         for actor in actors:
                             if actor and actor.lower() != "unknown":
                                 self._actor_to_movies.setdefault(actor, set()).add(mid)
@@ -352,19 +336,11 @@ class NDEnrichment:
                     cast_matched += len(matched_ids)
 
             # Convert sets to sorted lists
-            self._director_to_movies = {
-                k: sorted(v) for k, v in self._director_to_movies.items()
-            }
-            self._actor_to_movies = {
-                k: sorted(v) for k, v in self._actor_to_movies.items()
-            }
+            self._director_to_movies = {k: sorted(v) for k, v in self._director_to_movies.items()}
+            self._actor_to_movies = {k: sorted(v) for k, v in self._actor_to_movies.items()}
 
-        print(
-            f"{_LOG_PREFIX} Cast: {cast_matched} movies matched out of {len(cast_df)}"
-        )
-        print(
-            f"{_LOG_PREFIX}   {len(self._director_to_movies)} unique directors indexed"
-        )
+        print(f"{_LOG_PREFIX} Cast: {cast_matched} movies matched out of {len(cast_df)}")
+        print(f"{_LOG_PREFIX}   {len(self._director_to_movies)} unique directors indexed")
         print(f"{_LOG_PREFIX}   {len(self._actor_to_movies)} unique actors indexed")
 
         # ── 3. Index reviews ─────────────────────────────────────────────
@@ -400,9 +376,7 @@ class NDEnrichment:
                         break
 
             for rev_id, norm_title in review_to_norm.items():
-                matched_ids = norm_to_id.get(norm_title) or norm_to_id.get(
-                    _normalize(norm_title)
-                )
+                matched_ids = norm_to_id.get(norm_title) or norm_to_id.get(_normalize(norm_title))
                 if matched_ids:
                     texts = review_groups.get_group(rev_id)["review_text"].tolist()
                     for mid in matched_ids:
@@ -413,9 +387,7 @@ class NDEnrichment:
                             self._reviews_map[mid] = self._reviews_map[mid][:20]
                     reviews_matched += 1
 
-            print(
-                f"{_LOG_PREFIX} Reviews: {reviews_matched} movies matched with reviews"
-            )
+            print(f"{_LOG_PREFIX} Reviews: {reviews_matched} movies matched with reviews")
         else:
             print(f"{_LOG_PREFIX} No reviews to index")
 

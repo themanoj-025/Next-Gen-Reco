@@ -19,9 +19,7 @@ def render_comparison():
 
     with col1:
         st.markdown("#### Movie 1")
-        q1 = st.text_input(
-            "Search first movie:", key="comp_q1", placeholder="Type movie name..."
-        )
+        q1 = st.text_input("Search first movie:", key="comp_q1", placeholder="Type movie name...")
         if q1 and len(q1) >= 2:
             results1 = rec.search_movies(q1.strip(), limit=5)
             for r in results1:
@@ -30,16 +28,12 @@ def render_comparison():
                     current = st.session_state.comparison_ids
                     if len(current) >= 2:
                         current = current[-1:]  # drop oldest
-                    st.session_state.comparison_ids = list(
-                        set(current) | {r["movieId"]}
-                    )
+                    st.session_state.comparison_ids = list(set(current) | {r["movieId"]})
                     st.rerun()
 
     with col2:
         st.markdown("#### Movie 2")
-        q2 = st.text_input(
-            "Search second movie:", key="comp_q2", placeholder="Type movie name..."
-        )
+        q2 = st.text_input("Search second movie:", key="comp_q2", placeholder="Type movie name...")
         if q2 and len(q2) >= 2:
             results2 = rec.search_movies(q2.strip(), limit=5)
             for r in results2:
@@ -48,9 +42,7 @@ def render_comparison():
                     current = st.session_state.comparison_ids
                     if len(current) >= 2:
                         current = current[-1:]
-                    st.session_state.comparison_ids = list(
-                        set(current) | {r["movieId"]}
-                    )
+                    st.session_state.comparison_ids = list(set(current) | {r["movieId"]})
                     st.rerun()
 
     if st.session_state.comparison_ids:
@@ -96,9 +88,7 @@ def render_comparison():
                         )
 
                         st.markdown(
-                            _movie_poster_html(
-                                mid, info["title"], info.get("year"), size="80%"
-                            ),
+                            _movie_poster_html(mid, info["title"], info.get("year"), size="80%"),
                             unsafe_allow_html=True,
                         )
                         st.markdown(
@@ -124,10 +114,7 @@ def render_comparison():
                             st.rerun()
 
                 # Show prediction difference
-                if (
-                    info1["predicted_rating"] is not None
-                    and info2["predicted_rating"] is not None
-                ):
+                if info1["predicted_rating"] is not None and info2["predicted_rating"] is not None:
                     diff = info1["predicted_rating"] - info2["predicted_rating"]
                     if abs(diff) > 0.01:
                         winner = info1["title"] if diff > 0 else info2["title"]

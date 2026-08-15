@@ -27,25 +27,15 @@ def render_movie_stats_section(movie_id: int, info: dict):
     roi = stats.get("roi")
 
     if budget and revenue:
-        b_str = (
-            f"${budget / 1_000_000:.0f}M"
-            if budget >= 1_000_000
-            else f"${budget / 1_000:.0f}K"
-        )
+        b_str = f"${budget / 1_000_000:.0f}M" if budget >= 1_000_000 else f"${budget / 1_000:.0f}K"
         r_str = (
-            f"${revenue / 1_000_000:.0f}M"
-            if revenue >= 1_000_000
-            else f"${revenue / 1_000:.0f}K"
+            f"${revenue / 1_000_000:.0f}M" if revenue >= 1_000_000 else f"${revenue / 1_000:.0f}K"
         )
         if roi:
             roi_label = (
                 "💰 Blockbuster"
                 if roi >= 5
-                else "📈 Profitable"
-                if roi >= 2
-                else "📉 Modest"
-                if roi >= 1
-                else "💸 Flop"
+                else "📈 Profitable" if roi >= 2 else "📉 Modest" if roi >= 1 else "💸 Flop"
             )
             stat_items.append(
                 (
@@ -56,17 +46,11 @@ def render_movie_stats_section(movie_id: int, info: dict):
                 )
             )
     elif budget:
-        b_str = (
-            f"${budget / 1_000_000:.0f}M"
-            if budget >= 1_000_000
-            else f"${budget / 1_000:.0f}K"
-        )
+        b_str = f"${budget / 1_000_000:.0f}M" if budget >= 1_000_000 else f"${budget / 1_000:.0f}K"
         stat_items.append(("💰 Budget", "Production budget", b_str, "#60a5fa"))
     elif revenue:
         r_str = (
-            f"${revenue / 1_000_000:.0f}M"
-            if revenue >= 1_000_000
-            else f"${revenue / 1_000:.0f}K"
+            f"${revenue / 1_000_000:.0f}M" if revenue >= 1_000_000 else f"${revenue / 1_000:.0f}K"
         )
         stat_items.append(("💵 Revenue", "Box office revenue", r_str, "#34d399"))
 
@@ -93,11 +77,7 @@ def render_movie_stats_section(movie_id: int, info: dict):
         rank_label = (
             "🏆 Top Tier"
             if pop_pct >= 90
-            else "⭐ Popular"
-            if pop_pct >= 70
-            else "📊 Average"
-            if pop_pct >= 40
-            else "🔍 Niche"
+            else "⭐ Popular" if pop_pct >= 70 else "📊 Average" if pop_pct >= 40 else "🔍 Niche"
         )
         stat_items.append(
             (
@@ -111,12 +91,8 @@ def render_movie_stats_section(movie_id: int, info: dict):
     # Vote average
     vote_avg = stats.get("vote_average")
     if vote_avg:
-        tmdb_color = (
-            "#01b4e4" if vote_avg >= 7 else "#fbbf24" if vote_avg >= 5 else "#ef4444"
-        )
-        stat_items.append(
-            ("🌐 TMDB Rating", "Community score", f"{vote_avg:.1f}/10", tmdb_color)
-        )
+        tmdb_color = "#01b4e4" if vote_avg >= 7 else "#fbbf24" if vote_avg >= 5 else "#ef4444"
+        stat_items.append(("🌐 TMDB Rating", "Community score", f"{vote_avg:.1f}/10", tmdb_color))
 
     # Genre count
     gc = stats.get("genre_count")

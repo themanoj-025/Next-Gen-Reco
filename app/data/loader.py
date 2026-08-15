@@ -28,9 +28,7 @@ def _load_user_data():
             st.session_state.watchlist = {int(k): v for k, v in wl.items()}
         if "search_history" in st.session_state and not st.session_state.search_history:
             hist = data.get("search_history", [])
-            st.session_state.search_history = [
-                (q, datetime.fromisoformat(ts)) for q, ts in hist
-            ]
+            st.session_state.search_history = [(q, datetime.fromisoformat(ts)) for q, ts in hist]
     except Exception:
         pass  # Silently ignore corrupt data files
 
@@ -49,9 +47,7 @@ def _save_user_data():
 
         hist = st.session_state.get("search_history", [])
         data = {
-            "ratings": {
-                str(k): v for k, v in st.session_state.get("user_ratings", {}).items()
-            },
+            "ratings": {str(k): v for k, v in st.session_state.get("user_ratings", {}).items()},
             "watchlist": {str(k): v for k, v in wl_clean.items()},
             "search_history": [(q, ts.isoformat()) for q, ts in hist] if hist else [],
         }

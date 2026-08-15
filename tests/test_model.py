@@ -188,9 +188,7 @@ class ModelTester:
 
         # Load ratings stats for real rating_counts
         ratings = load_ratings_sample(n=500_000)
-        self.movie_rating_counts = dict(
-            ratings.groupby("movieId")["rating"].count().items()
-        )
+        self.movie_rating_counts = dict(ratings.groupby("movieId")["rating"].count().items())
 
     def _get_rating_count(self, movie_id: int) -> float:
         return float(self.movie_rating_counts.get(movie_id, 50))
@@ -198,9 +196,7 @@ class ModelTester:
     def cmd_search(self, query: str):
         """Search movies by title keyword."""
         q = query.lower()
-        matches = self.movies[
-            self.movies["title"].str.lower().str.contains(q, na=False)
-        ]
+        matches = self.movies[self.movies["title"].str.lower().str.contains(q, na=False)]
         if len(matches) == 0:
             print(f"  No movies found matching '{query}'")
             return
@@ -370,10 +366,7 @@ class ModelTester:
         print(f"  {'-' * 4}  {'-' * 5}  {'-' * 4}  {'-' * 40}")
         for i, (pred, row) in enumerate(results[:15]):
             year_str = str(int(row["year"])) if pd.notna(row["year"]) else "?"
-            print(
-                f"  {i + 1:>4d}  {_colorize(pred):>5s}  {year_str:>4s}  "
-                f"{row['title'][:55]}"
-            )
+            print(f"  {i + 1:>4d}  {_colorize(pred):>5s}  {year_str:>4s}  " f"{row['title'][:55]}")
 
     def cmd_explain(self, movie_id_str: str):
         """Show feature-by-feature explanation of a prediction."""
@@ -479,7 +472,8 @@ class ModelTester:
 
     def cmd_help(self):
         """Show help."""
-        print("""
+        print(
+            """
   Commands:
     search <query>     Search movies by title keyword
     predict <id>       Predict rating for a movie ID
@@ -496,7 +490,8 @@ class ModelTester:
     compare 1 2
     genre comedy
     explain 1
-""")
+"""
+        )
 
     def run_interactive(self):
         """Run the interactive REPL."""
@@ -576,17 +571,13 @@ def quick_demo(result: dict[str, Any]):
     # Model summary
     print(f"\n  Best Model: {best_name}")
     print(f"  Features:  {metrics['feature_count']:,}")
-    print(
-        f"  Samples:   {metrics['train_samples']:,} train / "
-        f"{metrics['test_samples']:,} test"
-    )
+    print(f"  Samples:   {metrics['train_samples']:,} train / " f"{metrics['test_samples']:,} test")
 
     for model_name in ["RandomForest", "XGBoost"]:
         if model_name in metrics:
             m = metrics[model_name]
             print(
-                f"  {model_name}:  R^2={m['R2']:.4f}  "
-                f"RMSE={m['RMSE']:.4f}  MAE={m['MAE']:.4f}"
+                f"  {model_name}:  R^2={m['R2']:.4f}  " f"RMSE={m['RMSE']:.4f}  MAE={m['MAE']:.4f}"
             )
 
     # Top features

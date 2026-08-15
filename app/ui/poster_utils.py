@@ -54,9 +54,7 @@ def _poster_initials(title: str) -> str:
     return initials[:3] if initials else "🎬"
 
 
-def _poster_html(
-    movie_id: int, title: str, year: int | None = None, size: str = "100%"
-) -> str:
+def _poster_html(movie_id: int, title: str, year: int | None = None, size: str = "100%") -> str:
     """Generate a styled poster placeholder HTML (gradient fallback)."""
     gradient = _poster_gradient(movie_id)
     initials = _poster_initials(title)
@@ -98,9 +96,7 @@ def _tmdb_poster_cached(title: str, year: int | None = None) -> str | None:
         return None
 
 
-def _search_tmdb_poster(
-    movie_id: int, title: str, year: int | None = None
-) -> str | None:
+def _search_tmdb_poster(movie_id: int, title: str, year: int | None = None) -> str | None:
     """Search TMDB for a movie poster URL. Uses @st.cache_data for persistence."""
     cache = st.session_state.tmdb_poster_cache
     if movie_id in cache:
