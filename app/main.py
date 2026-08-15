@@ -8,9 +8,12 @@ For the Streamlit app, run:
     streamlit run app.py
 """
 
+import logging
 import warnings
 
 warnings.filterwarnings("ignore")
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 
 from app.model import main as train_model_cli
 
