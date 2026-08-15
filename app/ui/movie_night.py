@@ -157,9 +157,7 @@ def render_movie_night():
                 if director and director.lower() not in ("unknown", "nan", "")
                 else ""
             )
-            actors_html = (
-                f"<span>🎭 {actors[0] if actors else ''}</span>" if actors else ""
-            )
+            actors_html = f"<span>🎭 {actors[0] if actors else ''}</span>" if actors else ""
 
             with st.container():
                 st.markdown(

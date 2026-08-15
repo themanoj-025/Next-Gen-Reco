@@ -98,14 +98,10 @@ def load_tags(path: str | None = None, top_k: int = 100) -> pd.DataFrame:
         except Exception:
             pass
 
-    tags = pd.read_csv(
-        path, dtype={"userId": "int32", "movieId": "int32", "tag": "object"}
-    )
+    tags = pd.read_csv(path, dtype={"userId": "int32", "movieId": "int32", "tag": "object"})
 
     # Find the top K most common tags overall
-    top_tags = (
-        tags["tag"].str.lower().str.strip().value_counts().head(top_k).index.tolist()
-    )
+    top_tags = tags["tag"].str.lower().str.strip().value_counts().head(top_k).index.tolist()
 
     # Filter to only those tags
     tags = tags[tags["tag"].str.lower().str.strip().isin(top_tags)].copy()
@@ -119,9 +115,7 @@ def load_tags(path: str | None = None, top_k: int = 100) -> pd.DataFrame:
     # Rename columns to avoid collisions
     tag_pivot.columns = [f"tag_{col.replace(' ', '_')}" for col in tag_pivot.columns]
     tag_pivot = tag_pivot.reset_index()
-    tag_pivot = tag_pivot.astype(
-        {c: "int8" for c in tag_pivot.columns if c != "movieId"}
-    )
+    tag_pivot = tag_pivot.astype({c: "int8" for c in tag_pivot.columns if c != "movieId"})
 
     # Save to cache
     try:
@@ -354,9 +348,7 @@ def train_model(
             }
             from sklearn.model_selection import GridSearchCV
 
-            xgb_base = xgb.XGBRegressor(
-                random_state=random_state, n_jobs=-1, verbosity=0
-            )
+            xgb_base = xgb.XGBRegressor(random_state=random_state, n_jobs=-1, verbosity=0)
             xgb_grid = GridSearchCV(
                 xgb_base,
                 xgb_param_grid,
@@ -452,9 +444,7 @@ def train_model(
 DEFAULT_MODEL_DIR = str(MODELS_DIR)
 
 
-def save_model(
-    result: dict, name: str = "best", dir_path: str = DEFAULT_MODEL_DIR
-) -> str:
+def save_model(result: dict, name: str = "best", dir_path: str = DEFAULT_MODEL_DIR) -> str:
     """
     Save a trained model result dict to disk using joblib.
 
@@ -526,9 +516,7 @@ def load_model(name: str = "best", dir_path: str = DEFAULT_MODEL_DIR) -> dict:
     result = {**core, **meta}
     if "best_model_name" not in result:
         result["best_model_name"] = "RandomForest"
-        print(
-            "  (defaulted best_model_name to RandomForest since meta was unavailable)"
-        )
+        print("  (defaulted best_model_name to RandomForest since meta was unavailable)")
 
     print(f"  Loaded model '{name}' from {model_path}")
     return result
@@ -645,9 +633,7 @@ def main():
     # Example prediction
     movies_example = load_movies()
     if "Toy Story (1995)" in movies_example["title"].values:
-        toy_story = movies_example[movies_example["title"] == "Toy Story (1995)"].iloc[
-            0
-        ]
+        toy_story = movies_example[movies_example["title"] == "Toy Story (1995)"].iloc[0]
         tag_pivot = load_tags(top_k=100)
         pred = predict_rating(
             toy_story,

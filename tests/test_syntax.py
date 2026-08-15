@@ -11,9 +11,11 @@ def nb_cell(source):
 
 cells1 = []
 cells1.append(
-    md_cell("""# MovieLens Dataset Analysis
+    md_cell(
+        """# MovieLens Dataset Analysis
 
----""")
+---"""
+    )
 )
 cells1.append(nb_cell("""import pandas as pd"""))
 print(f"OK: {len(cells1)} cells")

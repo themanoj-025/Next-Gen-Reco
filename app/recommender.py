@@ -114,9 +114,7 @@ class MovieRecommender:
         except FileNotFoundError:
             print(f"{_LOG_PREFIX} Model not found. Predictions will be basic.")
         except Exception as e:
-            print(
-                f"{_LOG_PREFIX} Model failed to load ({e}). Predictions will be basic."
-            )
+            print(f"{_LOG_PREFIX} Model failed to load ({e}). Predictions will be basic.")
 
         # Note: keeping tag_pivot for runtime predictions;
 
@@ -324,9 +322,7 @@ class MovieRecommender:
         mask = pd.Series([True] * len(self.movies), index=self.movies.index)
 
         if genre_filter:
-            mask &= self.movies["genres"].str.contains(
-                genre_filter, na=False, regex=False
-            )
+            mask &= self.movies["genres"].str.contains(genre_filter, na=False, regex=False)
 
         if year_min or year_max:
             yr = self.movies["year"]
@@ -343,22 +339,16 @@ class MovieRecommender:
         # Exact match
         exact_mask = self.movies["title"].str.lower() == q_lower
         if exact_mask.any():
-            return [
-                (100.0, row["movieId"]) for _, row in self.movies[exact_mask].iterrows()
-            ]
+            return [(100.0, row["movieId"]) for _, row in self.movies[exact_mask].iterrows()]
 
         # Starts with
         start_mask = self.movies["title"].str.lower().str.startswith(q_lower)
         if start_mask.any():
-            return [
-                (80.0, row["movieId"]) for _, row in self.movies[start_mask].iterrows()
-            ]
+            return [(80.0, row["movieId"]) for _, row in self.movies[start_mask].iterrows()]
 
         # Contains
         contains_mask = (
-            self.movies["title"]
-            .str.lower()
-            .str.contains(q_lower, na=False, regex=False)
+            self.movies["title"].str.lower().str.contains(q_lower, na=False, regex=False)
         )
         if contains_mask.any():
             candidates = self.movies[contains_mask]
@@ -414,9 +404,7 @@ class MovieRecommender:
             fast_results = self._exact_search(q_lower)
             if fast_results:
                 # Sort by score desc, then year
-                fast_results.sort(
-                    key=lambda x: (-x[0], -self.movies_by_id[x[1]].get("year", 0))
-                )
+                fast_results.sort(key=lambda x: (-x[0], -self.movies_by_id[x[1]].get("year", 0)))
                 results = []
                 for s, mid in fast_results[:limit]:
                     info = self.get_movie_info(mid)
@@ -436,9 +424,7 @@ class MovieRecommender:
         # Quick bail-out: check if ANY movie contains the query at all
         q_first_word = q_tokens[0] if q_tokens else q_lower
         any_match_mask = (
-            filtered["title"]
-            .str.lower()
-            .str.contains(q_first_word, na=False, regex=False)
+            filtered["title"].str.lower().str.contains(q_first_word, na=False, regex=False)
         )
         if not any_match_mask.any():
             # No movie contains even the first query word — return empty fast
@@ -475,9 +461,7 @@ class MovieRecommender:
             elif q_tokens:
                 title_tokens = self._tokenize(title)
                 matched = sum(
-                    1
-                    for t in q_tokens
-                    if any(t == tt or tt.startswith(t) for tt in title_tokens)
+                    1 for t in q_tokens if any(t == tt or tt.startswith(t) for tt in title_tokens)
                 )
                 if matched == len(q_tokens):
                     title_token_set = set(title_tokens)
@@ -526,8 +510,7 @@ class MovieRecommender:
             info = self.get_movie_info(mid)
             if info:
                 if rating_min is not None and (
-                    info["predicted_rating"] is None
-                    or info["predicted_rating"] < rating_min
+                    info["predicted_rating"] is None or info["predicted_rating"] < rating_min
                 ):
                     continue
                 info["_search_score"] = s
@@ -567,10 +550,7 @@ class MovieRecommender:
             common = sum(
                 1
                 for t in q_tokens
-                if any(
-                    t == tt or tt.startswith(t) or t.startswith(tt)
-                    for tt in title_tokens
-                )
+                if any(t == tt or tt.startswith(t) or t.startswith(tt) for tt in title_tokens)
             )
             if common > 0 and common < len(q_tokens):
                 score = common / len(q_tokens) * 50.0
@@ -784,9 +764,7 @@ class MovieRecommender:
 
         # Predict for most popular movies
         if "rating_count" in decade_movies.columns:
-            candidates = decade_movies.nlargest(
-                min(500, len(decade_movies)), "rating_count"
-            )
+            candidates = decade_movies.nlargest(min(500, len(decade_movies)), "rating_count")
         else:
             candidates = decade_movies.head(500)
 
@@ -869,9 +847,7 @@ class MovieRecommender:
                     continue
                 if actor:
                     actor_lower = actor.lower()
-                    if not any(
-                        actor_lower == a.lower() for a in enrich.get("actors", [])
-                    ):
+                    if not any(actor_lower == a.lower() for a in enrich.get("actors", [])):
                         continue
                 enrichment_filtered.append(mid)
             filtered = filtered[filtered["movieId"].isin(enrichment_filtered)]
@@ -1072,8 +1048,7 @@ class MovieRecommender:
             ]
             if all_popularities:
                 pct = (
-                    sum(1 for p in all_popularities if p < popularity)
-                    / len(all_popularities)
+                    sum(1 for p in all_popularities if p < popularity) / len(all_popularities)
                 ) * 100
                 stats["popularity_percentile"] = round(pct, 1)
 
@@ -1278,9 +1253,7 @@ class MovieRecommender:
             feats_copy = feats_raw.copy()
             feats_copy.at[0, feat_name] = 0.0
             if feat_name in genre_list:
-                feats_copy.at[0, "genre_count"] = max(
-                    0, feats_raw.at[0, "genre_count"] - 1
-                )
+                feats_copy.at[0, "genre_count"] = max(0, feats_raw.at[0, "genre_count"] - 1)
             if present_num:
                 feats_copy[present_num] = scaler.transform(feats_copy[present_num])
             pred_without = float(model.predict(feats_copy)[0])
@@ -1300,9 +1273,7 @@ class MovieRecommender:
             bar_len = min(int(abs(effect) / 0.5 * 30), 30)
             bar_str = "#" * bar_len + "." * (30 - bar_len)
             direction = "+" if effect > 0 else "-"
-            lines.append(
-                f"    {direction} {display_name:<30s} {bar_str}  {effect:+.4f}"
-            )
+            lines.append(f"    {direction} {display_name:<30s} {bar_str}  {effect:+.4f}")
 
         lines.append("")
         lines.append(f"    (Baseline prediction: {full_pred:.4f})")

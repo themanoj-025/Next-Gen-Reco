@@ -106,9 +106,7 @@ def render_header():
                     unsafe_allow_html=True,
                 )
             else:
-                if st.button(
-                    f"{icon} {tab_key}", key=f"nav_{tab_key}", use_container_width=True
-                ):
+                if st.button(f"{icon} {tab_key}", key=f"nav_{tab_key}", use_container_width=True):
                     if tab_key == "Search":
                         st.session_state.active_tab = "Search"
                     else:
@@ -151,13 +149,9 @@ def main():
             "Movie Night": "🎬 Movie Night",
         }
         for tab_key, tab_label in nav_map.items():
-            is_active = active_page == tab_key or (
-                active_page == "search" and tab_key == "Search"
-            )
+            is_active = active_page == tab_key or (active_page == "search" and tab_key == "Search")
             bt = "primary" if is_active else "secondary"
-            if st.button(
-                tab_label, key=f"side_{tab_key}", use_container_width=True, type=bt
-            ):
+            if st.button(tab_label, key=f"side_{tab_key}", use_container_width=True, type=bt):
                 if tab_key == "Search":
                     st.session_state.active_tab = "Search"
                 else:
