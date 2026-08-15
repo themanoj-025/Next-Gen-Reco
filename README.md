@@ -193,3 +193,11 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) for deta
 <p align="center">
   If you find this project useful, please give it a ⭐ star!
 </p>
+---
+
+## ⭐ Star History
+
+[![Last Commit](https://img.shields.io/github/last-commit/themanoj-025/Next-Gen-Reco?style=flat-square)](https://github.com/themanoj-025/Next-Gen-Reco)
+[![Contributors](https://img.shields.io/github/contributors/themanoj-025/Next-Gen-Reco?style=flat-square)](https://github.com/themanoj-025/Next-Gen-Reco/graphs/contributors)
+
+[![Star History Chart](https://api.star-history.com/svg?repos=themanoj-025/Next-Gen-Reco&type=Date)](https://star-history.com/#Next-Gen-Reco&Date)
