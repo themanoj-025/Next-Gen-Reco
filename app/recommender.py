@@ -13,6 +13,7 @@ Usage:
     recommendations = rec.recommend(movie_id=1, n=10)
 """
 
+import logging
 import re
 import warnings
 from functools import lru_cache
@@ -29,6 +30,7 @@ from app.enrichment import NDEnrichment
 from app.model import load_model, load_movies, load_tags, predict_rating
 
 _LOG_PREFIX = "[Recommender]"
+logger = logging.getLogger(__name__)
 
 # ── Cache helpers ─────────────────────────────────────────────────────────────
 
@@ -86,11 +88,13 @@ class MovieRecommender:
                     columns=self.genre_cols,
                     index=self.movies.index,
                 ).astype(int)
-                print(
-                    f"{_LOG_PREFIX} Loaded genre vectors from cache ({len(self.genre_cols)} cols)"
+                logger.info(
+                    "%s Loaded genre vectors from cache (%d cols)",
+                    _LOG_PREFIX,
+                    len(self.genre_cols),
                 )
             except Exception as e:
-                print(f"{_LOG_PREFIX} Genre cache load failed ({e}), rebuilding")
+                logger.warning("%s Genre cache load failed (%s), rebuilding", _LOG_PREFIX, e)
                 self._build_genre_vectors()
         else:
             self._build_genre_vectors()
@@ -112,9 +116,9 @@ class MovieRecommender:
         try:
             self.model_result = load_model(name=model_name, dir_path=model_dir)
         except FileNotFoundError:
-            print(f"{_LOG_PREFIX} Model not found. Predictions will be basic.")
+            logger.warning("%s Model not found. Predictions will be basic.", _LOG_PREFIX)
         except Exception as e:
-            print(f"{_LOG_PREFIX} Model failed to load ({e}). Predictions will be basic.")
+            logger.error("%s Model failed to load (%s). Predictions will be basic.", _LOG_PREFIX, e)
 
         # Note: keeping tag_pivot for runtime predictions;
 
@@ -127,15 +131,19 @@ class MovieRecommender:
                 n_rev = len(self.enrichment._reviews_map)
                 n_dir = len(self.enrichment._director_to_movies)
                 n_act = len(self.enrichment._actor_to_movies)
-                print(
-                    f"{_LOG_PREFIX} ND enrichment loaded: {n_meta} metadata, {n_cast} cast, {n_rev} review sets"
+                logger.info(
+                    "%s ND enrichment loaded: %d metadata, %d cast, %d review sets",
+                    _LOG_PREFIX,
+                    n_meta,
+                    n_cast,
+                    n_rev,
                 )
-                print(f"{_LOG_PREFIX}   {n_dir} directors, {n_act} actors indexed")
+                logger.info("%s   %d directors, %d actors indexed", _LOG_PREFIX, n_dir, n_act)
             else:
-                print(f"{_LOG_PREFIX} ND enrichment loaded but no data matched")
+                logger.warning("%s ND enrichment loaded but no data matched", _LOG_PREFIX)
                 self.enrichment = None
         except Exception as e:
-            print(f"{_LOG_PREFIX} ND enrichment failed to load: {e}")
+            logger.error("%s ND enrichment failed to load: %s", _LOG_PREFIX, e)
             self.enrichment = None
 
         # Build movie lookup by ID
@@ -168,9 +176,9 @@ class MovieRecommender:
                 norms=self._genre_norms,
                 cols=np.array(self.genre_cols, dtype=object),
             )
-            print(f"{_LOG_PREFIX} Saved genre vectors to cache")
+            logger.info("%s Saved genre vectors to cache", _LOG_PREFIX)
         except Exception as e:
-            print(f"{_LOG_PREFIX} Warning: could not save genre cache ({e})")
+            logger.warning("%s Warning: could not save genre cache (%s)", _LOG_PREFIX, e)
 
     def _build_tag_lookup(self):
         """Build a fast tag lookup: movieId -> set of tag column indices."""
