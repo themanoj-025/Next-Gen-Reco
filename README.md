@@ -25,6 +25,26 @@
 
 ---
 
+## 📋 Table of Contents
+
+- [🚀 Live Demo](#-live-demo)
+- [✨ Features](#-features)
+- [🧠 How It Works](#-how-it-works)
+- [🏗️ Architecture](#️-architecture)
+- [🚀 Quick Start](#-quick-start)
+- [📁 Project Structure](#-project-structure)
+- [📊 Dataset](#-dataset)
+- [🗺️ Roadmap](#️-roadmap)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
+- [🙏 Acknowledgements](#-acknowledgements)
+
+---
+
+> 📸 **Screenshot placeholder:** Add a screenshot of the recommendations page showing similar movies.
+
+---
+
 ## 🚀 Live Demo
 
 **Try it now:** [nextgenreco.streamlit.app](https://nextgenreco.streamlit.app)
