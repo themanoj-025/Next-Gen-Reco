@@ -12,6 +12,7 @@ All data is cross-referenced to the main MovieLens dataset by matching
 normalized movie titles.
 """
 
+import logging
 import pickle
 import re
 import warnings
@@ -24,6 +25,7 @@ warnings.filterwarnings("ignore")
 from app._paths import CACHE_DIR, ND_DIR
 
 _LOG_PREFIX = "[ND-Enrich]"
+logger = logging.getLogger(__name__)
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 
@@ -105,7 +107,7 @@ class NDEnrichment:
         if movies_df is not None:
             # Try loading from cache first
             if self._try_load_cache(movies_df):
-                print(f"{_LOG_PREFIX} Loaded enrichment from cache")
+                logger.info("Loaded enrichment from cache")
             else:
                 self.index_data(movies_df)
 
@@ -118,46 +120,46 @@ class NDEnrichment:
     def _load_tmdb_data(self) -> pd.DataFrame:
         """Load ND/movies.csv (TMDB data). Returns DataFrame with normalized titles."""
         if not TMDB_CSV.exists():
-            print(f"{_LOG_PREFIX} TMDB CSV not found at {TMDB_CSV}")
+            logger.warning("TMDB CSV not found at %s", TMDB_CSV)
             return pd.DataFrame()
 
         try:
             df = pd.read_csv(TMDB_CSV, low_memory=False)
             if "title" not in df.columns:
-                print(f"{_LOG_PREFIX} TMDB CSV missing 'title' column. Columns: {list(df.columns)}")
+                logger.warning("TMDB CSV missing 'title' column. Columns: %s", list(df.columns))
                 return pd.DataFrame()
 
             # Normalize titles for matching
             df["_norm_title"] = df["title"].apply(_tmdb_title)
-            print(f"{_LOG_PREFIX} Loaded {len(df)} TMDB movies")
+            logger.info("Loaded %d TMDB movies", len(df))
             return df
         except Exception as e:
-            print(f"{_LOG_PREFIX} Failed to load TMDB CSV: {e}")
+            logger.error("Failed to load TMDB CSV: %s", e)
             return pd.DataFrame()
 
     def _load_main_data(self) -> pd.DataFrame:
         """Load ND/main_data.csv (directors and actors)."""
         if not MAIN_DATA_CSV.exists():
-            print(f"{_LOG_PREFIX} Main data CSV not found at {MAIN_DATA_CSV}")
+            logger.warning("Main data CSV not found at %s", MAIN_DATA_CSV)
             return pd.DataFrame()
 
         try:
             df = pd.read_csv(MAIN_DATA_CSV, low_memory=False)
             if "movie_title" not in df.columns:
-                print(f"{_LOG_PREFIX} Main data CSV missing 'movie_title' column")
+                logger.warning("Main data CSV missing 'movie_title' column")
                 return pd.DataFrame()
 
             df["_norm_title"] = df["movie_title"].apply(_normalize)
-            print(f"{_LOG_PREFIX} Loaded {len(df)} rows of director/actor data")
+            logger.info("Loaded %d rows of director/actor data", len(df))
             return df
         except Exception as e:
-            print(f"{_LOG_PREFIX} Failed to load main data CSV: {e}")
+            logger.error("Failed to load main data CSV: %s", e)
             return pd.DataFrame()
 
     def _load_reviews(self) -> pd.DataFrame:
         """Load ND/reviews.txt (user text reviews)."""
         if not REVIEWS_TXT.exists():
-            print(f"{_LOG_PREFIX} Reviews file not found at {REVIEWS_TXT}")
+            logger.warning("Reviews file not found at %s", REVIEWS_TXT)
             return pd.DataFrame()
 
         try:
@@ -176,10 +178,10 @@ class NDEnrichment:
                             }
                         )
             df = pd.DataFrame(rows)
-            print(f"{_LOG_PREFIX} Loaded {len(df)} user reviews")
+            logger.info("Loaded %d user reviews", len(df))
             return df
         except Exception as e:
-            print(f"{_LOG_PREFIX} Failed to load reviews: {e}")
+            logger.error("Failed to load reviews: %s", e)
             return pd.DataFrame()
 
     # ── Cross-referencing ─────────────────────────────────────────────────
@@ -197,7 +199,7 @@ class NDEnrichment:
         cache_mtime = _ENRICHMENT_CACHE.stat().st_mtime
         for sp in source_paths:
             if sp.exists() and sp.stat().st_mtime > cache_mtime:
-                print(f"{_LOG_PREFIX} Source file {sp.name} changed, invalidating cache")
+                logger.info("Source file %s changed, invalidating cache", sp.name)
                 return False
 
         # Load full data from cache
@@ -212,7 +214,7 @@ class NDEnrichment:
             self._loaded = True
             return True
         except Exception as e:
-            print(f"{_LOG_PREFIX} Cache load failed: {e}")
+            logger.error("Cache load failed: %s", e)
             return False
 
     def _save_cache(self):
@@ -228,9 +230,9 @@ class NDEnrichment:
             }
             with open(_ENRICHMENT_CACHE, "wb") as f:
                 pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
-            print(f"{_LOG_PREFIX} Saved enrichment cache ({_ENRICHMENT_CACHE})")
+            logger.info("Saved enrichment cache (%s)", _ENRICHMENT_CACHE)
         except Exception as e:
-            print(f"{_LOG_PREFIX} Warning: could not save enrichment cache ({e})")
+            logger.warning("Could not save enrichment cache (%s)", e)
 
     def index_data(self, movies_df: pd.DataFrame):
         """Cross-reference ND data with the main MovieLens movies DataFrame.
@@ -240,7 +242,7 @@ class NDEnrichment:
         Results are cached to disk for fast subsequent loads.
         """
         if movies_df is None or len(movies_df) == 0:
-            print(f"{_LOG_PREFIX} No movies DataFrame provided, skipping indexing")
+            logger.warning("No movies DataFrame provided, skipping indexing")
             return
 
         # Build normalized title lookup using pandas groupby (much faster)
@@ -294,7 +296,7 @@ class NDEnrichment:
                             self._metadata_map[mid] = metadata
                     tmdb_matched += len(matched_ids)
 
-        print(f"{_LOG_PREFIX} TMDB: {tmdb_matched} movies matched out of {len(tmdb_df)}")
+        logger.info("TMDB: %d movies matched out of %d", tmdb_matched, len(tmdb_df))
 
         # ── 2. Index director / actor data ────────────────────────────────
         cast_df = self._load_main_data()
@@ -339,16 +341,16 @@ class NDEnrichment:
             self._director_to_movies = {k: sorted(v) for k, v in self._director_to_movies.items()}
             self._actor_to_movies = {k: sorted(v) for k, v in self._actor_to_movies.items()}
 
-        print(f"{_LOG_PREFIX} Cast: {cast_matched} movies matched out of {len(cast_df)}")
-        print(f"{_LOG_PREFIX}   {len(self._director_to_movies)} unique directors indexed")
-        print(f"{_LOG_PREFIX}   {len(self._actor_to_movies)} unique actors indexed")
+        logger.info("Cast: %d movies matched out of %d", cast_matched, len(cast_df))
+        logger.info("  %d unique directors indexed", len(self._director_to_movies))
+        logger.info("  %d unique actors indexed", len(self._actor_to_movies))
 
         # ── 3. Index reviews ─────────────────────────────────────────────
         reviews_df = self._load_reviews()
         reviews_matched = 0
         if len(reviews_df) > 0:
             review_groups = reviews_df.groupby("review_movie_id")
-            print(f"{_LOG_PREFIX}   {len(review_groups)} unique movies in reviews")
+            logger.info("  %d unique movies in reviews", len(review_groups))
 
             # Heuristic keyword matching for popular movies
             known_movie_keywords = {
@@ -387,9 +389,9 @@ class NDEnrichment:
                             self._reviews_map[mid] = self._reviews_map[mid][:20]
                     reviews_matched += 1
 
-            print(f"{_LOG_PREFIX} Reviews: {reviews_matched} movies matched with reviews")
+            logger.info("Reviews: %d movies matched with reviews", reviews_matched)
         else:
-            print(f"{_LOG_PREFIX} No reviews to index")
+            logger.info("No reviews to index")
 
         self._loaded = True
 
@@ -545,6 +547,7 @@ class NDEnrichment:
 # ── Quick test ────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
     print(f"{_LOG_PREFIX} Testing ND enrichment...")
 
     # Quick test with minimal movies DataFrame
