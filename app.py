@@ -13,9 +13,20 @@ _project_root = os.path.dirname(os.path.abspath(__file__))
 if _project_root not in sys.path:
     sys.path.insert(0, _project_root)
 
+import logging
 import warnings
 
 warnings.filterwarnings("ignore")
+
+# Surface the enrichment module's logs in the Streamlit terminal without
+# altering Streamlit's own logging configuration.
+_enrichment_logger = logging.getLogger("app.enrichment")
+_enrichment_logger.setLevel(logging.INFO)
+if not _enrichment_logger.handlers:
+    _enrichment_handler = logging.StreamHandler()
+    _enrichment_handler.setFormatter(logging.Formatter("%(levelname)s %(name)s: %(message)s"))
+    _enrichment_logger.addHandler(_enrichment_handler)
+_enrichment_logger.propagate = False
 
 from datetime import datetime
 
