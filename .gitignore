@@ -46,9 +46,12 @@ CLAUDE.md
 
 # === ML model artifacts (general patterns) ===
 *.pkl
-*.joblib
 *.h5
 *.pt
 *.ckpt
 *.parquet
 mlruns/
+
+# Production models in models/v1_test/ are tracked in git for deployment
+# (used by the Docker image build via COPY models/). Only ignore scratch.
+!models/v1_test/*.joblib

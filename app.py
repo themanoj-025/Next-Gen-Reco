@@ -24,9 +24,7 @@ _enrichment_logger = logging.getLogger("app.enrichment")
 _enrichment_logger.setLevel(logging.INFO)
 if not _enrichment_logger.handlers:
     _enrichment_handler = logging.StreamHandler()
-    _enrichment_handler.setFormatter(
-        logging.Formatter("%(levelname)s %(name)s: %(message)s")
-    )
+    _enrichment_handler.setFormatter(logging.Formatter("%(levelname)s %(name)s: %(message)s"))
     _enrichment_logger.addHandler(_enrichment_handler)
 _enrichment_logger.propagate = False
 
