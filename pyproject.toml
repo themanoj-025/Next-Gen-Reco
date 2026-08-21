@@ -12,3 +12,11 @@ testpaths = ["tests"]
 markers = [
     "slow: long-running tests that iterate over thousands of movies (deselect with '-m \"not slow\"')",
 ]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_return_any = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
