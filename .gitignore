@@ -22,6 +22,14 @@ split_app.py
 # Ignore local user data (generated at runtime)
 .movie_user_data.json
 
+# Node.js
+node_modules/
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
 # ═══ Model files ════════════════════════════════════════════════════════
 # Only ignore specific generated/junk model files, NOT production models
 # Production models in models/v1_test/ are tracked in git for deployment
