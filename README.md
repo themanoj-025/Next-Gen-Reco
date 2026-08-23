@@ -173,6 +173,88 @@ Uses the [MovieLens 32M Dataset](https://grouplens.org/datasets/movielens/32m/) 
 
 ---
 
+## 🔌 REST API
+
+The FastAPI server (`app/api_server.py`) exposes search, recommendation, and stats endpoints:
+
+### Endpoints
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/health` | Health check | No |
+| GET | `/api/v1/movies/search?q=...&limit=20` | Search movies by title | Optional |
+| GET | `/api/v1/movies/{id}` | Get movie details by ID | Optional |
+| GET | `/api/v1/recommendations/{id}?n=10` | Get similar movie recommendations | Optional |
+| GET | `/api/v1/stats` | Dataset statistics (movie count, year range) | Optional |
+
+### Authentication
+
+Set `NEXT_GEN_RECO_API_KEY` env var to enable Bearer token auth:
+
+```bash
+# Enable auth
+export NEXT_GEN_RECO_API_KEY=your-secret-key-here
+
+# Request with auth
+curl -H "Authorization: Bearer your-secret-key-here" http://localhost:8000/api/v1/stats
+```
+
+### Rate Limiting
+
+All endpoints are rate-limited to **60 requests per minute** per IP (via slowapi).
+
+### Running the API Server
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Start the API server
+uvicorn app.api_server:app --host 0.0.0.0 --port 8000
+```
+
+---
+
+## 🔧 Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NEXT_GEN_RECO_API_KEY` | (empty) | API key for Bearer token auth |
+| `TMDB_API_KEY` | (empty) | TMDB API key for movie posters (optional) |
+
+---
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+python -m pytest tests/ -v
+
+# Run specific test file
+python -m pytest tests/test_recommender.py -v
+```
+
+**Test coverage:** 313+ tests across 20 test files covering recommendation engine, data loading, UI components, and API endpoints.
+
+---
+
+## 🚀 Deployment
+
+### Streamlit Cloud
+
+1. Push to GitHub
+2. Connect to [Streamlit Cloud](https://share.streamlit.io/)
+3. Set `requirements.txt` as dependency
+4. Deploy!
+
+### Docker
+
+```bash
+docker-compose up -d
+```
+
+---
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md).
