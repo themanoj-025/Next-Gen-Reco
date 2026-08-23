@@ -133,7 +133,7 @@ class NDEnrichment:
             df["_norm_title"] = df["title"].apply(_tmdb_title)
             logger.info("Loaded %d TMDB movies", len(df))
             return df
-        except Exception as e:
+        except (OSError, ValueError, KeyError) as e:
             logger.error("Failed to load TMDB CSV: %s", e)
             return pd.DataFrame()
 
@@ -152,7 +152,7 @@ class NDEnrichment:
             df["_norm_title"] = df["movie_title"].apply(_normalize)
             logger.info("Loaded %d rows of director/actor data", len(df))
             return df
-        except Exception as e:
+        except (OSError, ValueError, KeyError) as e:
             logger.error("Failed to load main data CSV: %s", e)
             return pd.DataFrame()
 
@@ -180,7 +180,7 @@ class NDEnrichment:
             df = pd.DataFrame(rows)
             logger.info("Loaded %d user reviews", len(df))
             return df
-        except Exception as e:
+        except (OSError, ValueError, KeyError) as e:
             logger.error("Failed to load reviews: %s", e)
             return pd.DataFrame()
 
@@ -213,7 +213,7 @@ class NDEnrichment:
             self._actor_to_movies = data["_actor_to_movies"]
             self._loaded = True
             return True
-        except Exception as e:
+        except (OSError, ValueError, pickle.UnpicklingError) as e:
             logger.error("Cache load failed: %s", e)
             return False
 
@@ -231,7 +231,7 @@ class NDEnrichment:
             with open(_ENRICHMENT_CACHE, "wb") as f:
                 pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
             logger.info("Saved enrichment cache (%s)", _ENRICHMENT_CACHE)
-        except Exception as e:
+        except (OSError, pickle.PicklingError) as e:
             logger.warning("Could not save enrichment cache (%s)", e)
 
     def index_data(self, movies_df: pd.DataFrame):

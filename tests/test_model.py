@@ -223,7 +223,7 @@ class ModelTester:
                         rating_count=rc,
                     )
                     pred_str = f"{pred:.2f}"
-                except Exception:
+                except (ValueError, KeyError, TypeError):
                     pred_str = "  ?  "
             year_str = str(int(row["year"])) if pd.notna(row["year"]) else "?"
             print(
@@ -357,7 +357,7 @@ class ModelTester:
                     rating_count=rc,
                 )
                 results.append((pred, row))
-            except Exception:
+            except (ValueError, KeyError, TypeError):
                 pass
 
         results.sort(key=lambda x: x[0], reverse=True)
@@ -432,7 +432,7 @@ class ModelTester:
                     rating_count=rc,
                 )
                 pred_str = _colorize(pred)
-            except Exception:
+            except (ValueError, KeyError, TypeError):
                 pred_str = "  ?  "
             year_str = str(int(row["year"])) if pd.notna(row["year"]) else "?"
             print(

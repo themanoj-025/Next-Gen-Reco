@@ -29,7 +29,7 @@ def _load_user_data():
         if "search_history" in st.session_state and not st.session_state.search_history:
             hist = data.get("search_history", [])
             st.session_state.search_history = [(q, datetime.fromisoformat(ts)) for q, ts in hist]
-    except Exception:
+    except (json.JSONDecodeError, ValueError, KeyError, TypeError):
         pass  # Silently ignore corrupt data files
 
 
@@ -53,5 +53,5 @@ def _save_user_data():
         }
         with open(USER_DATA_FILE, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
-    except Exception:
+    except (OSError, TypeError, ValueError):
         pass
