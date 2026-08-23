@@ -7,6 +7,7 @@ title length), rating_count, and release year.
 """
 
 import os
+import pickle
 import re
 import time
 import warnings

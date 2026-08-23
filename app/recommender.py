@@ -16,7 +16,6 @@ Usage:
 import logging
 import re
 import warnings
-from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -49,6 +48,17 @@ def _check_cache_valid(cache_path: Path, *source_paths: str | Path) -> bool:
         if p.exists() and p.stat().st_mtime > cache_mtime:
             return False
     return True
+
+
+# ── Module-level prediction cache ────────────────────────────────────────────
+# Avoids B019 (lru_cache on instance method holds self reference).
+# Uses a plain dict instead of lru_cache so unhashable data (dict/DataFrame)
+# doesn't need to be passed as arguments.
+
+_predict_model_result: dict | None = None
+_predict_movies_by_id: dict[int, pd.Series] = {}
+_predict_tag_pivot: pd.DataFrame | None = None
+_prediction_cache: dict[int, float | None] = {}
 
 
 # ── Recommender Class ─────────────────────────────────────────────────────────
@@ -155,6 +165,13 @@ class MovieRecommender:
         years = self.movies["year"]
         self.year_mean = years.mean()
         self.year_std = max(years.std(), 1.0)
+
+        # Set module-level prediction cache data (avoids B019 memory leak)
+        global _predict_model_result, _predict_movies_by_id, _predict_tag_pivot
+        _predict_model_result = self.model_result
+        _predict_movies_by_id = self.movies_by_id
+        _predict_tag_pivot = self.tag_pivot
+        _prediction_cache.clear()
 
     def _build_genre_vectors(self):
         """Build and cache genre one-hot matrix."""
@@ -274,29 +291,32 @@ class MovieRecommender:
         except (ValueError, KeyError, TypeError):
             return None
 
-    @lru_cache(maxsize=2048)
-    def _predict_cached(self, movie_id_key: int) -> float | None:
-        """Cached prediction by movie ID. The key is movieId.
-
-        We pass movieId as the argument (not the full row) so
-        lru_cache can hash it. The actual row is looked up internally.
-        """
-        if self.model_result is None:
+    @staticmethod
+    def _predict_cached(movie_id_key: int) -> float | None:
+        """Cached prediction by movie ID. Uses module-level dict cache."""
+        if movie_id_key in _prediction_cache:
+            return _prediction_cache[movie_id_key]
+        if _predict_model_result is None:
+            _prediction_cache[movie_id_key] = None
             return None
         try:
-            row = self.movies_by_id.get(movie_id_key)
+            row = _predict_movies_by_id.get(movie_id_key)
             if row is None:
+                _prediction_cache[movie_id_key] = None
                 return None
-            return predict_rating(
+            result = predict_rating(
                 row,
-                self.model_result["best_model"],
-                self.model_result["scaler"],
-                self.model_result["feature_cols"],
-                self.model_result["num_cols"],
-                tag_pivot=self.tag_pivot,
+                _predict_model_result["best_model"],
+                _predict_model_result["scaler"],
+                _predict_model_result["feature_cols"],
+                _predict_model_result["num_cols"],
+                tag_pivot=_predict_tag_pivot,
                 rating_count=50.0,
             )
+            _prediction_cache[movie_id_key] = result
+            return result
         except (ValueError, KeyError, TypeError):
+            _prediction_cache[movie_id_key] = None
             return None
 
     def get_movie_info(self, movie_id: int) -> dict[str, Any] | None:
