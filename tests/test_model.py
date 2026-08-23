@@ -674,7 +674,7 @@ def main():
     for i, a in enumerate(args):
         if a in ("--load", "-l") and i + 1 < len(args):
             load_name = args[i + 1]
-        elif a.startswith("--load=") or a.startswith("-l="):
+        elif a.startswith(("--load=", "-l=")):
             load_name = a.split("=", 1)[1]
 
     if load_name:

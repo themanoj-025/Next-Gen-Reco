@@ -611,7 +611,7 @@ def render_visualization_charts(movie_id: int, info: dict, recs: list):
                 x=df_genres["In This Movie"],
                 name="This Movie",
                 orientation="h",
-                marker=dict(color="#f7971e", line=dict(color="#ffd200", width=1)),
+                marker={"color": "#f7971e", "line": {"color": "#ffd200", "width": 1}},
                 text=df_genres["In This Movie"],
                 textposition="outside",
             )
@@ -622,10 +622,10 @@ def render_visualization_charts(movie_id: int, info: dict, recs: list):
                 x=df_genres["In Similar Movies"],
                 name="In Similar Movies",
                 orientation="h",
-                marker=dict(
-                    color="rgba(96,165,250,0.6)",
-                    line=dict(color="rgba(96,165,250,0.8)", width=1),
-                ),
+                marker={
+                    "color": "rgba(96,165,250,0.6)",
+                    "line": {"color": "rgba(96,165,250,0.8)", "width": 1},
+                },
                 text=df_genres["In Similar Movies"],
                 textposition="outside",
             )
@@ -633,21 +633,21 @@ def render_visualization_charts(movie_id: int, info: dict, recs: list):
         fig.update_layout(
             barmode="group",
             height=350,
-            margin=dict(l=0, r=0, t=10, b=0),
+            margin={"l": 0, "r": 0, "t": 10, "b": 0},
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="rgba(255,255,255,0.7)", size=11),
-            legend=dict(
-                orientation="h",
-                yanchor="bottom",
-                y=1.02,
-                xanchor="right",
-                x=1,
-                font=dict(color="rgba(255,255,255,0.6)", size=10),
-            ),
-            xaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,0.05)", title="Count"),
-            yaxis=dict(title="", gridcolor="rgba(255,255,255,0.05)"),
-            hoverlabel=dict(bgcolor="rgba(30,30,60,0.95)", font=dict(color="white", size=12)),
+            font={"color": "rgba(255,255,255,0.7)", "size": 11},
+            legend={
+                "orientation": "h",
+                "yanchor": "bottom",
+                "y": 1.02,
+                "xanchor": "right",
+                "x": 1,
+                "font": {"color": "rgba(255,255,255,0.6)", "size": 10},
+            },
+            xaxis={"showgrid": True, "gridcolor": "rgba(255,255,255,0.05)", "title": "Count"},
+            yaxis={"title": "", "gridcolor": "rgba(255,255,255,0.05)"},
+            hoverlabel={"bgcolor": "rgba(30,30,60,0.95)", "font": {"color": "white", "size": 12}},
         )
         st.plotly_chart(fig, use_container_width=True)
 
@@ -686,10 +686,10 @@ def render_visualization_charts(movie_id: int, info: dict, recs: list):
                 go.Bar(
                     x=all_data["Movie"],
                     y=all_data["Rating"],
-                    marker=dict(
-                        color=colors_list,
-                        line=dict(color="rgba(255,255,255,0.1)", width=1),
-                    ),
+                    marker={
+                        "color": colors_list,
+                        "line": {"color": "rgba(255,255,255,0.1)", "width": 1},
+                    },
                     text=all_data["Rating"].apply(lambda x: f"{x:.2f}"),
                     textposition="outside",
                     hovertemplate="%{x}<br>Rating: %{y:.2f}<extra></extra>",
@@ -697,18 +697,18 @@ def render_visualization_charts(movie_id: int, info: dict, recs: list):
             )
             fig2.update_layout(
                 height=350,
-                margin=dict(l=0, r=0, t=10, b=60),
+                margin={"l": 0, "r": 0, "t": 10, "b": 60},
                 paper_bgcolor="rgba(0,0,0,0)",
                 plot_bgcolor="rgba(0,0,0,0)",
-                font=dict(color="rgba(255,255,255,0.7)", size=10),
-                xaxis=dict(showgrid=False, tickangle=45, title=""),
-                yaxis=dict(
-                    showgrid=True,
-                    gridcolor="rgba(255,255,255,0.05)",
-                    title="Predicted Rating",
-                    range=[0, 5.5],
-                ),
-                hoverlabel=dict(bgcolor="rgba(30,30,60,0.95)", font=dict(color="white", size=12)),
+                font={"color": "rgba(255,255,255,0.7)", "size": 10},
+                xaxis={"showgrid": False, "tickangle": 45, "title": ""},
+                yaxis={
+                    "showgrid": True,
+                    "gridcolor": "rgba(255,255,255,0.05)",
+                    "title": "Predicted Rating",
+                    "range": [0, 5.5],
+                },
+                hoverlabel={"bgcolor": "rgba(30,30,60,0.95)", "font": {"color": "white", "size": 12}},
             )
             st.plotly_chart(fig2, use_container_width=True)
 
@@ -755,37 +755,37 @@ def render_similarity_breakdown(movie_id: int, recs: list):
                 name=col,
                 x=df_sim["Movie"],
                 y=df_sim[col],
-                marker=dict(color=color, opacity=0.85),
+                marker={"color": color, "opacity": 0.85},
                 text=df_sim[col].apply(lambda x: f"{x:.0%}"),
                 textposition="inside",
-                textfont=dict(size=9, color="white"),
+                textfont={"size": 9, "color": "white"},
             )
         )
 
     fig.update_layout(
         barmode="group",
         height=300,
-        margin=dict(l=0, r=0, t=10, b=60),
+        margin={"l": 0, "r": 0, "t": 10, "b": 60},
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="rgba(255,255,255,0.7)", size=10),
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="right",
-            x=1,
-            font=dict(color="rgba(255,255,255,0.6)", size=10),
-        ),
-        xaxis=dict(showgrid=False, tickangle=45, title=""),
-        yaxis=dict(
-            showgrid=True,
-            gridcolor="rgba(255,255,255,0.05)",
-            title="Similarity Score",
-            tickformat=".0%",
-            range=[0, 1.1],
-        ),
-        hoverlabel=dict(bgcolor="rgba(30,30,60,0.95)", font=dict(color="white", size=12)),
+        font={"color": "rgba(255,255,255,0.7)", "size": 10},
+        legend={
+            "orientation": "h",
+            "yanchor": "bottom",
+            "y": 1.02,
+            "xanchor": "right",
+            "x": 1,
+            "font": {"color": "rgba(255,255,255,0.6)", "size": 10},
+        },
+        xaxis={"showgrid": False, "tickangle": 45, "title": ""},
+        yaxis={
+            "showgrid": True,
+            "gridcolor": "rgba(255,255,255,0.05)",
+            "title": "Similarity Score",
+            "tickformat": ".0%",
+            "range": [0, 1.1],
+        },
+        hoverlabel={"bgcolor": "rgba(30,30,60,0.95)", "font": {"color": "white", "size": 12}},
     )
     st.plotly_chart(fig, use_container_width=True)
 
