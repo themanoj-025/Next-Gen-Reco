@@ -585,7 +585,7 @@ def main():
     do_save = "--save" in args or "-s" in args
     load_name = None
     for a in args:
-        if a.startswith("--load=") or a.startswith("-l="):
+        if a.startswith(("--load=", "-l=")):
             load_name = a.split("=", 1)[1]
 
     print("=" * 55)

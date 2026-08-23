@@ -2,7 +2,14 @@
 
 from pathlib import Path
 
-from app._paths import CACHE_DIR, DATA_DIR, MODELS_DIR, ND_DIR, PROJECT_ROOT, STREAMLIT_DIR
+from app._paths import (
+    CACHE_DIR,
+    DATA_DIR,
+    MODELS_DIR,
+    ND_DIR,
+    PROJECT_ROOT,
+    STREAMLIT_DIR,
+)
 
 
 class TestProjectRoot:

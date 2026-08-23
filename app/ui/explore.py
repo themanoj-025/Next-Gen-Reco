@@ -145,7 +145,6 @@ def render_mood_explorer():
                 st.info("No movies found matching all selected genres. Try fewer genres.")
 
     # Reset button
-    if selected:
-        if st.button("🔄 Clear Mood Selection", use_container_width=False):
-            st.session_state.mood_genres = []
-            st.rerun()
+    if selected and st.button("🔄 Clear Mood Selection", use_container_width=False):
+        st.session_state.mood_genres = []
+        st.rerun()
