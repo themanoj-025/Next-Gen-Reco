@@ -131,28 +131,28 @@ def render_decade_explorer():
                 y=df_genre["Genre"],
                 x=df_genre["Count"],
                 orientation="h",
-                marker=dict(
-                    color=df_genre["Count"],
-                    colorscale="Viridis",
-                    line=dict(color="rgba(255,255,255,0.1)", width=1),
-                ),
+                marker={
+                    'color': df_genre["Count"],
+                    'colorscale': "Viridis",
+                    'line': {'color': "rgba(255,255,255,0.1)", 'width': 1},
+                },
                 text=df_genre["Count"],
                 textposition="outside",
-                textfont=dict(size=10, color="var(--text-secondary)"),
+                textfont={'size': 10, 'color': "var(--text-secondary)"},
             )
         )
         fig.update_layout(
             height=max(250, len(df_genre) * 25 + 50),
-            margin=dict(l=100, r=40, t=10, b=10),
+            margin={'l': 100, 'r': 40, 't': 10, 'b': 10},
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="var(--text-secondary)", size=10),
-            xaxis=dict(
-                showgrid=True,
-                gridcolor="rgba(255,255,255,0.05)",
-                title="Number of Movies",
-            ),
-            yaxis=dict(title="", gridcolor="rgba(255,255,255,0.05)"),
+            font={'color': "var(--text-secondary)", 'size': 10},
+            xaxis={
+                'showgrid': True,
+                'gridcolor': "rgba(255,255,255,0.05)",
+                'title': "Number of Movies",
+            },
+            yaxis={'title': "", 'gridcolor': "rgba(255,255,255,0.05)"},
         )
         st.plotly_chart(fig, use_container_width=True)
 
