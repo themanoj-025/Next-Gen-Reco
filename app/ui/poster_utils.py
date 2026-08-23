@@ -92,7 +92,7 @@ def _tmdb_poster_cached(title: str, year: int | None = None) -> str | None:
             if poster_path:
                 return f"{TMDB_IMAGE_BASE}{poster_path}"
         return None
-    except Exception:
+    except (OSError, ValueError, KeyError):
         return None
 
 
