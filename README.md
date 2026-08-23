@@ -41,7 +41,15 @@
 
 ---
 
-> 📸 **Screenshot placeholder:** Add a screenshot of the recommendations page showing similar movies.
+## 📸 Screenshots
+
+> _To add screenshots: run `streamlit run app.py` or visit the [live demo](https://nextgenreco.streamlit.app), capture your screen, save images to `docs/assets/`, and reference them below._
+>
+> **Suggested screenshots:**
+> - Recommendations page showing similar movies
+> - Search with predicted ratings
+> - Prediction breakdown with feature contributions
+> - Movie Night marathon lineup generator
 
 ---
 
