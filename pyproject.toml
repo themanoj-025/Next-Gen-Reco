@@ -2,7 +2,7 @@
 line-length = 120
 
 [tool.ruff.lint]
-ignore = ["DTZ005"]
+ignore = ["DTZ005", "B008"]  # B008: idiomatic FastAPI Security() in defaults
 
 [tool.black]
 line-length = 100
