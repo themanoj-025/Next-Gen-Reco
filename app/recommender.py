@@ -93,7 +93,7 @@ class MovieRecommender:
                     _LOG_PREFIX,
                     len(self.genre_cols),
                 )
-            except Exception as e:
+            except (OSError, ValueError, KeyError) as e:
                 logger.warning("%s Genre cache load failed (%s), rebuilding", _LOG_PREFIX, e)
                 self._build_genre_vectors()
         else:
@@ -117,7 +117,7 @@ class MovieRecommender:
             self.model_result = load_model(name=model_name, dir_path=model_dir)
         except FileNotFoundError:
             logger.warning("%s Model not found. Predictions will be basic.", _LOG_PREFIX)
-        except Exception as e:
+        except (OSError, ValueError, KeyError) as e:
             logger.error("%s Model failed to load (%s). Predictions will be basic.", _LOG_PREFIX, e)
 
         # Note: keeping tag_pivot for runtime predictions;
@@ -142,7 +142,7 @@ class MovieRecommender:
             else:
                 logger.warning("%s ND enrichment loaded but no data matched", _LOG_PREFIX)
                 self.enrichment = None
-        except Exception as e:
+        except (OSError, ValueError, KeyError) as e:
             logger.error("%s ND enrichment failed to load: %s", _LOG_PREFIX, e)
             self.enrichment = None
 
@@ -177,7 +177,7 @@ class MovieRecommender:
                 cols=np.array(self.genre_cols, dtype=object),
             )
             logger.info("%s Saved genre vectors to cache", _LOG_PREFIX)
-        except Exception as e:
+        except (OSError, ValueError) as e:
             logger.warning("%s Warning: could not save genre cache (%s)", _LOG_PREFIX, e)
 
     def _build_tag_lookup(self):
@@ -271,7 +271,7 @@ class MovieRecommender:
         try:
             mid = int(movie_row["movieId"])
             return self._predict_cached(mid)
-        except Exception:
+        except (ValueError, KeyError, TypeError):
             return None
 
     @lru_cache(maxsize=2048)
@@ -296,7 +296,7 @@ class MovieRecommender:
                 tag_pivot=self.tag_pivot,
                 rating_count=50.0,
             )
-        except Exception:
+        except (ValueError, KeyError, TypeError):
             return None
 
     def get_movie_info(self, movie_id: int) -> dict[str, Any] | None:
@@ -1203,7 +1203,7 @@ class MovieRecommender:
                 self.model_result["importance"],
             )
             return {"prediction": pred, "explanation": explanation}
-        except Exception as e:
+        except (ValueError, KeyError, TypeError) as e:
             return {"prediction": pred, "explanation": None, "error": str(e)}
 
     def _explain_prediction(

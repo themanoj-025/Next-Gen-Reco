@@ -107,7 +107,7 @@ def init_session():
                     """
                 )
                 st.stop()
-            except Exception as e:
+            except (OSError, ValueError, KeyError) as e:
                 st.error(f"Failed to initialize: {e}")
                 st.markdown(
                     f"""

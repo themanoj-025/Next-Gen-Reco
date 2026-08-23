@@ -95,7 +95,7 @@ def load_tags(path: str | None = None, top_k: int = 100) -> pd.DataFrame:
             df = pd.read_pickle(cache_file)
             print(f"  Loaded tag pivot from cache ({len(df)} rows)")
             return df
-        except Exception:
+        except (OSError, ValueError, KeyError):
             pass
 
     tags = pd.read_csv(path, dtype={"userId": "int32", "movieId": "int32", "tag": "object"})
@@ -121,7 +121,7 @@ def load_tags(path: str | None = None, top_k: int = 100) -> pd.DataFrame:
     try:
         tag_pivot.to_pickle(cache_file)
         print("  Saved tag pivot to cache")
-    except Exception as e:
+    except (OSError, pickle.PicklingError) as e:
         print(f"  Warning: could not save tag cache ({e})")
 
     return tag_pivot
@@ -510,7 +510,7 @@ def load_model(name: str = "best", dir_path: str = DEFAULT_MODEL_DIR) -> dict:
     if os.path.exists(meta_path):
         try:
             meta = joblib.load(meta_path)
-        except (ModuleNotFoundError, Exception) as e:
+        except (ModuleNotFoundError, OSError, ValueError, KeyError) as e:
             print(f"  Warning: Could not load metadata ({e}). Running without extras.")
 
     result = {**core, **meta}
