@@ -172,6 +172,15 @@ jobs:
             '**/*.md'
         continue-on-error: true
 
+  hadolint:
+    name: Container lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+
   docker:
     runs-on: ubuntu-latest
     needs: validate
