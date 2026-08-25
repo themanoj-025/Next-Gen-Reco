@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from fastapi import Depends, FastAPI, HTTPException, Query, Security
+from fastapi import Depends, FastAPI, HTTPException, Query, Response, Security
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -32,10 +32,32 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app.recommender import MovieRecommender
 
+try:
+    from prometheus_client import Counter, Histogram, generate_latest
+
+    _PROM_AVAILABLE = True
+except ImportError:
+    _PROM_AVAILABLE = False
+
 # ── App Setup ─────────────────────────────────────────────────────────────
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+if _PROM_AVAILABLE:
+    NGRECO_REQUEST_COUNT = Counter(
+        "ngreco_requests_total",
+        "Total HTTP requests",
+        ["method", "endpoint", "status"],
+    )
+    NGRECO_REQUEST_LATENCY = Histogram(
+        "ngreco_request_duration_seconds",
+        "HTTP request latency in seconds",
+        ["method", "endpoint"],
+        buckets=[0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0],
+    )
+    NGRECO_SEARCH_COUNT = Counter("ngreco_search_total", "Movie search requests")
+    NGRECO_RECOMMEND_COUNT = Counter("ngreco_recommend_total", "Recommendation requests")
 
 app = FastAPI(
     title="MovieLens AI API",
@@ -63,6 +85,22 @@ app = FastAPI(
         },
     ],
 )
+
+@app.middleware("http")
+async def track_metrics(request, call_next):
+    import time as _time
+    request.state.start_time = _time.time()
+    response = await call_next(request)
+    if _PROM_AVAILABLE:
+        path = request.url.path
+        NGRECO_REQUEST_COUNT.labels(
+            method=request.method, endpoint=path, status=response.status_code
+        ).inc()
+        if hasattr(request.state, "start_time"):
+            NGRECO_REQUEST_LATENCY.labels(method=request.method, endpoint=path).observe(
+                _time.time() - request.state.start_time
+            )
+    return response
 
 app.add_middleware(
     CORSMiddleware,
@@ -128,6 +166,8 @@ async def search_movies(
 ) -> list[dict[str, Any]]:
     """Search movies by title."""
     rec = _get_recommender()
+    if _PROM_AVAILABLE:
+        NGRECO_SEARCH_COUNT.inc()
     results = rec.search_movies(q, limit=limit)
     return results
 
@@ -152,6 +192,8 @@ async def get_recommendations(
     info = rec.get_movie_info(movie_id)
     if info is None:
         raise HTTPException(status_code=404, detail=f"Movie {movie_id} not found")
+    if _PROM_AVAILABLE:
+        NGRECO_RECOMMEND_COUNT.inc()
     results = rec.recommend(movie_id, n=n)
     return results
 
@@ -169,6 +211,14 @@ async def dataset_stats() -> dict[str, Any]:
         },
         "model_loaded": rec.model_result is not None,
     }
+
+
+@app.get("/metrics")
+async def metrics():
+    """Prometheus metrics endpoint."""
+    if not _PROM_AVAILABLE:
+        return {"status": "prometheus_client not installed"}
+    return Response(content=generate_latest(), media_type="text/plain")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────

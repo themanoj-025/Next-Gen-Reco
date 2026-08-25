@@ -8,6 +8,13 @@ python-dotenv>=1.2.2
 requests>=2.34.2
 pyarrow>=10.0.0
 
+# API observability
+fastapi>=0.100.0
+uvicorn>=0.23.0
+slowapi>=0.1.9
+python-multipart>=0.0.6
+prometheus-client>=0.21.0
+
 # xgboost is optional — only needed for retraining the model.
 # The pre-trained model uses RandomForest and doesn't require xgboost at runtime.
 # xgboost>=1.7.0
