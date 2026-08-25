@@ -37,7 +37,32 @@ from app.recommender import MovieRecommender
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="MovieLens AI API", version="1.0.0")
+app = FastAPI(
+    title="MovieLens AI API",
+    description="MovieLens AI Recommendation Engine API. Provides movie search,\n"
+    "personalized recommendations, and dataset statistics.",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_tags=[
+        {
+            "name": "health",
+            "description": "Service health check endpoints",
+        },
+        {
+            "name": "movies",
+            "description": "Movie search and details",
+        },
+        {
+            "name": "recommendations",
+            "description": "Personalized movie recommendations",
+        },
+        {
+            "name": "analytics",
+            "description": "Dataset statistics and metadata",
+        },
+    ],
+)
 
 app.add_middleware(
     CORSMiddleware,
