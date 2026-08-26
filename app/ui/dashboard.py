@@ -35,7 +35,7 @@ def _render_empty_state(icon: str, text: str, hint: str = ""):
     )
 
 
-def render_dashboard():
+def render_dashboard() -> None:
     rec = st.session_state.recommender
     ratings = st.session_state.user_ratings
     watchlist = st.session_state.watchlist

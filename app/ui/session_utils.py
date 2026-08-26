@@ -41,7 +41,7 @@ def _load_recommender() -> MovieRecommender:
     return MovieRecommender()
 
 
-def init_session():
+def init_session() -> None:
     if "recommender" not in st.session_state:
         # Pre-flight checks before attempting model load
         missing_files = _check_data_files()

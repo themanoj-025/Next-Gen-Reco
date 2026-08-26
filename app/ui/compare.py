@@ -3,7 +3,7 @@ import streamlit as st
 from app.ui.poster_utils import _genre_chip_class, _movie_poster_html, _rating_color
 
 
-def render_comparison():
+def render_comparison() -> None:
     st.markdown(
         '<div class="section-title"><span class="icon">⚖️</span> Movie Comparison</div>',
         unsafe_allow_html=True,

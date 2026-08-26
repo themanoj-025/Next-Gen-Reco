@@ -30,7 +30,7 @@ def _stars_display(rating: float | None) -> str:
 # ── Rating Widget ─────────────────────────────────────────────────────────────
 
 
-def render_rating_widget(movie_id: int):
+def render_rating_widget(movie_id: int) -> None:
     """Show interactive star rating for a movie with modern styling."""
     current = st.session_state.user_ratings.get(movie_id)
 
@@ -86,7 +86,7 @@ def render_rating_widget(movie_id: int):
 WATCHLIST_CATEGORIES = ["Want to Watch", "Watching", "Watched"]
 
 
-def render_watchlist_button(movie_id: int):
+def render_watchlist_button(movie_id: int) -> None:
     in_wl = movie_id in st.session_state.watchlist
 
     if not in_wl:
@@ -132,7 +132,7 @@ def render_watchlist_button(movie_id: int):
 # ── Movie Detail ──────────────────────────────────────────────────────────────
 
 
-def render_movie_detail(movie_id: int):
+def render_movie_detail(movie_id: int) -> None:
     rec = st.session_state.recommender
     info = rec.get_movie_info(movie_id)
     if info is None:
@@ -421,7 +421,7 @@ def render_movie_detail(movie_id: int):
 # ── Similar Movies ────────────────────────────────────────────────────────────
 
 
-def render_similar_movies(movie_id: int, info: dict, recs: list):
+def render_similar_movies(movie_id: int, info: dict, recs: list) -> None:
     if not recs:
         st.info("No similar movies found.")
         return
@@ -498,7 +498,7 @@ def render_similar_movies(movie_id: int, info: dict, recs: list):
 # ── Feature Explanation ───────────────────────────────────────────────────────
 
 
-def render_feature_explanation(movie_id: int):
+def render_feature_explanation(movie_id: int) -> None:
     rec = st.session_state.recommender
     fb = rec.get_feature_breakdown(movie_id)
     if fb is None or fb.get("explanation") is None:
@@ -526,7 +526,7 @@ def render_feature_explanation(movie_id: int):
 # ── Metrics ───────────────────────────────────────────────────────────────────
 
 
-def render_metrics_card(info: dict):
+def render_metrics_card(info: dict) -> None:
     pred = info["predicted_rating"]
     pred_color = "#22c55e" if pred and pred >= 3.5 else "#fbbf24" if pred else "#888"
 
@@ -572,7 +572,7 @@ def render_metrics_card(info: dict):
 # ── Visualization Charts ──────────────────────────────────────────────────────
 
 
-def render_visualization_charts(movie_id: int, info: dict, recs: list):
+def render_visualization_charts(movie_id: int, info: dict, recs: list) -> None:
     if info is None:
         return
 
@@ -716,7 +716,7 @@ def render_visualization_charts(movie_id: int, info: dict, recs: list):
 # ── Similarity Breakdown ──────────────────────────────────────────────────────
 
 
-def render_similarity_breakdown(movie_id: int, recs: list):
+def render_similarity_breakdown(movie_id: int, recs: list) -> None:
     if not recs:
         return
 
@@ -793,7 +793,7 @@ def render_similarity_breakdown(movie_id: int, recs: list):
 # ── Export ────────────────────────────────────────────────────────────────────
 
 
-def render_export(movie_id: int, info: dict, recs: list):
+def render_export(movie_id: int, info: dict, recs: list) -> None:
     st.markdown(
         """
     <div class="dash-section-header">

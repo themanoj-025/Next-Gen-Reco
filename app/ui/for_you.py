@@ -5,7 +5,7 @@ import streamlit as st
 from app.ui.poster_utils import _genre_chip_class, _rating_color
 
 
-def render_for_you():
+def render_for_you() -> None:
     st.markdown(
         '<div class="section-title"><span class="icon">❤️</span> For You</div>',
         unsafe_allow_html=True,
