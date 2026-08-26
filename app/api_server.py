@@ -102,9 +102,13 @@ async def track_metrics(request, call_next) -> Response:
             )
     return response
 
+_allowed_origins = os.environ.get(
+    "NGRECO_CORS_ORIGINS", "http://localhost:8501,http://localhost:3000"
+).split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
