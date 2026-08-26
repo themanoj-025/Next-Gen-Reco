@@ -6,7 +6,7 @@ import streamlit as st
 from app.ui.poster_utils import _genre_chip_class, _rating_color
 
 
-def render_surprise_me():
+def render_surprise_me() -> None:
     st.markdown(
         '<div class="section-title"><span class="icon">🎲</span> Surprise Me</div>',
         unsafe_allow_html=True,
@@ -50,7 +50,7 @@ def render_surprise_me():
 # ── Genre Explorer ────────────────────────────────────────────────────────────────
 
 
-def render_mood_explorer():
+def render_mood_explorer() -> None:
     st.markdown(
         '<div class="section-title"><span class="icon">🎨</span> Genre Explorer</div>',
         unsafe_allow_html=True,

@@ -173,7 +173,7 @@ class MovieRecommender:
         _predict_tag_pivot = self.tag_pivot
         _prediction_cache.clear()
 
-    def _build_genre_vectors(self):
+    def _build_genre_vectors(self) -> None:
         """Build and cache genre one-hot matrix."""
         self.genre_dummies = self.movies["genres"].str.get_dummies(sep="|")
         if "(no genres listed)" in self.genre_dummies.columns:

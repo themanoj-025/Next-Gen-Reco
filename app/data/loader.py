@@ -12,7 +12,7 @@ from app._paths import PROJECT_ROOT
 USER_DATA_FILE = PROJECT_ROOT / ".movie_user_data.json"
 
 
-def _load_user_data():
+def _load_user_data() -> None:
     """Load user data (ratings, watchlist, search history) from local JSON file."""
     if not USER_DATA_FILE.exists():
         return
@@ -33,7 +33,7 @@ def _load_user_data():
         pass  # Silently ignore corrupt data files
 
 
-def _save_user_data():
+def _save_user_data() -> None:
     """Save user data (ratings, watchlist, search history) to local JSON file."""
     try:
         wl = st.session_state.get("watchlist", {})
