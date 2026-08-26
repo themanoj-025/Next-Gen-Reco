@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from fastapi import Depends, FastAPI, HTTPException, Query, Response, Security
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Response, Security
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -118,6 +118,9 @@ app.add_middleware(SlowAPIMiddleware)
 
 security = HTTPBearer(auto_error=False)
 
+# ── API v1 Router ─────────────────────────────────────────────────────────
+v1_router = APIRouter(prefix="/api/v1")
+
 # ── Auth ──────────────────────────────────────────────────────────────────
 
 
@@ -159,7 +162,7 @@ async def health():
     return {"status": "ok", "service": "movielens-ai-api"}
 
 
-@app.get("/api/v1/movies/search", dependencies=[Depends(verify_api_key)])
+@v1_router.get("/movies/search", dependencies=[Depends(verify_api_key)])
 async def search_movies(
     q: str = Query(..., min_length=1, description="Search query"),
     limit: int = Query(20, ge=1, le=100, description="Max results"),
@@ -172,7 +175,7 @@ async def search_movies(
     return results
 
 
-@app.get("/api/v1/movies/{movie_id}", dependencies=[Depends(verify_api_key)])
+@v1_router.get("/movies/{movie_id}", dependencies=[Depends(verify_api_key)])
 async def get_movie(movie_id: int) -> dict[str, Any]:
     """Get detailed info for a movie by ID."""
     rec = _get_recommender()
@@ -182,7 +185,7 @@ async def get_movie(movie_id: int) -> dict[str, Any]:
     return info
 
 
-@app.get("/api/v1/recommendations/{movie_id}", dependencies=[Depends(verify_api_key)])
+@v1_router.get("/recommendations/{movie_id}", dependencies=[Depends(verify_api_key)])
 async def get_recommendations(
     movie_id: int,
     n: int = Query(10, ge=1, le=50, description="Number of recommendations"),
@@ -198,7 +201,7 @@ async def get_recommendations(
     return results
 
 
-@app.get("/api/v1/stats", dependencies=[Depends(verify_api_key)])
+@v1_router.get("/stats", dependencies=[Depends(verify_api_key)])
 async def dataset_stats() -> dict[str, Any]:
     """Return summary statistics about the MovieLens dataset."""
     rec = _get_recommender()
@@ -211,6 +214,9 @@ async def dataset_stats() -> dict[str, Any]:
         },
         "model_loaded": rec.model_result is not None,
     }
+
+
+app.include_router(v1_router)
 
 
 @app.get("/metrics")
