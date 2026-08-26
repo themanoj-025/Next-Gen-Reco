@@ -3,7 +3,7 @@
 import streamlit as st
 
 
-def render_movie_stats_section(movie_id: int, info: dict):
+def render_movie_stats_section(movie_id: int, info: dict) -> None:
     """Show interesting stats and trivia for a movie on the detail page."""
     rec = st.session_state.recommender
 

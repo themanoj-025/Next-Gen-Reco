@@ -8,7 +8,7 @@ from app.data.loader import _save_user_data
 from app.ui.poster_utils import _genre_chip_class, _rating_color
 
 
-def render_search():
+def render_search() -> None:
     rec = st.session_state.recommender
 
     st.markdown('<div style="max-width:700px;margin:0 auto;">', unsafe_allow_html=True)
@@ -196,7 +196,7 @@ def render_search():
 # ── Search History Sidebar ────────────────────────────────────────────────────
 
 
-def render_search_history():
+def render_search_history() -> None:
     if not st.session_state.search_history:
         return
 

@@ -3,7 +3,7 @@
 import streamlit as st
 
 
-def inject_css(theme="dark"):
+def inject_css(theme="dark") -> None:
     """Inject all custom CSS into the app.
 
     Parameters

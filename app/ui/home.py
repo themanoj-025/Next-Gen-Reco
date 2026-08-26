@@ -11,7 +11,7 @@ from app.ui.poster_utils import (
 )
 
 
-def render_home():
+def render_home() -> None:
     """IMDb-style home page with hero section and movie grids."""
     rec = st.session_state.recommender
 

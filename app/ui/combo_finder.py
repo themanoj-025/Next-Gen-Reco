@@ -5,7 +5,7 @@ import streamlit as st
 from app.ui.poster_utils import _genre_chip_class, _rating_color
 
 
-def render_combo_finder():
+def render_combo_finder() -> None:
     st.markdown(
         '<div class="section-title"><span class="icon">🎯</span> Combo Finder</div>',
         unsafe_allow_html=True,

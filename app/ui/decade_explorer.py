@@ -5,7 +5,7 @@ import streamlit as st
 from app.ui.poster_utils import _genre_chip_class, _rating_color
 
 
-def render_decade_explorer():
+def render_decade_explorer() -> None:
     st.markdown(
         '<div class="section-title"><span class="icon">📅</span> Decade Explorer</div>',
         unsafe_allow_html=True,

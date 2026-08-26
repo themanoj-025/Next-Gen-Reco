@@ -3,7 +3,7 @@ import streamlit as st
 from app.ui.poster_utils import _genre_chip_class, _rating_color
 
 
-def render_movie_night():
+def render_movie_night() -> None:
     st.markdown(
         '<div class="section-title"><span class="icon">🎬</span> Movie Night Generator</div>',
         unsafe_allow_html=True,

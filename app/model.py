@@ -201,7 +201,7 @@ def train_model(
     use_tuning: bool = True,
     save_path: str | None = None,
     random_state: int = 42,
-):
+) -> dict[str, Any]:
     """
     Train Random Forest + XGBoost models to predict average movie ratings.
 
@@ -578,7 +578,7 @@ def predict_rating(
 # ── CLI entry point ────────────────────────────────────────────────────────────
 
 
-def main():
+def main() -> None:
     """Train models and show comparison."""
     import sys
 

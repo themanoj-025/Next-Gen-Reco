@@ -217,7 +217,7 @@ class NDEnrichment:
             logger.error("Cache load failed: %s", e)
             return False
 
-    def _save_cache(self):
+    def _save_cache(self) -> None:
         """Save the current enrichment data to disk cache."""
         try:
             _CACHE_DIR.mkdir(exist_ok=True)
