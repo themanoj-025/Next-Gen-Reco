@@ -224,7 +224,7 @@ app.include_router(v1_router)
 
 
 @app.get("/metrics")
-async def metrics() -> Response | dict[str, str]:
+async def metrics():
     """Prometheus metrics endpoint."""
     if not _PROM_AVAILABLE:
         return {"status": "prometheus_client not installed"}
