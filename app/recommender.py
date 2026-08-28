@@ -23,7 +23,7 @@ Usage:
 from __future__ import annotations
 
 # Re-export from the package for backward compatibility.
-from app.recommender_pkg import MovieRecommender  # noqa: F401
+from app.recommender_pkg import MovieRecommender
 
 __all__ = ["MovieRecommender"]
 
