@@ -13,7 +13,7 @@ fastapi>=0.100.0
 uvicorn>=0.23.0
 slowapi>=0.1.9
 python-multipart>=0.0.6
-prometheus-client>=0.21.0
+prometheus-client>=0.26.0
 
 # xgboost is optional — only needed for retraining the model.
 # The pre-trained model uses RandomForest and doesn't require xgboost at runtime.
