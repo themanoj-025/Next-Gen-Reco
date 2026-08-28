@@ -12,7 +12,7 @@ pyarrow>=10.0.0
 fastapi>=0.141.1
 uvicorn>=0.23.0
 slowapi>=0.1.10
-python-multipart>=0.0.6
+python-multipart>=0.0.32
 prometheus-client>=0.26.0
 
 # xgboost is optional — only needed for retraining the model.
