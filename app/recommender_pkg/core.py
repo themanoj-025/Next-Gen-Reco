@@ -50,7 +50,7 @@ class CoreMixin:
         model_name: str = "v1_test",
         model_dir: str | None = None,
         top_tags: int = 100,
-    ):
+    ) -> None:
         if model_dir is None:
             model_dir = str(PROJECT_ROOT / "models")
         # Load movies — load_movies() already computes year, genre_list, etc.
@@ -170,7 +170,7 @@ class CoreMixin:
         except (OSError, ValueError) as e:
             logger.warning("%s Warning: could not save genre cache (%s)", _LOG_PREFIX, e)
 
-    def _build_tag_lookup(self):
+    def _build_tag_lookup(self) -> None:
         """Build a fast tag lookup: movieId -> set of tag column indices."""
         tag_cols = [c for c in self.tag_pivot.columns if c != "movieId"]
         self._tag_cols = tag_cols
@@ -185,7 +185,7 @@ class CoreMixin:
             if tags:
                 self._tag_lookup[mid] = tags
 
-    def _precompute_title_tokens(self):
+    def _precompute_title_tokens(self) -> None:
         """Precompute lowercase tokens for every movie title for fast search."""
         titles = self.movies["title"].str.lower()
         self._title_tokens = titles.str.split(r"[\s\W]+")

@@ -24,7 +24,7 @@ def _stars_display(rating: float | None) -> str:
     return "★" * full + ("½" if half else "") + "☆" * empty
 
 
-def _render_empty_state(icon: str, text: str, hint: str = ""):
+def _render_empty_state(icon: str, text: str, hint: str = "") -> None:
     st.markdown(
         f"""<article class="dash-empty" role="status">
             <div class="dash-empty-icon">{icon}</div>

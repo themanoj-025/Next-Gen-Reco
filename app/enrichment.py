@@ -81,7 +81,7 @@ class NDEnrichment:
         reviews = enrich.get_reviews(movie_id)
     """
 
-    def __init__(self, movies_df: pd.DataFrame | None = None):
+    def __init__(self, movies_df: pd.DataFrame | None = None) -> None:
         """Initialize enrichment by loading ND data.
 
         Parameters
@@ -234,7 +234,7 @@ class NDEnrichment:
         except (OSError, pickle.PicklingError) as e:
             logger.warning("Could not save enrichment cache (%s)", e)
 
-    def index_data(self, movies_df: pd.DataFrame):
+    def index_data(self, movies_df: pd.DataFrame) -> None:
         """Cross-reference ND data with the main MovieLens movies DataFrame.
 
         Performance: uses pandas vectorized ops and dict lookups instead of
