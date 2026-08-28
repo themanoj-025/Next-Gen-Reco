@@ -161,7 +161,7 @@ def _get_recommender() -> MovieRecommender:
 
 
 @app.get("/health")
-async def health():
+async def health() -> dict[str, object]:
     """Health check endpoint."""
     return {"status": "ok", "service": "movielens-ai-api"}
 
@@ -224,7 +224,7 @@ app.include_router(v1_router)
 
 
 @app.get("/metrics")
-async def metrics():
+async def metrics() -> dict[str, object]:
     """Prometheus metrics endpoint."""
     if not _PROM_AVAILABLE:
         return {"status": "prometheus_client not installed"}
