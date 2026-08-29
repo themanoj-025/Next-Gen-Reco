@@ -9,10 +9,10 @@ from __future__ import annotations
 from typing import Any
 
 from app.recommender_pkg.core import (
-    CoreMixin,
     _CACHE_DIR,
     _GENRE_CACHE_PATH,
     _MOVIES_CACHE_PATH,
+    CoreMixin,
     _check_cache_valid,
     _predict_model_result,
     _predict_movies_by_id,
@@ -41,7 +41,6 @@ class MovieRecommender(
     Composed from focused mixin modules for maintainability.
     """
 
-    pass
 
 
 __all__ = ["MovieRecommender"]

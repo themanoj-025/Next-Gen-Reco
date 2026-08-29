@@ -1,6 +1,5 @@
 """Unit tests for Next-Gen-Reco: recommender core, features, and data loader."""
 
-import pytest
 
 
 # ── Core Mixin Pure Methods ─────────────────────────────────────────────────

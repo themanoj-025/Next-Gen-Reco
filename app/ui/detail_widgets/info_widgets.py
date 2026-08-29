@@ -5,7 +5,6 @@ from __future__ import annotations
 import csv
 import io
 
-import pandas as pd
 import streamlit as st
 
 from app.ui.poster_utils import _rating_color

@@ -12,7 +12,7 @@ This regex matches (YYYY) and captures YYYY.
 import re
 
 # Fix create_notebook1.py
-with open("create_notebook1.py", "r", encoding="utf-8") as f:
+with open("create_notebook1.py", encoding="utf-8") as f:
     content1 = f.read()
 
 # Current pattern in the file (inside the triple-quoted string):
@@ -40,7 +40,7 @@ with open("create_notebook1.py", "w", encoding="utf-8") as f:
     f.write(content1)
 
 # Fix create_notebook2.py
-with open("create_notebook2.py", "r", encoding="utf-8") as f:
+with open("create_notebook2.py", encoding="utf-8") as f:
     content2 = f.read()
 
 if old in content2:
@@ -58,7 +58,7 @@ with open("create_notebook2.py", "w", encoding="utf-8") as f:
 # Verify by reading back
 print()
 print("Verification:")
-with open("create_notebook1.py", "r", encoding="utf-8") as f:
+with open("create_notebook1.py", encoding="utf-8") as f:
     for line in f:
         if "str.extract" in line:
             line = line.strip()
@@ -69,7 +69,7 @@ with open("create_notebook1.py", "r", encoding="utf-8") as f:
                 inner = m_inner.group(1)
                 print(f"  Inner pattern: {inner!r}")
 
-with open("create_notebook2.py", "r", encoding="utf-8") as f:
+with open("create_notebook2.py", encoding="utf-8") as f:
     for line in f:
         if "str.extract" in line:
             line = line.strip()

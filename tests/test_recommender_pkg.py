@@ -3,14 +3,9 @@
 Tests cache validation, title normalization, and explain features.
 """
 
-import tempfile
-from datetime import datetime
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 
-import numpy as np
 import pandas as pd
-import pytest
 
 
 class TestCacheValidation:
