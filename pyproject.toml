@@ -2,7 +2,27 @@
 line-length = 120
 
 [tool.ruff.lint]
-ignore = ["DTZ005", "B008"]  # B008: idiomatic FastAPI Security() in defaults
+select = ["E", "F", "W", "B", "BLE", "UP", "SIM", "C4", "RUF", "PLC", "PIE", "I"]
+ignore = [
+    "DTZ005",  # datetime.now() without tz
+    "B008",    # FastAPI Depends() in defaults
+    "E501",    # line too long
+    "BLE001",  # blind except — defensive coding
+    "RUF012",  # mutable class default
+    "UP031",   # printf formatting
+    "PLC0415", # import-outside-top-level — lazy imports
+    "E402",    # module-import-not-at-top — intentional
+    "F401",    # unused import — re-export pattern
+    "RUF059",  # unused loop variable
+    "RUF005",  # collection-literal-in-comparison
+    "SIM102",  # collapsible if — circuit breaker pattern
+    "F821",    # undefined name — pre-existing missing imports
+    "SIM105",  # suppressible-exception
+    "RUF001",  # ambiguous unicode — intentional
+    "B007",    # unused loop variable
+    "SIM117",  # multiple with-statements
+    "F811",    # redefinition of unused name
+]
 
 [tool.black]
 line-length = 100

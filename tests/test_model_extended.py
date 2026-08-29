@@ -1,7 +1,5 @@
 """Tests for model.py — extended coverage for untested functions."""
 import os
-import tempfile
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -14,7 +12,6 @@ from app.model import (
     predict_rating,
     save_model,
 )
-
 
 # ─── Fixtures ───────────────────────────────────────────────────────
 

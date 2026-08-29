@@ -166,7 +166,7 @@ class NDEnrichment:
             # Tab-separated: movie_original_id \t review_text
             # Reviews have their own movie ID scheme (not our movieId)
             rows = []
-            with open(REVIEWS_TXT, "r", encoding="utf-8", errors="replace") as f:
+            with open(REVIEWS_TXT, encoding="utf-8", errors="replace") as f:
                 for line in f:
                     line = line.strip()
                     if "\t" in line:

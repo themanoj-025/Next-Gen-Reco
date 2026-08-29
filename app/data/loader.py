@@ -17,7 +17,7 @@ def _load_user_data() -> None:
     if not USER_DATA_FILE.exists():
         return
     try:
-        with open(USER_DATA_FILE, "r", encoding="utf-8") as f:
+        with open(USER_DATA_FILE, encoding="utf-8") as f:
             data = json.load(f)
         # Only restore if we have fresh session state
         if "user_ratings" in st.session_state and not st.session_state.user_ratings:

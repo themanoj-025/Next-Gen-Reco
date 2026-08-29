@@ -22,8 +22,8 @@ __all__ = [
     "render_metrics_card",
     "render_movie_detail",
     "render_rating_widget",
-    "render_similarity_breakdown",
     "render_similar_movies",
+    "render_similarity_breakdown",
     "render_visualization_charts",
     "render_watchlist_button",
 ]

@@ -3,11 +3,8 @@
 Tests title normalization, caching, and data merging logic.
 """
 
-import re
-from unittest.mock import patch
 
 import pandas as pd
-import pytest
 
 
 class TestTitleNormalization:
