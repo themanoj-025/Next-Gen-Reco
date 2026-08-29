@@ -4,11 +4,8 @@ Tests user data persistence and session state management.
 """
 
 import json
-import tempfile
 from pathlib import Path
-from unittest.mock import MagicMock, patch
-
-import pytest
+from unittest.mock import patch
 
 
 class TestUserDataPersistence:
@@ -41,24 +38,23 @@ class TestUserDataPersistence:
 
     def test_save_and_load_roundtrip(self, tmp_path: Path) -> None:
         data_file = tmp_path / "roundtrip.json"
-        with patch("app.data.loader.USER_DATA_FILE", data_file):
-            with patch("app.data.loader.st") as mock_st:
-                mock_st.session_state = {
-                    "user_ratings": {10: 4.5},
-                    "watchlist": set(),
-                    "search_history": [],
-                }
-                from app.data.loader import _save_user_data
+        with patch("app.data.loader.USER_DATA_FILE", data_file), patch("app.data.loader.st") as mock_st:
+            mock_st.session_state = {
+                "user_ratings": {10: 4.5},
+                "watchlist": set(),
+                "search_history": [],
+            }
+            from app.data.loader import _save_user_data
 
-                _save_user_data()
+            _save_user_data()
 
-                # Reset session state
-                mock_st.session_state = {
-                    "user_ratings": {},
-                    "watchlist": set(),
-                    "search_history": [],
-                }
-                from app.data.loader import _load_user_data
+            # Reset session state
+            mock_st.session_state = {
+                "user_ratings": {},
+                "watchlist": set(),
+                "search_history": [],
+            }
+            from app.data.loader import _load_user_data
 
-                _load_user_data()
-                assert mock_st.session_state["user_ratings"] == {10: 4.5}
+            _load_user_data()
+            assert mock_st.session_state["user_ratings"] == {10: 4.5}

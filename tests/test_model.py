@@ -1,6 +1,5 @@
 """Tests for Next-Gen-Reco model module — year extraction, data loading, feature engineering."""
 
-import numpy as np
 import pandas as pd
 import pytest
 

@@ -523,8 +523,9 @@ class TestCheckCacheValid:
         assert result is False
 
     def test_returns_true_when_cache_newer(self, tmp_path):
-        from app.recommender import _check_cache_valid
         import time
+
+        from app.recommender import _check_cache_valid
         source = tmp_path / "source.csv"
         source.touch()
         time.sleep(1.1)  # Windows needs >1s for distinct mtime
@@ -533,8 +534,9 @@ class TestCheckCacheValid:
         assert _check_cache_valid(cache, source) is True
 
     def test_returns_false_when_source_newer(self, tmp_path):
-        from app.recommender import _check_cache_valid
         import time
+
+        from app.recommender import _check_cache_valid
         cache = tmp_path / "cache.npz"
         cache.touch()
         time.sleep(1.1)  # Windows needs >1s for distinct mtime
@@ -768,7 +770,7 @@ class TestPredictionCache:
         assert isinstance(_prediction_cache, dict)
 
     def test_cache_populated_after_predict(self, recommender):
-        from app.recommender import _prediction_cache, _predict_model_result
+        from app.recommender import _predict_model_result, _prediction_cache
         if _predict_model_result is not None:
             row = recommender.movies_by_id.get(1)
             if row is not None:
