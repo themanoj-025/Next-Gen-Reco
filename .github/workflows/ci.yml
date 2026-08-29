@@ -148,10 +148,10 @@ jobs:
           done
 
       - name: Install test dependencies
-        run: pip install pytest
+        run: pip install pytest pytest-cov
 
       - name: Run pytest test suite
-        run: python -m pytest tests/ -v --tb=short
+        run: python -m pytest tests/ -v --tb=short --cov=. --cov-report=term-missing --cov-fail-under=55
         # Exit code 5 means no tests collected (test_model.py is a standalone script, not a pytest suite)
         # Any other failure exit code will still fail the job
         continue-on-error: true
