@@ -94,7 +94,7 @@ def load_tags(path: str | None = None, top_k: int = 100) -> pd.DataFrame:
     if _is_cache_valid(cache_file, path):
         try:
             df = pd.read_pickle(cache_file)
-            print(f"  Loaded tag pivot from cache ({len(df)} rows)")
+            logger.info(f"  Loaded tag pivot from cache ({len(df)} rows)")
             return df
         except (OSError, ValueError, KeyError):
             pass
@@ -121,9 +121,9 @@ def load_tags(path: str | None = None, top_k: int = 100) -> pd.DataFrame:
     # Save to cache
     try:
         tag_pivot.to_pickle(cache_file)
-        print("  Saved tag pivot to cache")
+        logger.info("  Saved tag pivot to cache")
     except (OSError, pickle.PicklingError) as e:
-        print(f"  Warning: could not save tag cache ({e})")
+        logger.warning(f"  Warning: could not save tag cache ({e})")
 
     return tag_pivot
 
@@ -244,20 +244,20 @@ def train_model(
     from sklearn.model_selection import train_test_split
     from sklearn.preprocessing import StandardScaler
 
-    print("Loading data...")
+    logger.info("Loading data...")
     movies = load_movies(movies_path)
     ratings = load_ratings_sample(ratings_path, n=sample_size)
-    print(f"  Movies: {len(movies):,}  |  Ratings: {len(ratings):,}")
+    logger.info(f"  Movies: {len(movies):,}  |  Ratings: {len(ratings):,}")
 
     tag_pivot = None
     if use_tags:
-        print("Loading tags...")
+        logger.info("Loading tags...")
         tag_pivot = load_tags(tags_path, top_k=top_tags)
-        print(f"  Tags: {len(tag_pivot):,} movies with {top_tags} tag features")
+        logger.info(f"  Tags: {len(tag_pivot):,} movies with {top_tags} tag features")
 
-    print("Building features...")
+    logger.info("Building features...")
     X, y, feature_cols, num_cols, mf = _build_features(movies, ratings, tag_pivot)
-    print(f"  Features: {len(feature_cols)}  |  Samples: {len(X):,}")
+    logger.info(f"  Features: {len(feature_cols)}  |  Samples: {len(X):,}")
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=random_state
@@ -279,11 +279,11 @@ def train_model(
     rf_params = None
 
     # ── Random Forest ────────────────────────────────────────────────────
-    print("\n1. Training Random Forest...")
+    logger.info("\n1. Training Random Forest...")
     rf_start = time.time()
 
     if use_tuning:
-        print("   Hyperparameter tuning with GridSearchCV...")
+        logger.info("   Hyperparameter tuning with GridSearchCV...")
         from sklearn.ensemble import RandomForestRegressor
         from sklearn.model_selection import GridSearchCV
 
@@ -304,7 +304,7 @@ def train_model(
         rf_grid.fit(X_train_scaled, y_train)
         rf_model = rf_grid.best_estimator_
         rf_params = rf_grid.best_params_
-        print(f"   Best params: {rf_params}")
+        logger.info(f"   Best params: {rf_params}")
     else:
         from sklearn.ensemble import RandomForestRegressor
 
@@ -325,10 +325,8 @@ def train_model(
         "R2": float(r2_score(y_test, y_pred_rf)),
     }
     metrics["RandomForest"] = rf_metrics
-    print(
-        f"   RF - R^2: {rf_metrics['R2']:.4f}  RMSE: {rf_metrics['RMSE']:.4f}  "
-        f"MAE: {rf_metrics['MAE']:.4f}  ({time.time() - rf_start:.1f}s)"
-    )
+    logger.info(f"   RF - R^2: {rf_metrics['R2']:.4f}  RMSE: {rf_metrics['RMSE']:.4f}  "
+        f"MAE: {rf_metrics['MAE']:.4f}  ({time.time() - rf_start:.1f}s)")
 
     best_model = rf_model
     best_name = "RandomForest"
@@ -337,7 +335,7 @@ def train_model(
     try:
         import xgboost as xgb
 
-        print("\n2. Training XGBoost...")
+        logger.info("\n2. Training XGBoost...")
         xgb_start = time.time()
 
         if use_tuning:
@@ -360,7 +358,7 @@ def train_model(
             )
             xgb_grid.fit(X_train_scaled, y_train)
             xgb_model = xgb_grid.best_estimator_
-            print(f"   Best params: {xgb_grid.best_params_}")
+            logger.info(f"   Best params: {xgb_grid.best_params_}")
         else:
             xgb_model = xgb.XGBRegressor(
                 n_estimators=200,
@@ -380,17 +378,15 @@ def train_model(
             "R2": float(r2_score(y_test, y_pred_xgb)),
         }
         metrics["XGBoost"] = xgb_metrics
-        print(
-            f"   XGB - R^2: {xgb_metrics['R2']:.4f}  RMSE: {xgb_metrics['RMSE']:.4f}  "
-            f"MAE: {xgb_metrics['MAE']:.4f}  ({time.time() - xgb_start:.1f}s)"
-        )
+        logger.info(f"   XGB - R^2: {xgb_metrics['R2']:.4f}  RMSE: {xgb_metrics['RMSE']:.4f}  "
+            f"MAE: {xgb_metrics['MAE']:.4f}  ({time.time() - xgb_start:.1f}s)")
 
         # Pick the best model
         if xgb_metrics["R2"] > rf_metrics["R2"]:
             best_model = xgb_model
             best_name = "XGBoost"
     except ImportError:
-        print("\n2. XGBoost not available — skipping.")
+        logger.info("\n2. XGBoost not available — skipping.")
 
     # Feature importance from best model
     if hasattr(best_model, "feature_importances_"):
@@ -480,8 +476,8 @@ def save_model(result: dict, name: str = "best", dir_path: str = DEFAULT_MODEL_D
     }
     joblib.dump(meta, meta_path)
 
-    print(f"  Model saved to {model_path}")
-    print(f"  Metadata saved to {meta_path}")
+    logger.info(f"  Model saved to {model_path}")
+    logger.info(f"  Metadata saved to {meta_path}")
     return os.path.join(dir_path, name)
 
 
@@ -512,14 +508,14 @@ def load_model(name: str = "best", dir_path: str = DEFAULT_MODEL_DIR) -> dict:
         try:
             meta = joblib.load(meta_path)
         except (ModuleNotFoundError, OSError, ValueError, KeyError) as e:
-            print(f"  Warning: Could not load metadata ({e}). Running without extras.")
+            logger.warning(f"  Warning: Could not load metadata ({e}). Running without extras.")
 
     result = {**core, **meta}
     if "best_model_name" not in result:
         result["best_model_name"] = "RandomForest"
-        print("  (defaulted best_model_name to RandomForest since meta was unavailable)")
+        logger.info("  (defaulted best_model_name to RandomForest since meta was unavailable)")
 
-    print(f"  Loaded model '{name}' from {model_path}")
+    logger.info(f"  Loaded model '{name}' from {model_path}")
     return result
 
 
@@ -589,12 +585,12 @@ def main() -> None:
         if a.startswith(("--load=", "-l=")):
             load_name = a.split("=", 1)[1]
 
-    print("=" * 55)
-    print("  MovieLens Rating Predictor — Improved ML Model")
-    print("=" * 55)
+    logger.info("=" * 55)
+    logger.info("  MovieLens Rating Predictor — Improved ML Model")
+    logger.info("=" * 55)
 
     if load_name:
-        print(f"\nLoading saved model '{load_name}'...")
+        logger.info(f"\nLoading saved model '{load_name}'...")
         result = load_model(name=load_name)
     else:
         result = train_model(
@@ -609,27 +605,27 @@ def main() -> None:
     imp = result["importance"]
     best_name = result["best_model_name"]
 
-    print(f"\n{'=' * 55}")
-    print(f"  >> Best Model: {best_name}")
-    print(f"{'=' * 55}")
+    logger.info(f"\n{'=' * 55}")
+    logger.info(f"  >> Best Model: {best_name}")
+    logger.info(f"{'=' * 55}")
 
     # Per-model comparison
     for model_name in ["RandomForest", "XGBoost"]:
         if model_name in metrics:
             m = metrics[model_name]
-            print(f"  {model_name}:")
-            print(f"    R^2:   {m['R2']:.4f}")
-            print(f"    RMSE: {m['RMSE']:.4f}")
-            print(f"    MAE:  {m['MAE']:.4f}")
+            logger.info(f"  {model_name}:")
+            logger.info(f"    R^2:   {m['R2']:.4f}")
+            logger.info(f"    RMSE: {m['RMSE']:.4f}")
+            logger.info(f"    MAE:  {m['MAE']:.4f}")
 
-    print(f"\n  Training samples: {metrics['train_samples']:,}")
-    print(f"  Test samples:     {metrics['test_samples']:,}")
-    print(f"  Features:         {metrics['feature_count']:,}")
+    logger.info(f"\n  Training samples: {metrics['train_samples']:,}")
+    logger.info(f"  Test samples:     {metrics['test_samples']:,}")
+    logger.info(f"  Features:         {metrics['feature_count']:,}")
 
-    print(f"\n  Top 15 Features by Importance:\n  {'-' * 40}")
+    logger.info(f"\n  Top 15 Features by Importance:\n  {'-' * 40}")
     for _, row in imp.head(15).iterrows():
         bar = "#" * int(row["importance"] * 200)
-        print(f"  {row['feature']:<35s} {row['importance']:.4f} {bar}")
+        logger.info(f"  {row['feature']:<35s} {row['importance']:.4f} {bar}")
 
     # Example prediction
     movies_example = load_movies()
@@ -645,19 +641,19 @@ def main() -> None:
             tag_pivot=tag_pivot,
             rating_count=50.0,
         )
-        print(f"\n{'=' * 55}")
-        print("  Example: Toy Story (1995)")
-        print(f"  Predicted avg rating: {pred:.2f} / 5.0")
-        print(f"{'=' * 55}")
+        logger.info(f"\n{'=' * 55}")
+        logger.info("  Example: Toy Story (1995)")
+        logger.info(f"  Predicted avg rating: {pred:.2f} / 5.0")
+        logger.info(f"{'=' * 55}")
 
     # Improvement over baseline
-    print("\n  Baseline (genre + year + count):     R^2 ~0.078")
+    logger.info("\n  Baseline (genre + year + count):     R^2 ~0.078")
     rf_r2 = metrics.get("RandomForest", {}).get("R2", 0)
     xgb_r2 = metrics.get("XGBoost", {}).get("R2", 0)
     best_r2 = max(rf_r2, xgb_r2)
-    print(f"  Improved (tags + tuning + more features): R^2 ~{best_r2:.4f}")
+    logger.info(f"  Improved (tags + tuning + more features): R^2 ~{best_r2:.4f}")
     if best_r2 > 0.08:
-        print(f"  Improvement: +{(best_r2 - 0.078) * 100:.1f}% explained variance")
+        logger.info(f"  Improvement: +{(best_r2 - 0.078) * 100:.1f}% explained variance")
 
 
 if __name__ == "__main__":
