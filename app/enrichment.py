@@ -548,7 +548,7 @@ class NDEnrichment:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
-    print(f"{_LOG_PREFIX} Testing ND enrichment...")
+    logger.info(f"{_LOG_PREFIX} Testing ND enrichment...")
 
     # Quick test with minimal movies DataFrame
     test_movies = pd.DataFrame(
@@ -565,30 +565,30 @@ if __name__ == "__main__":
 
     enrich = NDEnrichment(test_movies)
 
-    print(f"\nLoaded: {enrich.is_loaded}")
-    print(f"Movies with metadata: {len(enrich._metadata_map)}")
-    print(f"Movies with cast: {len(enrich._cast_map)}")
-    print(f"Unique directors: {len(enrich._director_to_movies)}")
-    print(f"Unique actors: {len(enrich._actor_to_movies)}")
+    logger.info(f"\nLoaded: {enrich.is_loaded}")
+    logger.info(f"Movies with metadata: {len(enrich._metadata_map)}")
+    logger.info(f"Movies with cast: {len(enrich._cast_map)}")
+    logger.info(f"Unique directors: {len(enrich._director_to_movies)}")
+    logger.info(f"Unique actors: {len(enrich._actor_to_movies)}")
 
     # Test lookup
     for mid in [1, 2, 3]:
         meta = enrich.get_metadata(mid)
         cast = enrich.get_cast(mid)
         if meta:
-            print(f"\n--- Movie {mid} ---")
+            logger.info(f"\n--- Movie {mid} ---")
             if meta.get("overview"):
-                print(f"  Overview: {meta['overview'][:80]}...")
+                logger.info(f"  Overview: {meta['overview'][:80]}...")
             if meta.get("tagline"):
-                print(f"  Tagline: {meta['tagline']}")
+                logger.info(f"  Tagline: {meta['tagline']}")
             if meta.get("runtime"):
-                print(f"  Runtime: {enrich.format_runtime(mid)}")
+                logger.info(f"  Runtime: {enrich.format_runtime(mid)}")
             if meta.get("budget"):
-                print(f"  Budget: {enrich.format_budget(mid)}")
+                logger.info(f"  Budget: {enrich.format_budget(mid)}")
         if cast:
             if cast.get("director"):
-                print(f"  Director: {cast['director']}")
+                logger.info(f"  Director: {cast['director']}")
             if cast.get("actors"):
-                print(f"  Actors: {', '.join(cast['actors'][:3])}")
+                logger.info(f"  Actors: {', '.join(cast['actors'][:3])}")
 
-    print(f"\n{_LOG_PREFIX} Enrichment test complete!")
+    logger.info(f"\n{_LOG_PREFIX} Enrichment test complete!")

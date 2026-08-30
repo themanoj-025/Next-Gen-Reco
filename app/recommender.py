@@ -32,28 +32,26 @@ __all__ = ["MovieRecommender"]
 
 
 if __name__ == "__main__":
-    print("Testing MovieRecommender...")
+    logger.info("Testing MovieRecommender...")
     rec = MovieRecommender()
 
     # Test search
-    print("\n--- Search 'toy story' ---")
+    logger.info("\n--- Search 'toy story' ---")
     results = rec.search_movies("toy story", limit=5)
     for r in results:
-        print(f"  [{r['movieId']}] {r['title']}  (pred: {r['predicted_rating']})")
+        logger.info(f"  [{r['movieId']}] {r['title']}  (pred: {r['predicted_rating']})")
 
     if results:
         mid = results[0]["movieId"]
-        print(f"\n--- Recommend for movie {mid} ---")
+        logger.info(f"\n--- Recommend for movie {mid} ---")
         recs = rec.recommend(mid, n=8)
         for r in recs:
             genres = ", ".join(r["genres"][:3])
-            print(
-                f"  [{r['movieId']}] {r['title']}  sim={r['similarity']:.3f}  pred={r['predicted_rating']}  [{genres}]"
-            )
+            logger.info(f"  [{r['movieId']}] {r['title']}  sim={r['similarity']:.3f}  pred={r['predicted_rating']}  [{genres}]")
 
-        print(f"\n--- Feature breakdown for {mid} ---")
+        logger.info(f"\n--- Feature breakdown for {mid} ---")
         fb = rec.get_feature_breakdown(mid)
         if fb and fb.get("explanation"):
-            print(fb["explanation"])
+            logger.info("%s", fb["explanation"])
         else:
-            print("  (not available)")
+            logger.info("  (not available)")
