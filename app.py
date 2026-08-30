@@ -65,7 +65,7 @@ st.set_page_config(
 )
 
 
-def render_header():
+def render_header() -> None:
     """Render IMDb-style top nav bar and Streamlit-native navigation buttons."""
     theme = st.session_state.get("theme", "dark")
     inject_css(theme)
@@ -126,7 +126,7 @@ def render_header():
                     st.rerun()
 
 
-def main():
+def main() -> None:
     init_session()
     render_header()
 

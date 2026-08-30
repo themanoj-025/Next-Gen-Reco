@@ -7,32 +7,32 @@ import pytest
 class TestExtractYear:
     """Tests for year extraction from movie titles."""
 
-    def test_extracts_year_from_parentheses(self):
+    def test_extracts_year_from_parentheses(self) -> None:
         from app.model import _extract_year
 
         assert _extract_year("Toy Story (1995)") == 1995.0
 
-    def test_returns_none_for_no_year(self):
+    def test_returns_none_for_no_year(self) -> None:
         from app.model import _extract_year
 
         assert _extract_year("No Year Here") is None
 
-    def test_extracts_year_from_complex_title(self):
+    def test_extracts_year_from_complex_title(self) -> None:
         from app.model import _extract_year
 
         assert _extract_year("The Matrix (1999) [Some Tag]") == 1999.0
 
-    def test_extracts_four_digit_year(self):
+    def test_extracts_four_digit_year(self) -> None:
         from app.model import _extract_year
 
         assert _extract_year("Movie (2024)") == 2024.0
 
-    def test_returns_none_for_empty_string(self):
+    def test_returns_none_for_empty_string(self) -> None:
         from app.model import _extract_year
 
         assert _extract_year("") is None
 
-    def test_handles_year_outside_parens(self):
+    def test_handles_year_outside_parens(self) -> None:
         """Year not in parentheses should return None."""
         from app.model import _extract_year
 
@@ -42,7 +42,7 @@ class TestExtractYear:
 class TestCachePath:
     """Tests for cache path generation."""
 
-    def test_returns_path_object(self):
+    def test_returns_path_object(self) -> None:
         from pathlib import Path
 
         from app.model import _cache_path
@@ -50,7 +50,7 @@ class TestCachePath:
         result = _cache_path("test_cache.pkl")
         assert isinstance(result, Path)
 
-    def test_uses_cache_dir(self):
+    def test_uses_cache_dir(self) -> None:
         from app.model import _CACHE_DIR, _cache_path
 
         result = _cache_path("test.pkl")
@@ -60,13 +60,13 @@ class TestCachePath:
 class TestIsCacheValid:
     """Tests for cache freshness validation."""
 
-    def test_nonexistent_cache_returns_false(self, tmp_path):
+    def test_nonexistent_cache_returns_false(self, tmp_path) -> None:
         from app.model import _is_cache_valid
 
         fake_path = tmp_path / "nonexistent.pkl"
         assert _is_cache_valid(fake_path) is False
 
-    def test_cache_newer_than_source_returns_true(self, tmp_path):
+    def test_cache_newer_than_source_returns_true(self, tmp_path) -> None:
         import time
 
         from app.model import _is_cache_valid
@@ -79,7 +79,7 @@ class TestIsCacheValid:
         # Cache is older than source
         assert _is_cache_valid(cache, source) is False
 
-    def test_cache_newer_than_all_sources(self, tmp_path):
+    def test_cache_newer_than_all_sources(self, tmp_path) -> None:
         import time
 
         from app.model import _is_cache_valid
@@ -93,7 +93,7 @@ class TestIsCacheValid:
         cache.write_text("cached")
         assert _is_cache_valid(cache, source1, source2) is True
 
-    def test_missing_source_ignored(self, tmp_path):
+    def test_missing_source_ignored(self, tmp_path) -> None:
         from app.model import _is_cache_valid
 
         cache = tmp_path / "cache.pkl"
@@ -106,7 +106,7 @@ class TestLoadMovies:
     """Tests for movie data loading (requires test data fixture)."""
 
     @pytest.fixture
-    def sample_movies_csv(self, tmp_path):
+    def sample_movies_csv(self, tmp_path) -> str:
         """Create a minimal movies.csv for testing."""
         csv_content = (
             "movieId,title,genres\n"
@@ -120,21 +120,21 @@ class TestLoadMovies:
         csv_path.write_text(csv_content)
         return str(csv_path)
 
-    def test_load_movies_returns_dataframe(self, sample_movies_csv):
+    def test_load_movies_returns_dataframe(self, sample_movies_csv) -> None:
         from app.model import load_movies
 
         df = load_movies(sample_movies_csv)
         assert isinstance(df, pd.DataFrame)
         assert len(df) == 5
 
-    def test_load_movies_extracts_year(self, sample_movies_csv):
+    def test_load_movies_extracts_year(self, sample_movies_csv) -> None:
         from app.model import load_movies
 
         df = load_movies(sample_movies_csv)
         assert "year" in df.columns
         assert df.iloc[0]["year"] == 1995.0
 
-    def test_load_movies_creates_genre_list(self, sample_movies_csv):
+    def test_load_movies_creates_genre_list(self, sample_movies_csv) -> None:
         from app.model import load_movies
 
         df = load_movies(sample_movies_csv)
@@ -142,7 +142,7 @@ class TestLoadMovies:
         assert isinstance(df.iloc[0]["genre_list"], list)
         assert "Adventure" in df.iloc[0]["genre_list"]
 
-    def test_load_movies_computes_derived_features(self, sample_movies_csv):
+    def test_load_movies_computes_derived_features(self, sample_movies_csv) -> None:
         from app.model import load_movies
 
         df = load_movies(sample_movies_csv)
@@ -156,7 +156,7 @@ class TestBuildFeatures:
     """Tests for feature matrix construction."""
 
     @pytest.fixture
-    def sample_data(self, tmp_path):
+    def sample_data(self, tmp_path) -> tuple[object, ...]:
         """Create minimal movies and ratings data."""
         movies_csv = tmp_path / "movies.csv"
         movies_csv.write_text(
@@ -177,7 +177,7 @@ class TestBuildFeatures:
         )
         return str(movies_csv), str(ratings_csv)
 
-    def test_build_features_returns_tuple(self, sample_data):
+    def test_build_features_returns_tuple(self, sample_data) -> None:
         from app.model import _build_features, load_movies
 
         movies_path, ratings_path = sample_data
@@ -189,7 +189,7 @@ class TestBuildFeatures:
         assert len(X) == len(y)
         assert len(feature_cols) > 0
 
-    def test_build_features_has_genre_columns(self, sample_data):
+    def test_build_features_has_genre_columns(self, sample_data) -> None:
         from app.model import _build_features, load_movies
 
         movies_path, ratings_path = sample_data
@@ -204,7 +204,7 @@ class TestLoadTags:
     """Tests for tag loading and pivot creation."""
 
     @pytest.fixture
-    def sample_tags_csv(self, tmp_path):
+    def sample_tags_csv(self, tmp_path) -> str:
         csv_content = (
             "userId,movieId,tag\n"
             "1,1,action\n"
@@ -218,14 +218,14 @@ class TestLoadTags:
         csv_path.write_text(csv_content)
         return str(csv_path)
 
-    def test_load_tags_returns_dataframe(self, sample_tags_csv):
+    def test_load_tags_returns_dataframe(self, sample_tags_csv) -> None:
         from app.model import load_tags
 
         df = load_tags(sample_tags_csv, top_k=10)
         assert isinstance(df, pd.DataFrame)
         assert "movieId" in df.columns
 
-    def test_load_tags_has_tag_columns(self, sample_tags_csv):
+    def test_load_tags_has_tag_columns(self, sample_tags_csv) -> None:
         from app.model import load_tags
 
         df = load_tags(sample_tags_csv, top_k=10)

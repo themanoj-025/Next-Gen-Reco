@@ -19,7 +19,7 @@ pytestmark = pytest.mark.slow
 
 
 @pytest.fixture
-def sample_movies_csv(tmp_path):
+def sample_movies_csv(tmp_path) -> str:
     """Create a minimal movies.csv for testing."""
     csv = tmp_path / "movies.csv"
     csv.write_text(
@@ -34,7 +34,7 @@ def sample_movies_csv(tmp_path):
 
 
 @pytest.fixture
-def sample_ratings_csv(tmp_path):
+def sample_ratings_csv(tmp_path) -> str:
     """Create a minimal ratings.csv for testing."""
     csv = tmp_path / "ratings.csv"
     csv.write_text(
@@ -54,7 +54,7 @@ def sample_ratings_csv(tmp_path):
 
 
 @pytest.fixture
-def sample_model_result():
+def sample_model_result() -> dict[str, object]:
     """Create a model result dict with picklable objects."""
     from sklearn.ensemble import RandomForestRegressor
     from sklearn.preprocessing import StandardScaler
@@ -88,21 +88,21 @@ def sample_model_result():
 class TestLoadRatingsSample:
     """Tests for load_ratings_sample function."""
 
-    def test_returns_dataframe(self, sample_ratings_csv):
+    def test_returns_dataframe(self, sample_ratings_csv) -> None:
         result = load_ratings_sample(sample_ratings_csv, n=5)
         assert isinstance(result, pd.DataFrame)
 
-    def test_sample_size(self, sample_ratings_csv):
+    def test_sample_size(self, sample_ratings_csv) -> None:
         result = load_ratings_sample(sample_ratings_csv, n=3)
         assert len(result) <= 3
 
-    def test_has_required_columns(self, sample_ratings_csv):
+    def test_has_required_columns(self, sample_ratings_csv) -> None:
         result = load_ratings_sample(sample_ratings_csv, n=10)
         assert "userId" in result.columns
         assert "movieId" in result.columns
         assert "rating" in result.columns
 
-    def test_returns_all_when_n_larger(self, sample_ratings_csv):
+    def test_returns_all_when_n_larger(self, sample_ratings_csv) -> None:
         result = load_ratings_sample(sample_ratings_csv, n=100)
         assert len(result) == 10  # only 10 rows in CSV
 
@@ -113,23 +113,23 @@ class TestLoadRatingsSample:
 class TestSaveModel:
     """Tests for save_model function."""
 
-    def test_creates_directory(self, sample_model_result, tmp_path):
+    def test_creates_directory(self, sample_model_result, tmp_path) -> None:
         save_dir = str(tmp_path / "test_model")
         result_path = save_model(sample_model_result, name="test", dir_path=save_dir)
         assert os.path.exists(result_path)
         assert os.path.isdir(result_path)
 
-    def test_creates_model_file(self, sample_model_result, tmp_path):
+    def test_creates_model_file(self, sample_model_result, tmp_path) -> None:
         save_dir = str(tmp_path / "test_model")
         result_path = save_model(sample_model_result, name="test", dir_path=save_dir)
         assert os.path.exists(os.path.join(result_path, "model.joblib"))
 
-    def test_creates_meta_file(self, sample_model_result, tmp_path):
+    def test_creates_meta_file(self, sample_model_result, tmp_path) -> None:
         save_dir = str(tmp_path / "test_model")
         result_path = save_model(sample_model_result, name="test", dir_path=save_dir)
         assert os.path.exists(os.path.join(result_path, "meta.joblib"))
 
-    def test_returns_path_string(self, sample_model_result, tmp_path):
+    def test_returns_path_string(self, sample_model_result, tmp_path) -> None:
         save_dir = str(tmp_path / "test_model")
         result_path = save_model(sample_model_result, name="test", dir_path=save_dir)
         assert isinstance(result_path, str)
@@ -141,7 +141,7 @@ class TestSaveModel:
 class TestLoadModel:
     """Tests for load_model function."""
 
-    def test_loads_saved_model(self, sample_model_result, tmp_path):
+    def test_loads_saved_model(self, sample_model_result, tmp_path) -> None:
         save_dir = str(tmp_path / "test_model")
         save_model(sample_model_result, name="test", dir_path=save_dir)
         loaded = load_model(name="test", dir_path=save_dir)
@@ -150,18 +150,18 @@ class TestLoadModel:
         assert "scaler" in loaded
         assert "feature_cols" in loaded
 
-    def test_loads_metadata(self, sample_model_result, tmp_path):
+    def test_loads_metadata(self, sample_model_result, tmp_path) -> None:
         save_dir = str(tmp_path / "test_model")
         save_model(sample_model_result, name="test", dir_path=save_dir)
         loaded = load_model(name="test", dir_path=save_dir)
         assert "metrics" in loaded
         assert "importance" in loaded
 
-    def test_missing_model_raises(self, tmp_path):
+    def test_missing_model_raises(self, tmp_path) -> None:
         with pytest.raises(FileNotFoundError):
             load_model(name="nonexistent", dir_path=str(tmp_path))
 
-    def test_feature_cols_preserved(self, sample_model_result, tmp_path):
+    def test_feature_cols_preserved(self, sample_model_result, tmp_path) -> None:
         save_dir = str(tmp_path / "test_model")
         save_model(sample_model_result, name="test", dir_path=save_dir)
         loaded = load_model(name="test", dir_path=save_dir)
@@ -174,7 +174,7 @@ class TestLoadModel:
 class TestPredictRating:
     """Tests for predict_rating function."""
 
-    def _make_model(self):
+    def _make_model(self) -> tuple[object, ...]:
         """Create a model+scaler pair with matching feature shapes.
 
         predict_rating builds a DataFrame with feature_cols + 3 derived
@@ -197,31 +197,31 @@ class TestPredictRating:
         rf.fit(np.random.rand(10, len(all_model_cols)), np.random.rand(10))
         return rf, scaler, feature_cols, num_cols
 
-    def test_returns_float(self):
+    def test_returns_float(self) -> None:
         rf, scaler, feature_cols, num_cols = self._make_model()
         movie_row = pd.Series({"movieId": 1, "genre_list": ["Action", "Comedy"], "year": 2000, "rating_count": 100})
         result = predict_rating(movie_row, rf, scaler, feature_cols, num_cols)
         assert isinstance(result, float)
 
-    def test_returns_value_in_range(self):
+    def test_returns_value_in_range(self) -> None:
         rf, scaler, feature_cols, num_cols = self._make_model()
         movie_row = pd.Series({"movieId": 1, "genre_list": ["Action", "Comedy"], "year": 2000, "rating_count": 100})
         result = predict_rating(movie_row, rf, scaler, feature_cols, num_cols)
         assert 0.0 <= result <= 5.0
 
-    def test_empty_genre_list(self):
+    def test_empty_genre_list(self) -> None:
         rf, scaler, feature_cols, num_cols = self._make_model()
         movie_row = pd.Series({"movieId": 1, "genre_list": [], "year": 2000, "rating_count": 100})
         result = predict_rating(movie_row, rf, scaler, feature_cols, num_cols)
         assert isinstance(result, float)
 
-    def test_none_year(self):
+    def test_none_year(self) -> None:
         rf, scaler, feature_cols, num_cols = self._make_model()
         movie_row = pd.Series({"movieId": 1, "genre_list": ["Action"], "year": None, "rating_count": 50})
         result = predict_rating(movie_row, rf, scaler, feature_cols, num_cols)
         assert isinstance(result, float)
 
-    def test_with_tag_pivot(self):
+    def test_with_tag_pivot(self) -> None:
         rf, scaler, feature_cols, num_cols = self._make_model()
         movie_row = pd.Series({"movieId": 1, "genre_list": ["Action"], "year": 2000, "rating_count": 50})
         tag_pivot = pd.DataFrame({"movieId": [1], "genre_action": [0.5], "genre_comedy": [0.2]})
@@ -235,21 +235,21 @@ class TestPredictRating:
 class TestLoadMoviesExtended:
     """Extended tests for load_movies function."""
 
-    def test_returns_dataframe(self, sample_movies_csv):
+    def test_returns_dataframe(self, sample_movies_csv) -> None:
         result = load_movies(sample_movies_csv)
         assert isinstance(result, pd.DataFrame)
 
-    def test_has_expected_columns(self, sample_movies_csv):
+    def test_has_expected_columns(self, sample_movies_csv) -> None:
         result = load_movies(sample_movies_csv)
         assert "movieId" in result.columns
         assert "title" in result.columns
         assert "genres" in result.columns
 
-    def test_extracts_year(self, sample_movies_csv):
+    def test_extracts_year(self, sample_movies_csv) -> None:
         result = load_movies(sample_movies_csv)
         assert "year" in result.columns
         assert result["year"].notna().any()
 
-    def test_creates_genre_count(self, sample_movies_csv):
+    def test_creates_genre_count(self, sample_movies_csv) -> None:
         result = load_movies(sample_movies_csv)
         assert "genre_count" in result.columns
