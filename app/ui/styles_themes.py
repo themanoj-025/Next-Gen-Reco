@@ -1,0 +1,75 @@
+"""CSS custom property values for dark/light themes."""
+
+dark_vars = """
+    --bg-app: linear-gradient(135deg, #0f0c29 0%, #1a1a3e 50%, #24243e 100%);
+    --bg-card: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    --bg-card-hover: rgba(255,255,255,0.08);
+    --bg-card-ghost: linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+    --bg-sidebar: rgba(255,255,255,0.03);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255,255,255,0.6);
+    --text-muted: rgba(255,255,255,0.35);
+    --text-muted-2: rgba(255,255,255,0.25);
+    --text-muted-3: rgba(255,255,255,0.15);
+    --border-color: rgba(255,255,255,0.08);
+    --border-subtle: rgba(255,255,255,0.06);
+    --border-hover: rgba(247,151,30,0.3);
+    --accent: #f5c518;
+    --accent-gradient: linear-gradient(135deg, #f7971e, #ffd200);
+    --star-color: #fbbf24;
+    --star-empty: rgba(255,255,255,0.15);
+    --footer-text: rgba(255,255,255,0.25);
+    --card-shadow: rgba(0,0,0,0.2);
+    --scrollbar-bg: rgba(255,255,255,0.05);
+    --scrollbar-thumb: rgba(255,255,255,0.15);
+    --hero-overlay: linear-gradient(transparent, rgba(0,0,0,0.8));
+    --btn-primary-bg: var(--accent-gradient);
+    --btn-primary-text: #1a1a2e;
+    --btn-secondary-bg: rgba(255,255,255,0.04);
+    --btn-secondary-text: rgba(255,255,255,0.7);
+    --tab-bg: rgba(255,255,255,0.04);
+    --tab-text: rgba(255,255,255,0.5);
+    --hover-glow: rgba(247,151,30,0.08);
+    --genre-chip-bg: rgba(255,255,255,0.08);
+    --genre-chip-text: rgba(255,255,255,0.7);
+    --about-bg: rgba(255,255,255,0.03);
+    --about-text: rgba(255,255,255,0.65);
+    --sidebar-hr: rgba(255,255,255,0.1);
+"""
+
+light_vars = """
+    --bg-app: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+    --bg-card: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
+    --bg-card-hover: #ffffff;
+    --bg-card-ghost: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
+    --bg-sidebar: rgba(0,0,0,0.02);
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --text-muted-2: rgba(0,0,0,0.25);
+    --text-muted-3: rgba(0,0,0,0.12);
+    --border-color: rgba(0,0,0,0.08);
+    --border-subtle: rgba(0,0,0,0.05);
+    --border-hover: rgba(247,151,30,0.35);
+    --accent: #f5c518;
+    --accent-gradient: linear-gradient(135deg, #f7971e, #ffd200);
+    --star-color: #eab308;
+    --star-empty: rgba(0,0,0,0.1);
+    --footer-text: rgba(0,0,0,0.25);
+    --card-shadow: rgba(0,0,0,0.08);
+    --scrollbar-bg: rgba(0,0,0,0.03);
+    --scrollbar-thumb: rgba(0,0,0,0.1);
+    --hero-overlay: linear-gradient(transparent, rgba(0,0,0,0.5));
+    --btn-primary-bg: var(--accent-gradient);
+    --btn-primary-text: #1a1a2e;
+    --btn-secondary-bg: rgba(0,0,0,0.04);
+    --btn-secondary-text: #475569;
+    --tab-bg: rgba(0,0,0,0.04);
+    --tab-text: rgba(0,0,0,0.5);
+    --hover-glow: rgba(247,151,30,0.1);
+    --genre-chip-bg: rgba(0,0,0,0.06);
+    --genre-chip-text: rgba(0,0,0,0.6);
+    --about-bg: rgba(0,0,0,0.02);
+    --about-text: rgba(0,0,0,0.5);
+    --sidebar-hr: rgba(0,0,0,0.08);
+"""

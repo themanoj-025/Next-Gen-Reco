@@ -8,7 +8,6 @@ title length), rating_count, and release year.
 
 import os
 import pickle
-import re
 import time
 import warnings
 from pathlib import Path
@@ -16,120 +15,39 @@ from pathlib import Path
 import joblib
 import numpy as np
 import pandas as pd
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.preprocessing import StandardScaler
 
 warnings.filterwarnings("ignore")
 
 from app._paths import CACHE_DIR, DATA_DIR, MODELS_DIR
+from app.model_data import (
+    _CACHE_DIR,
+    _cache_path,
+    _extract_year,
+    _is_cache_valid,
+    load_movies,
+    load_ratings_sample,
+    load_tags,
+)
+from app.utils import logger
 
-# ── Cache helpers ──────────────────────────────────────────────────────────────
+# Re-export data loading functions for backward compatibility
+__all__ = [
+    "_build_features",
+    "load_movies",
+    "load_ratings_sample",
+    "load_tags",
+    "train_model",
+    "save_model",
+    "load_model",
+    "predict_rating",
+    "main",
+]
 
-_CACHE_DIR = CACHE_DIR
-
-
-def _cache_path(name: str) -> Path:
-    """Get path to a cache file."""
-    _CACHE_DIR.mkdir(exist_ok=True)
-    return _CACHE_DIR / name
-
-
-def _is_cache_valid(cache_path: str | Path, *source_paths: str | Path) -> bool:
-    """Check if cache is newer than all source files."""
-    cp = Path(cache_path)
-    if not cp.exists():
-        return False
-    cache_mtime = cp.stat().st_mtime
-    for sp in source_paths:
-        p = Path(sp)
-        if p.exists() and p.stat().st_mtime > cache_mtime:
-            return False
-    return True
-
-
-# ── Helpers ───────────────────────────────────────────────────────────────────
-
-
-def _extract_year(title: str) -> float | None:
-    m = re.search(r"\((\d{4})\)", title)
-    return float(m.group(1)) if m else None
-
-
-# ── Data loading ──────────────────────────────────────────────────────────────
-
-
-def load_movies(path: str | None = None) -> pd.DataFrame:
-    """Load movies CSV and add derived features."""
-    if path is None:
-        path = str(DATA_DIR / "movies.csv")
-    df = pd.read_csv(path)
-    df["year"] = df["title"].apply(_extract_year)
-    df["genre_list"] = df["genres"].str.split("|")
-    df["genre_count"] = df["genre_list"].apply(len)
-    df["title_length"] = df["title"].str.len()
-    df["title_words"] = df["title"].str.split(r"\s+").apply(len)
-    return df
-
-
-def load_ratings_sample(path: str | None = None, n: int = 500_000) -> pd.DataFrame:
-    """Load a sample of ratings (default 500K)."""
-    if path is None:
-        path = str(DATA_DIR / "ratings.csv")
-    return pd.read_csv(
-        path,
-        nrows=n,
-        dtype={"userId": "int32", "movieId": "int32", "rating": "float32"},
-    )
-
-
-def load_tags(path: str | None = None, top_k: int = 100) -> pd.DataFrame:
-    """Load tags CSV and return top-K most frequent tags per movie as one-hot features.
-
-    Results are cached to disk (as pickle) for fast subsequent loads.
-    Cache is invalidated when the source CSV changes.
-    """
-    if path is None:
-        path = str(DATA_DIR / "tags.csv")
-    cache_file = _cache_path(f"tag_pivot_top{top_k}.pkl")
-
-    # Try loading from cache first
-    if _is_cache_valid(cache_file, path):
-        try:
-            df = pd.read_pickle(cache_file)
-            logger.info(f"  Loaded tag pivot from cache ({len(df)} rows)")
-            return df
-        except (OSError, ValueError, KeyError):
-            pass
-
-    tags = pd.read_csv(path, dtype={"userId": "int32", "movieId": "int32", "tag": "object"})
-
-    # Find the top K most common tags overall
-    top_tags = tags["tag"].str.lower().str.strip().value_counts().head(top_k).index.tolist()
-
-    # Filter to only those tags
-    tags = tags[tags["tag"].str.lower().str.strip().isin(top_tags)].copy()
-    tags["tag"] = tags["tag"].str.lower().str.strip()
-
-    # One tag per movie (keep first occurrence per movie)
-    tags = tags.drop_duplicates(subset=["movieId", "tag"])
-
-    # Pivot to one-hot: movieId x tag
-    tag_pivot = pd.crosstab(tags["movieId"], tags["tag"])
-    # Rename columns to avoid collisions
-    tag_pivot.columns = [f"tag_{col.replace(' ', '_')}" for col in tag_pivot.columns]
-    tag_pivot = tag_pivot.reset_index()
-    tag_pivot = tag_pivot.astype({c: "int8" for c in tag_pivot.columns if c != "movieId"})
-
-    # Save to cache
-    try:
-        tag_pivot.to_pickle(cache_file)
-        logger.info("  Saved tag pivot to cache")
-    except (OSError, pickle.PicklingError) as e:
-        logger.warning(f"  Warning: could not save tag cache ({e})")
-
-    return tag_pivot
-
-
-# ── Model training ────────────────────────────────────────────────────────────
-
+DEFAULT_MODEL_DIR = str(MODELS_DIR)
 
 def _build_features(
     movies: pd.DataFrame,
@@ -573,88 +491,3 @@ def predict_rating(
 
 # ── CLI entry point ────────────────────────────────────────────────────────────
 
-
-def main() -> None:
-    """Train models and show comparison."""
-    import sys
-
-    args = [a.lower() for a in sys.argv[1:]]
-    do_save = "--save" in args or "-s" in args
-    load_name = None
-    for a in args:
-        if a.startswith(("--load=", "-l=")):
-            load_name = a.split("=", 1)[1]
-
-    logger.info("=" * 55)
-    logger.info("  MovieLens Rating Predictor — Improved ML Model")
-    logger.info("=" * 55)
-
-    if load_name:
-        logger.info(f"\nLoading saved model '{load_name}'...")
-        result = load_model(name=load_name)
-    else:
-        result = train_model(
-            sample_size=500_000,
-            use_tags=True,
-            top_tags=100,
-            use_tuning=True,
-            save_path="v1" if do_save else None,
-        )
-
-    metrics = result["metrics"]
-    imp = result["importance"]
-    best_name = result["best_model_name"]
-
-    logger.info(f"\n{'=' * 55}")
-    logger.info(f"  >> Best Model: {best_name}")
-    logger.info(f"{'=' * 55}")
-
-    # Per-model comparison
-    for model_name in ["RandomForest", "XGBoost"]:
-        if model_name in metrics:
-            m = metrics[model_name]
-            logger.info(f"  {model_name}:")
-            logger.info(f"    R^2:   {m['R2']:.4f}")
-            logger.info(f"    RMSE: {m['RMSE']:.4f}")
-            logger.info(f"    MAE:  {m['MAE']:.4f}")
-
-    logger.info(f"\n  Training samples: {metrics['train_samples']:,}")
-    logger.info(f"  Test samples:     {metrics['test_samples']:,}")
-    logger.info(f"  Features:         {metrics['feature_count']:,}")
-
-    logger.info(f"\n  Top 15 Features by Importance:\n  {'-' * 40}")
-    for _, row in imp.head(15).iterrows():
-        bar = "#" * int(row["importance"] * 200)
-        logger.info(f"  {row['feature']:<35s} {row['importance']:.4f} {bar}")
-
-    # Example prediction
-    movies_example = load_movies()
-    if "Toy Story (1995)" in movies_example["title"].values:
-        toy_story = movies_example[movies_example["title"] == "Toy Story (1995)"].iloc[0]
-        tag_pivot = load_tags(top_k=100)
-        pred = predict_rating(
-            toy_story,
-            result["best_model"],
-            result["scaler"],
-            result["feature_cols"],
-            result["num_cols"],
-            tag_pivot=tag_pivot,
-            rating_count=50.0,
-        )
-        logger.info(f"\n{'=' * 55}")
-        logger.info("  Example: Toy Story (1995)")
-        logger.info(f"  Predicted avg rating: {pred:.2f} / 5.0")
-        logger.info(f"{'=' * 55}")
-
-    # Improvement over baseline
-    logger.info("\n  Baseline (genre + year + count):     R^2 ~0.078")
-    rf_r2 = metrics.get("RandomForest", {}).get("R2", 0)
-    xgb_r2 = metrics.get("XGBoost", {}).get("R2", 0)
-    best_r2 = max(rf_r2, xgb_r2)
-    logger.info(f"  Improved (tags + tuning + more features): R^2 ~{best_r2:.4f}")
-    if best_r2 > 0.08:
-        logger.info(f"  Improvement: +{(best_r2 - 0.078) * 100:.1f}% explained variance")
-
-
-if __name__ == "__main__":
-    main()
