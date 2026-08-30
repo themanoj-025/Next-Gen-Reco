@@ -32,14 +32,14 @@ def client():
 # ── Health Endpoint ───────────────────────────────────────────────────────
 
 class TestHealthEndpoint:
-    def test_health_returns_ok(self, client):
+    def test_health_returns_ok(self, client) -> None:
         response = client.get("/health")
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "ok"
         assert data["service"] == "movielens-ai-api"
 
-    def test_health_is_get(self, client):
+    def test_health_is_get(self, client) -> None:
         response = client.get("/health")
         assert response.status_code == 200
 
@@ -48,7 +48,7 @@ class TestHealthEndpoint:
 
 class TestSearchMovies:
     @patch("app.api_server._get_recommender")
-    def test_search_returns_results(self, mock_get, client):
+    def test_search_returns_results(self, mock_get, client) -> None:
         mock_rec = MagicMock()
         mock_rec.search_movies.return_value = [
             {"movieId": 1, "title": "Toy Story", "genres": "Animation|Children"}
@@ -63,7 +63,7 @@ class TestSearchMovies:
         mock_rec.search_movies.assert_called_once_with("toy", limit=20)
 
     @patch("app.api_server._get_recommender")
-    def test_search_with_limit(self, mock_get, client):
+    def test_search_with_limit(self, mock_get, client) -> None:
         mock_rec = MagicMock()
         mock_rec.search_movies.return_value = []
         mock_get.return_value = mock_rec
@@ -72,11 +72,11 @@ class TestSearchMovies:
         assert response.status_code == 200
         mock_rec.search_movies.assert_called_once_with("star", limit=5)
 
-    def test_search_missing_query(self, client):
+    def test_search_missing_query(self, client) -> None:
         response = client.get("/api/v1/movies/search")
         assert response.status_code == 422
 
-    def test_search_empty_query(self, client):
+    def test_search_empty_query(self, client) -> None:
         response = client.get("/api/v1/movies/search?q=")
         assert response.status_code == 422
 
@@ -85,7 +85,7 @@ class TestSearchMovies:
 
 class TestGetMovie:
     @patch("app.api_server._get_recommender")
-    def test_get_movie_found(self, mock_get, client):
+    def test_get_movie_found(self, mock_get, client) -> None:
         mock_rec = MagicMock()
         mock_rec.get_movie_info.return_value = {
             "movieId": 1, "title": "Toy Story", "genres": "Animation"
@@ -98,7 +98,7 @@ class TestGetMovie:
         assert data["title"] == "Toy Story"
 
     @patch("app.api_server._get_recommender")
-    def test_get_movie_not_found(self, mock_get, client):
+    def test_get_movie_not_found(self, mock_get, client) -> None:
         mock_rec = MagicMock()
         mock_rec.get_movie_info.return_value = None
         mock_get.return_value = mock_rec
@@ -111,7 +111,7 @@ class TestGetMovie:
 
 class TestGetRecommendations:
     @patch("app.api_server._get_recommender")
-    def test_get_recommendations(self, mock_get, client):
+    def test_get_recommendations(self, mock_get, client) -> None:
         mock_rec = MagicMock()
         mock_rec.get_movie_info.return_value = {"movieId": 1}
         mock_rec.recommend.return_value = [
@@ -126,7 +126,7 @@ class TestGetRecommendations:
         mock_rec.recommend.assert_called_once_with(1, n=5)
 
     @patch("app.api_server._get_recommender")
-    def test_get_recommendations_movie_not_found(self, mock_get, client):
+    def test_get_recommendations_movie_not_found(self, mock_get, client) -> None:
         mock_rec = MagicMock()
         mock_rec.get_movie_info.return_value = None
         mock_get.return_value = mock_rec
@@ -139,7 +139,7 @@ class TestGetRecommendations:
 
 class TestDatasetStats:
     @patch("app.api_server._get_recommender")
-    def test_stats_returns_metrics(self, mock_get, client):
+    def test_stats_returns_metrics(self, mock_get, client) -> None:
         import pandas as pd
         mock_rec = MagicMock()
         mock_rec.movies = pd.DataFrame({
@@ -162,32 +162,32 @@ class TestDatasetStats:
 # ── API Key Auth ──────────────────────────────────────────────────────────
 
 class TestAPIKeyAuth:
-    def test_no_key_allows_open_access(self):
+    def test_no_key_allows_open_access(self) -> None:
         """When NEXT_GEN_RECO_API_KEY is empty, all endpoints are open."""
         client = TestClient(app)
         response = client.get("/api/v1/stats")
         assert response.status_code != 401
         assert response.status_code != 403
 
-    def test_verify_api_key_returns_none_when_no_env_key(self):
+    def test_verify_api_key_returns_none_when_no_env_key(self) -> None:
         with patch.dict(os.environ, {"NEXT_GEN_RECO_API_KEY": ""}):
             result = asyncio.run(verify_api_key(credentials=None))
             assert result is None
 
-    def test_verify_api_key_rejects_wrong_key(self):
+    def test_verify_api_key_rejects_wrong_key(self) -> None:
         with patch.dict(os.environ, {"NEXT_GEN_RECO_API_KEY": "correct-key"}):
             creds = HTTPAuthorizationCredentials(scheme="Bearer", credentials="wrong-key")
             with pytest.raises(HTTPException) as exc_info:
                 asyncio.run(verify_api_key(credentials=creds))
             assert exc_info.value.status_code == 403
 
-    def test_verify_api_key_rejects_missing_credentials(self):
+    def test_verify_api_key_rejects_missing_credentials(self) -> None:
         with patch.dict(os.environ, {"NEXT_GEN_RECO_API_KEY": "some-key"}):
             with pytest.raises(HTTPException) as exc_info:
                 asyncio.run(verify_api_key(credentials=None))
             assert exc_info.value.status_code == 401
 
-    def test_verify_api_key_accepts_correct_key(self):
+    def test_verify_api_key_accepts_correct_key(self) -> None:
         with patch.dict(os.environ, {"NEXT_GEN_RECO_API_KEY": "my-secret"}):
             creds = HTTPAuthorizationCredentials(scheme="Bearer", credentials="my-secret")
             result = asyncio.run(verify_api_key(credentials=creds))
@@ -197,12 +197,12 @@ class TestAPIKeyAuth:
 # ── HTTP Method Validation ────────────────────────────────────────────────
 
 class TestHTTPMethods:
-    def test_health_only_accepts_get(self, client):
+    def test_health_only_accepts_get(self, client) -> None:
         response = client.post("/health")
         assert response.status_code == 405
 
     @patch("app.api_server._get_recommender")
-    def test_search_only_accepts_get(self, mock_get, client):
+    def test_search_only_accepts_get(self, mock_get, client) -> None:
         mock_rec = MagicMock()
         mock_rec.search_movies.return_value = []
         mock_get.return_value = mock_rec
@@ -213,7 +213,7 @@ class TestHTTPMethods:
 # ── Response Format Validation ────────────────────────────────────────────
 
 class TestResponseFormat:
-    def test_health_response_structure(self, client):
+    def test_health_response_structure(self, client) -> None:
         response = client.get("/health")
         data = response.json()
         assert "status" in data
@@ -221,7 +221,7 @@ class TestResponseFormat:
         assert isinstance(data["status"], str)
 
     @patch("app.api_server._get_recommender")
-    def test_search_response_is_list(self, mock_get, client):
+    def test_search_response_is_list(self, mock_get, client) -> None:
         mock_rec = MagicMock()
         mock_rec.search_movies.return_value = []
         mock_get.return_value = mock_rec
@@ -229,7 +229,7 @@ class TestResponseFormat:
         assert isinstance(response.json(), list)
 
     @patch("app.api_server._get_recommender")
-    def test_stats_response_structure(self, mock_get, client):
+    def test_stats_response_structure(self, mock_get, client) -> None:
         import pandas as pd
 
 
