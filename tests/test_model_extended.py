@@ -6,6 +6,8 @@ import pandas as pd
 import pytest
 
 from app.model import (
+
+pytestmark = pytest.mark.slow
     load_model,
     load_movies,
     load_ratings_sample,
@@ -181,6 +183,7 @@ class TestPredictRating:
         """
         from sklearn.ensemble import RandomForestRegressor
         from sklearn.preprocessing import StandardScaler
+
 
         feature_cols = ["genre_action", "genre_comedy", "year", "rating_count"]
         num_cols = ["year", "rating_count"]
