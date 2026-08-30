@@ -12,7 +12,6 @@ Covers:
 import numpy as np
 import pandas as pd
 
-
 pytestmark = pytest.mark.slow
 # ── _extract_year ─────────────────────────────────────────────────────────────
 
