@@ -28,13 +28,13 @@ new = r"r'\\(\\d{4}\\)'"
 
 if old in content1:
     content1 = content1.replace(old, new)
-    print("Notebook 1: Replaced pattern")
+    logger.info("Notebook 1: Replaced pattern")
 else:
-    print("Notebook 1: Pattern NOT FOUND - checking for alternatives")
+    logger.warning("Notebook 1: Pattern NOT FOUND - checking for alternatives")
     # Let's find what patterns exist around str.extract
     for i, line in enumerate(content1.split("\n")):
         if "str.extract" in line:
-            print(f"  Line {i + 1}: {line.strip()}")
+            logger.info(f"  Line {i + 1}: {line.strip()}")
 
 with open("create_notebook1.py", "w", encoding="utf-8") as f:
     f.write(content1)
@@ -45,39 +45,39 @@ with open("create_notebook2.py", encoding="utf-8") as f:
 
 if old in content2:
     content2 = content2.replace(old, new)
-    print("Notebook 2: Replaced pattern")
+    logger.info("Notebook 2: Replaced pattern")
 else:
-    print("Notebook 2: Pattern NOT FOUND - checking for alternatives")
+    logger.warning("Notebook 2: Pattern NOT FOUND - checking for alternatives")
     for i, line in enumerate(content2.split("\n")):
         if "str.extract" in line:
-            print(f"  Line {i + 1}: {line.strip()}")
+            logger.info(f"  Line {i + 1}: {line.strip()}")
 
 with open("create_notebook2.py", "w", encoding="utf-8") as f:
     f.write(content2)
 
 # Verify by reading back
 print()
-print("Verification:")
+logger.info("Verification:")
 with open("create_notebook1.py", encoding="utf-8") as f:
     for line in f:
         if "str.extract" in line:
             line = line.strip()
-            print(f"  Notebook1: {line}")
+            logger.info(f"  Notebook1: {line}")
             # Extract the raw string portion between r' and '
             m_inner = re.search(r"r'(.+?)'", line)
             if m_inner:
                 inner = m_inner.group(1)
-                print(f"  Inner pattern: {inner!r}")
+                logger.info(f"  Inner pattern: {inner!r}")
 
 with open("create_notebook2.py", encoding="utf-8") as f:
     for line in f:
         if "str.extract" in line:
             line = line.strip()
-            print(f"  Notebook2: {line}")
+            logger.info(f"  Notebook2: {line}")
             m_inner = re.search(r"r'(.+?)'", line)
             if m_inner:
                 inner = m_inner.group(1)
-                print(f"  Inner pattern: {inner!r}")
+                logger.info(f"  Inner pattern: {inner!r}")
 
 print()
-print("Done!")
+logger.info("Done!")
