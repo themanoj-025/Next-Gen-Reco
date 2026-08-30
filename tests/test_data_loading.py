@@ -12,6 +12,8 @@ Covers:
 import numpy as np
 import pandas as pd
 
+
+pytestmark = pytest.mark.slow
 # ── _extract_year ─────────────────────────────────────────────────────────────
 
 
@@ -201,6 +203,7 @@ class TestPredictRating:
 
     def test_rating_count_affects_prediction(self, model_result, movies_df):
         from app.model import predict_rating
+
 
         row = movies_df.iloc[0]
         pred_low = predict_rating(

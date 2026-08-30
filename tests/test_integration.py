@@ -16,6 +16,9 @@ from fastapi.testclient import TestClient
 
 from app.api_server import app
 
+
+
+pytestmark = pytest.mark.slow
 # ── Fixtures ──────────────────────────────────────────────────────────────
 
 

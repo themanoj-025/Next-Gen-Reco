@@ -16,6 +16,8 @@ from fastapi import HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
 from fastapi.testclient import TestClient
 
+
+pytestmark = pytest.mark.slow
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app.api_server import app, verify_api_key
@@ -230,6 +232,8 @@ class TestResponseFormat:
     @patch("app.api_server._get_recommender")
     def test_stats_response_structure(self, mock_get, client):
         import pandas as pd
+
+
         mock_rec = MagicMock()
         mock_rec.movies = pd.DataFrame({"year": [2000], "rating_count": [50]})
         mock_rec.model_result = None
