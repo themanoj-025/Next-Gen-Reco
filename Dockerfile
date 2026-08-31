@@ -12,7 +12,7 @@
 # ═══════════════════════════════════════════════════════════════════════
 
 # ── Base stage ─────────────────────────────────────────────────────────
-FROM python:3.12-slim AS base
+FROM python:3.14-slim AS base
 
 LABEL org.opencontainers.image.title="MovieLens AI"
 LABEL org.opencontainers.image.description="Streamlit movie recommender using MovieLens 32M dataset"
