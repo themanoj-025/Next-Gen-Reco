@@ -2,8 +2,8 @@
 
 import streamlit as st
 
-from app.ui.styles_themes import dark_vars, light_vars
 from app.ui.styles_css import CSS_BLOCK
+from app.ui.styles_themes import dark_vars, light_vars
 
 
 def inject_css(theme="dark") -> None:
