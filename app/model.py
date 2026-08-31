@@ -37,14 +37,13 @@ from app.utils import logger
 # Re-export data loading functions for backward compatibility
 __all__ = [
     "_build_features",
+    "load_model",
     "load_movies",
     "load_ratings_sample",
     "load_tags",
-    "train_model",
-    "save_model",
-    "load_model",
     "predict_rating",
-    "main",
+    "save_model",
+    "train_model",
 ]
 
 DEFAULT_MODEL_DIR = str(MODELS_DIR)
