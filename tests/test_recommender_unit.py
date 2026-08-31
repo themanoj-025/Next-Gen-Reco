@@ -48,7 +48,7 @@ class TestCoreMixinHelpers:
         from app.recommender_pkg.core import CoreMixin
 
         class MockCore:
-            def _normalize_title(self, title):
+            def _normalize_title(self, title) -> None:
                 return CoreMixin._normalize_title(self, title)
 
         mock = MockCore()
@@ -59,7 +59,7 @@ class TestCoreMixinHelpers:
         from app.recommender_pkg.core import CoreMixin
 
         class MockCore:
-            def _normalize_title(self, title):
+            def _normalize_title(self, title) -> None:
                 return CoreMixin._normalize_title(self, title)
 
         mock = MockCore()
@@ -70,7 +70,7 @@ class TestCoreMixinHelpers:
         from app.recommender_pkg.core import CoreMixin
 
         class MockCore:
-            def _normalize_title(self, title):
+            def _normalize_title(self, title) -> None:
                 return CoreMixin._normalize_title(self, title)
 
         mock = MockCore()

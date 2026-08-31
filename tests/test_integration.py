@@ -21,13 +21,13 @@ pytestmark = pytest.mark.slow
 
 
 @pytest.fixture()
-def client():
+def client() -> None:
     """Create a TestClient for the FastAPI app."""
     return TestClient(app, raise_server_exceptions=False)
 
 
 @pytest.fixture()
-def mock_recommender():
+def mock_recommender() -> None:
     """A fully mocked MovieRecommender."""
     rec = MagicMock()
     rec.search_movies.return_value = [
