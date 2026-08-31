@@ -24,7 +24,7 @@ from app.api_server import app, verify_api_key
 # ── Fixtures ──────────────────────────────────────────────────────────────
 
 @pytest.fixture
-def client():
+def client() -> None:
     """Create a TestClient for the FastAPI app."""
     return TestClient(app)
 
