@@ -17,7 +17,7 @@ if str(_project_root) not in sys.path:
 
 
 @pytest.fixture(scope="module")
-def recommender():
+def recommender() -> None:
     """Load MovieRecommender once for the entire test module.
 
     This is expensive (~1-3s) but avoids reloading 87K movies per test.
@@ -28,7 +28,7 @@ def recommender():
 
 
 @pytest.fixture(scope="module")
-def movies_df():
+def movies_df() -> None:
     """Load the raw movies DataFrame once."""
     from app.model import load_movies
 
@@ -36,7 +36,7 @@ def movies_df():
 
 
 @pytest.fixture(scope="module")
-def model_result():
+def model_result() -> None:
     """Load the trained model once."""
     from app.model import load_model
 

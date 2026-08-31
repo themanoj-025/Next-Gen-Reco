@@ -1,11 +1,11 @@
 import nbformat as nbf
 
 
-def md_cell(source):
+def md_cell(source) -> None:
     return nbf.v4.new_markdown_cell(source)
 
 
-def nb_cell(source):
+def nb_cell(source) -> None:
     return nbf.v4.new_code_cell(source)
 
 
