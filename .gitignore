@@ -30,6 +30,10 @@ node_modules/
 *.db-shm
 *.db-wal
 
+# Logs
+logs/
+*.log
+
 # ═══ Model files ════════════════════════════════════════════════════════
 # Only ignore specific generated/junk model files, NOT production models
 # Production models in models/v1_test/ are tracked in git for deployment
