@@ -5,16 +5,14 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from app.model import (
-
 pytestmark = pytest.mark.slow
+from app.model import (
     load_model,
     load_movies,
     load_ratings_sample,
     predict_rating,
     save_model,
 )
-
 
 # ─── Fixtures ───────────────────────────────────────────────────────
 
