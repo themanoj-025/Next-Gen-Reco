@@ -1,3 +1,7 @@
+import pytest
+
+pytestmark = pytest.mark.unit
+
 """Tests for Next-Gen-Reco data loader module.
 
 Tests user data persistence and session state management.
