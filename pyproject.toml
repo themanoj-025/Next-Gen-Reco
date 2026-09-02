@@ -37,6 +37,8 @@ addopts = "-m 'not slow' --cov --cov-fail-under=50"
 minversion = "7.0"
 testpaths = ["tests"]
 markers = [
+    "unit: marks pure unit tests (deselect with '-m \"not unit\"')",
+    "integration: marks tests requiring external services (deselect with '-m \"not integration\"')",
     "slow: long-running tests that iterate over thousands of movies (deselect with '-m \"not slow\"')",
 ]
 
