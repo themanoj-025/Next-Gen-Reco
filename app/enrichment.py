@@ -12,7 +12,12 @@ All data is cross-referenced to the main MovieLens dataset by matching
 normalized movie titles.
 """
 
+import hashlib
+import hmac
+import io
+import json
 import logging
+import os
 import pickle
 import re
 import warnings
@@ -202,10 +207,27 @@ class NDEnrichment:
                 logger.info("Source file %s changed, invalidating cache", sp.name)
                 return False
 
-        # Load full data from cache
+        # Load full data from cache with HMAC verification
         try:
+            _hmac_key = os.environ.get(
+                "NGRECO_ENRICHMENT_HMAC_KEY", "ngreco-default-dev-key"
+            ).encode()
             with open(_ENRICHMENT_CACHE, "rb") as f:
-                data = pickle.load(f)
+                envelope = pickle.load(f)
+
+            # Support both legacy (raw) and new (HMAC-wrapped) formats
+            if isinstance(envelope, dict) and "data" in envelope and "hmac" in envelope:
+                expected_sig = envelope["hmac"]
+                raw = envelope["data"]
+                actual_sig = hmac.new(_hmac_key, raw, hashlib.sha256).hexdigest()
+                if not hmac.compare_digest(expected_sig, actual_sig):
+                    logger.warning("Enrichment cache HMAC mismatch — rebuilding")
+                    return False
+                data = pickle.loads(raw)  # noqa: S301 — HMAC-verified
+            else:
+                # Legacy format without HMAC
+                data = envelope
+
             self._metadata_map = data["_metadata_map"]
             self._cast_map = data["_cast_map"]
             self._reviews_map = data["_reviews_map"]
@@ -218,8 +240,11 @@ class NDEnrichment:
             return False
 
     def _save_cache(self) -> None:
-        """Save the current enrichment data to disk cache."""
+        """Save the current enrichment data to disk cache with HMAC integrity."""
         try:
+            _hmac_key = os.environ.get(
+                "NGRECO_ENRICHMENT_HMAC_KEY", "ngreco-default-dev-key"
+            ).encode()
             _CACHE_DIR.mkdir(exist_ok=True)
             data = {
                 "_metadata_map": self._metadata_map,
@@ -228,8 +253,11 @@ class NDEnrichment:
                 "_director_to_movies": self._director_to_movies,
                 "_actor_to_movies": self._actor_to_movies,
             }
+            raw = pickle.dumps(data, protocol=pickle.HIGHEST_PROTOCOL)
+            sig = hmac.new(_hmac_key, raw, hashlib.sha256).hexdigest()
+            envelope = {"data": raw, "hmac": sig}
             with open(_ENRICHMENT_CACHE, "wb") as f:
-                pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
+                pickle.dump(envelope, f)
             logger.info("Saved enrichment cache (%s)", _ENRICHMENT_CACHE)
         except (OSError, pickle.PicklingError) as e:
             logger.warning("Could not save enrichment cache (%s)", e)
