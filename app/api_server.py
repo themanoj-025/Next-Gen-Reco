@@ -15,7 +15,6 @@ Auth:
 import logging
 import os
 import secrets
-import sys
 from pathlib import Path
 from typing import Any
 
@@ -26,9 +25,6 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
-
-# Ensure project root is on path
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app.health import create_health_router
 from app.recommender import MovieRecommender
