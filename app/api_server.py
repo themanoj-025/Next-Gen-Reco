@@ -30,6 +30,7 @@ from slowapi.util import get_remote_address
 # Ensure project root is on path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from app.health import create_health_router
 from app.recommender import MovieRecommender
 
 try:
@@ -157,6 +158,13 @@ def _get_recommender() -> MovieRecommender:
     return _recommender
 
 
+def _recommender_ready() -> None:
+    """Readiness probe: the recommender model must be loaded to serve."""
+    rec = _get_recommender()
+    if rec.model_result is None:
+        raise RuntimeError("recommender model not loaded")
+
+
 # ── Endpoints ─────────────────────────────────────────────────────────────
 
 
@@ -221,6 +229,12 @@ async def dataset_stats() -> dict[str, Any]:
 
 
 app.include_router(v1_router)
+
+# Canonical readiness probes (app/health.py is synced from
+# shared/aegis_common/health.py):
+#   GET /health        — liveness (the bespoke /health above wins on path)
+#   GET /health/ready  — readiness, 503 until the recommender model is loaded
+app.include_router(create_health_router(checks={"recommender": _recommender_ready}))
 
 
 @app.get("/metrics")
