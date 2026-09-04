@@ -10,6 +10,9 @@ This regex matches (YYYY) and captures YYYY.
 """
 
 import re
+import structlog
+
+logger = structlog.get_logger("fix_regex")
 
 # Fix create_notebook1.py
 with open("create_notebook1.py", encoding="utf-8") as f:
@@ -56,7 +59,7 @@ with open("create_notebook2.py", "w", encoding="utf-8") as f:
     f.write(content2)
 
 # Verify by reading back
-print()
+logger.info("")
 logger.info("Verification:")
 with open("create_notebook1.py", encoding="utf-8") as f:
     for line in f:
@@ -79,5 +82,5 @@ with open("create_notebook2.py", encoding="utf-8") as f:
                 inner = m_inner.group(1)
                 logger.info(f"  Inner pattern: {inner!r}")
 
-print()
+logger.info("")
 logger.info("Done!")
