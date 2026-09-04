@@ -20,6 +20,7 @@ import pandas as pd
 warnings.filterwarnings("ignore")
 
 from app._paths import CACHE_DIR, DATA_DIR, MODELS_DIR
+from app.utils import logger
 
 # ── Cache helpers ──────────────────────────────────────────────────────────────
 
