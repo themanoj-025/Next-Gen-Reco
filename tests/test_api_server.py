@@ -46,6 +46,30 @@ class TestHealthEndpoint:
         response = client.get("/health")
         assert response.status_code == 200
 
+    # ── Readiness (canonical shared module) ────────────────────────────────
+
+    @patch("app.api_server._get_recommender")
+    def test_ready_ok_when_model_loaded(self, mock_get, client) -> None:
+        rec = MagicMock()
+        rec.model_result = object()  # not None => model loaded
+        mock_get.return_value = rec
+
+        response = client.get("/health/ready")
+        assert response.status_code == 200
+        assert response.json()["status"] == "ready"
+
+    @patch("app.api_server._get_recommender")
+    def test_ready_503_when_model_not_loaded(self, mock_get, client) -> None:
+        rec = MagicMock()
+        rec.model_result = None
+        mock_get.return_value = rec
+
+        response = client.get("/health/ready")
+        assert response.status_code == 503
+        data = response.json()
+        assert data["status"] == "not_ready"
+        assert data["checks"][0]["status"] == "down"
+
 
 # ── Search Endpoint ───────────────────────────────────────────────────────
 
