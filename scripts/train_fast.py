@@ -2,14 +2,9 @@
 Fast model training - saves to models/v1_test/ (where the recommender expects it)
 """
 
-import os
-import sys
 import warnings
 
 warnings.filterwarnings("ignore")
-
-# Ensure project root is on path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.model import train_model
 
