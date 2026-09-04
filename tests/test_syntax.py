@@ -1,4 +1,7 @@
 import nbformat as nbf
+import structlog
+
+logger = structlog.get_logger("test_syntax")
 
 
 def md_cell(source) -> None:
@@ -18,4 +21,4 @@ cells1.append(
     )
 )
 cells1.append(nb_cell("""import pandas as pd"""))
-print(f"OK: {len(cells1)} cells")
+logger.info("cells_created", count=len(cells1))
