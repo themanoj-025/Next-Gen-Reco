@@ -3,7 +3,6 @@
 Tests title normalization, caching, and data merging logic.
 """
 
-
 import pandas as pd
 
 
@@ -11,68 +10,118 @@ class TestTitleNormalization:
     """Test movie title normalization for matching."""
 
     def test_normalize_title_lowercase(self) -> None:
-        from app.enrichment import _normalize_title
+        from app.enrichment import _normalize
 
-        assert _normalize_title("Toy Story") == "toy story"
+        assert _normalize("Toy Story") == "toy story"
 
     def test_normalize_title_strip_whitespace(self) -> None:
-        from app.enrichment import _normalize_title
+        from app.enrichment import _normalize
 
-        assert _normalize_title("  Toy Story  ") == "toy story"
+        assert _normalize("  Toy Story  ") == "toy story"
 
     def test_normalize_title_remove_year(self) -> None:
-        from app.enrichment import _normalize_title
+        from app.enrichment import _normalize
 
-        result = _normalize_title("Toy Story (1995)")
+        result = _normalize("Toy Story (1995)")
         assert "1995" not in result
 
     def test_normalize_title_special_chars(self) -> None:
-        from app.enrichment import _normalize_title
+        from app.enrichment import _normalize
 
-        result = _normalize_title("Toy Story: The Movie!")
+        result = _normalize("Toy Story: The Movie!")
         # Should remove punctuation
         assert "!" not in result
 
 
-class TestCacheHelpers:
-    """Test caching logic."""
+class TestTmdbTitle:
+    """Test TMDB title normalization."""
 
-    def test_cache_path_construction(self) -> None:
-        from app.enrichment import _cache_path
+    def test_tmdb_title_lowercase(self) -> None:
+        from app.enrichment import _tmdb_title
 
-        path = _cache_path("test_cache.pkl")
-        assert path.name == "test_cache.pkl"
-        assert path.suffix == ".pkl"
+        assert _tmdb_title("Avatar") == "avatar"
+
+    def test_tmdb_title_strips_special(self) -> None:
+        from app.enrichment import _tmdb_title
+
+        result = _tmdb_title("The Movie: Part 2")
+        assert ":" not in result
+        assert "the movie part 2" == result
 
 
-class TestEnrichmentMerge:
-    """Test data merging with ND folder data."""
+class TestEnrichmentClass:
+    """Test NDEnrichment class initialization and methods."""
 
-    def test_merge_empty_dataframes(self) -> None:
-        df_main = pd.DataFrame({"movieId": [1, 2], "title": ["Movie A", "Movie B"]})
-        df_nd = pd.DataFrame(columns=["title", "overview"])
+    def test_init_without_movies_df(self) -> None:
+        from app.enrichment import NDEnrichment
 
-        from app.enrichment import _merge_nd_data
+        enrich = NDEnrichment()
+        assert enrich.is_loaded is False
 
-        result = _merge_nd_data(df_main, df_nd)
-        assert len(result) == 2
-        assert "overview" in result.columns
+    def test_metadata_returns_none_for_unknown(self) -> None:
+        from app.enrichment import NDEnrichment
 
-    def test_merge_with_matching_titles(self) -> None:
-        df_main = pd.DataFrame({"movieId": [1], "title": ["Toy Story"]})
-        df_nd = pd.DataFrame({"title": ["Toy Story"], "overview": ["A toy adventure"]})
+        enrich = NDEnrichment()
+        assert enrich.get_metadata(999999) is None
 
-        from app.enrichment import _merge_nd_data
+    def test_cast_returns_none_for_unknown(self) -> None:
+        from app.enrichment import NDEnrichment
 
-        result = _merge_nd_data(df_main, df_nd)
-        assert len(result) == 1
-        assert result.iloc[0]["overview"] == "A toy adventure"
+        enrich = NDEnrichment()
+        assert enrich.get_cast(999999) is None
 
-    def test_merge_preserves_all_main_rows(self) -> None:
-        df_main = pd.DataFrame({"movieId": [1, 2, 3], "title": ["A", "B", "C"]})
-        df_nd = pd.DataFrame({"title": ["A"], "overview": ["About A"]})
+    def test_reviews_returns_none_for_unknown(self) -> None:
+        from app.enrichment import NDEnrichment
 
-        from app.enrichment import _merge_nd_data
+        enrich = NDEnrichment()
+        assert enrich.get_reviews(999999) is None
 
-        result = _merge_nd_data(df_main, df_nd)
-        assert len(result) == 3
+    def test_get_movies_by_director_empty(self) -> None:
+        from app.enrichment import NDEnrichment
+
+        enrich = NDEnrichment()
+        assert enrich.get_movies_by_director("Nonexistent") == []
+
+    def test_get_movies_by_actor_empty(self) -> None:
+        from app.enrichment import NDEnrichment
+
+        enrich = NDEnrichment()
+        assert enrich.get_movies_by_actor("Nonexistent") == []
+
+    def test_has_data_false_for_unknown(self) -> None:
+        from app.enrichment import NDEnrichment
+
+        enrich = NDEnrichment()
+        assert enrich.has_data(999999) is False
+
+    def test_format_budget_empty(self) -> None:
+        from app.enrichment import NDEnrichment
+
+        enrich = NDEnrichment()
+        assert enrich.format_budget(999999) == ""
+
+    def test_format_revenue_empty(self) -> None:
+        from app.enrichment import NDEnrichment
+
+        enrich = NDEnrichment()
+        assert enrich.format_revenue(999999) == ""
+
+    def test_format_runtime_empty(self) -> None:
+        from app.enrichment import NDEnrichment
+
+        enrich = NDEnrichment()
+        assert enrich.format_runtime(999999) == ""
+
+    def test_get_status_summary_empty(self) -> None:
+        from app.enrichment import NDEnrichment
+
+        enrich = NDEnrichment()
+        summary = enrich.get_status_summary(999999)
+        assert isinstance(summary, dict)
+        assert len(summary) == 0
+
+    def test_get_cache_size_estimate(self) -> None:
+        from app.enrichment import NDEnrichment
+
+        enrich = NDEnrichment()
+        assert isinstance(enrich.get_cache_size_estimate(), int)
