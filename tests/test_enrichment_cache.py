@@ -1,8 +1,9 @@
-"""Tests for the ND enrichment cache (JSON serialization + legacy migration).
+"""Tests for the ND enrichment cache (JSON serialization + legacy discard).
 
 Covers the JSON round-trip (including int movieId key restoration), corrupt
-cache handling, source-change invalidation, and one-time migration of the
-legacy pickle cache into JSON.
+cache handling, source-change invalidation, and safe disposal of the legacy
+pickle cache (deleted on sight — never deserialized, since pickle can
+execute arbitrary code on load).
 """
 
 from __future__ import annotations
@@ -120,37 +121,37 @@ class TestJsonCache:
 
 
 class TestLegacyMigration:
-    def test_legacy_pickle_migrated_to_json(self, cache_paths) -> None:
+    def test_legacy_pickle_never_deserialized(self, cache_paths, monkeypatch) -> None:
+        """The legacy pickle is deleted on sight — deserialization is banned.
+
+        Pickle can execute arbitrary code on load, so even an HMAC-valid
+        legacy file must never be parsed (the old flow called pickle.load
+        on the envelope before verifying the signature).
+        """
         json_path, pkl_path, _ = cache_paths
-        data = {
-            "_metadata_map": {1: {"overview": "old", "budget": 50}},
-            "_cast_map": {1: {"director": "Jane", "actors": ["Al"], "actors_raw": ["Al", "", ""]}},
-            "_reviews_map": {2: ["ok"]},
-            "_director_to_movies": {"Jane": [1]},
-            "_actor_to_movies": {"Al": [1]},
-        }
-        _write_legacy_pickle(pkl_path, data)
+        _write_legacy_pickle(pkl_path, {"_metadata_map": {1: {"overview": "old"}}})
+
+        import pickle as _pickle
+
+        def _boom(*args, **kwargs):
+            raise AssertionError("pickle deserialization must never be called")
+
+        monkeypatch.setattr(_pickle, "load", _boom)
+        monkeypatch.setattr(_pickle, "loads", _boom)
 
         fresh = NDEnrichment.__new__(NDEnrichment)
         for attr in ("_metadata_map", "_cast_map", "_reviews_map", "_director_to_movies", "_actor_to_movies"):
             setattr(fresh, attr, {})
-        assert fresh._try_load_cache(None) is True
+        assert fresh._try_load_cache(None) is False
 
-        # Data preserved with int keys restored
-        assert fresh._metadata_map[1]["overview"] == "old"
-        assert fresh._cast_map[1]["director"] == "Jane"
-        assert fresh._reviews_map == {2: ["ok"]}
-
-        # Pickle removed, JSON written in its place
+        # Pickle removed without being read; nothing written to JSON
         assert not pkl_path.exists()
-        assert json_path.exists()
-        with open(json_path, encoding="utf-8") as f:
-            assert json.load(f)["_metadata_map"]["1"]["overview"] == "old"
+        assert not json_path.exists()
 
     def test_legacy_pickle_tampered_returns_false(self, cache_paths) -> None:
         _, pkl_path, _ = cache_paths
         pkl_path.parent.mkdir(parents=True, exist_ok=True)
-        # Wrong HMAC key → integrity check fails
+        # Wrong HMAC key → legacy file is untrusted
         data = {"_metadata_map": {}}
         raw = pickle.dumps(data)
         sig = hmac.new(b"wrong-key", raw, hashlib.sha256).hexdigest()
@@ -159,3 +160,5 @@ class TestLegacyMigration:
 
         fresh = NDEnrichment.__new__(NDEnrichment)
         assert fresh._try_load_cache(None) is False
+        # File is discarded rather than parsed
+        assert not pkl_path.exists()

@@ -7,7 +7,6 @@ title length), rating_count, and release year.
 """
 
 import os
-import pickle
 import time
 import warnings
 from pathlib import Path
