@@ -14,7 +14,6 @@ normalized movie titles.
 
 import json
 import logging
-import pickle
 import re
 import warnings
 from typing import Any
@@ -37,7 +36,7 @@ REVIEWS_TXT = ND_DIR / "reviews.txt"
 # Cache (JSON — safe to parse, unlike pickle, which could execute code)
 _CACHE_DIR = CACHE_DIR
 _ENRICHMENT_CACHE = _CACHE_DIR / "nd_enrichment.json"
-# Legacy pickle cache (pre-JSON) — migrated once on first load, then removed
+# Legacy pickle cache (pre-JSON) — discarded on sight, never deserialized
 _LEGACY_ENRICHMENT_CACHE = _CACHE_DIR / "nd_enrichment.pkl"
 
 
@@ -194,44 +193,27 @@ class NDEnrichment:
 
     # ── Cross-referencing ─────────────────────────────────────────────────
 
-    def _load_legacy_cache(self) -> dict[str, Any] | None:
-        """Migrate the legacy pickle cache (pre-JSON) into plain data.
+    def _discard_legacy_cache(self) -> None:
+        """Delete a stale legacy pickle cache without deserializing it.
 
-        The legacy file is the app's own HMAC-verified envelope, so integrity
-        is checked against the known key before deserializing. This runs once
-        per deployment; the pickle is deleted after the JSON re-save.
-
-        Returns the data dict, or None if the legacy cache is unreadable.
+        Pickle can execute arbitrary code on load, so the pre-JSON cache is
+        never parsed — not even for HMAC verification (the old flow called
+        ``pickle.load`` on the envelope *before* checking the signature,
+        which already executed attacker-controlled bytecode). The enrichment
+        data is deterministically rebuildable from the committed ND CSVs, so
+        the file is simply removed and the data rebuilt.
         """
-        import hashlib
-        import hmac
-        import io
-        import os
-
         try:
-            _hmac_key = os.environ.get(
-                "NGRECO_ENRICHMENT_HMAC_KEY", "ngreco-default-dev-key"
-            ).encode()
-            with open(_LEGACY_ENRICHMENT_CACHE, "rb") as f:
-                envelope = pickle.load(f)
-
-            if isinstance(envelope, dict) and "data" in envelope and "hmac" in envelope:
-                expected_sig = envelope["hmac"]
-                raw = envelope["data"]
-                actual_sig = hmac.new(_hmac_key, raw, hashlib.sha256).hexdigest()
-                if not hmac.compare_digest(expected_sig, actual_sig):
-                    logger.warning("Legacy cache HMAC mismatch — rebuilding")
-                    return None
-                return pickle.loads(raw)
-            return envelope
-        except (OSError, ValueError, pickle.UnpicklingError) as e:
-            logger.warning("Legacy cache migration failed (%s) — rebuilding", e)
-            return None
+            _LEGACY_ENRICHMENT_CACHE.unlink()
+            logger.info("Discarded legacy pickle cache without reading it")
+        except OSError as e:
+            logger.warning("Could not remove legacy pickle cache (%s)", e)
 
     def _try_load_cache(self, movies_df: pd.DataFrame) -> bool:
         """Try to load pre-computed enrichment from the disk cache.
 
-        Prefers the JSON cache; migrates a legacy pickle cache once. Returns
+        Prefers the JSON cache; discards any stale legacy pickle cache
+        without deserializing it. Returns
         True if cache was loaded successfully, False otherwise.
         """
         cache_path = (
@@ -257,9 +239,10 @@ class NDEnrichment:
                 with open(_ENRICHMENT_CACHE, encoding="utf-8") as f:
                     data = json.load(f)
             else:
-                data = self._load_legacy_cache()
-                if data is None:
-                    return False
+                # Legacy pickle caches are never deserialized (pickle can
+                # execute code on load) — drop the file and rebuild instead.
+                self._discard_legacy_cache()
+                return False
 
             self._metadata_map = _int_keyed(data["_metadata_map"])
             self._cast_map = _int_keyed(data["_cast_map"])
@@ -268,10 +251,6 @@ class NDEnrichment:
             self._actor_to_movies = data["_actor_to_movies"]
             self._loaded = True
 
-            if cache_path == _LEGACY_ENRICHMENT_CACHE:
-                # Populate the JSON cache now that data is loaded, then remove
-                # the legacy pickle (one-time migration).
-                self._save_cache()
             return True
         except (OSError, ValueError, TypeError, json.JSONDecodeError) as e:
             logger.error("Cache load failed: %s", e)

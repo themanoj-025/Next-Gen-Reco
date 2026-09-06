@@ -7,7 +7,6 @@ title length), rating_count, and release year.
 """
 
 import os
-import pickle
 import re
 import time
 import warnings
@@ -84,17 +83,17 @@ def load_ratings_sample(path: str | None = None, n: int = 500_000) -> pd.DataFra
 def load_tags(path: str | None = None, top_k: int = 100) -> pd.DataFrame:
     """Load tags CSV and return top-K most frequent tags per movie as one-hot features.
 
-    Results are cached to disk (as pickle) for fast subsequent loads.
+    Results are cached to disk (as Parquet) for fast subsequent loads.
     Cache is invalidated when the source CSV changes.
     """
     if path is None:
         path = str(DATA_DIR / "tags.csv")
-    cache_file = _cache_path(f"tag_pivot_top{top_k}.pkl")
+    cache_file = _cache_path(f"tag_pivot_top{top_k}.parquet")
 
     # Try loading from cache first
     if _is_cache_valid(cache_file, path):
         try:
-            df = pd.read_pickle(cache_file)
+            df = pd.read_parquet(cache_file)
             logger.info(f"  Loaded tag pivot from cache ({len(df)} rows)")
             return df
         except (OSError, ValueError, KeyError):
@@ -121,9 +120,9 @@ def load_tags(path: str | None = None, top_k: int = 100) -> pd.DataFrame:
 
     # Save to cache
     try:
-        tag_pivot.to_pickle(cache_file)
+        tag_pivot.to_parquet(cache_file, index=False)
         logger.info("  Saved tag pivot to cache")
-    except (OSError, pickle.PicklingError) as e:
+    except (OSError, ValueError) as e:
         logger.warning(f"  Warning: could not save tag cache ({e})")
 
     return tag_pivot

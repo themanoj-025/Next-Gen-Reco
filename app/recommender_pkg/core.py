@@ -61,10 +61,10 @@ class CoreMixin:
         movies_csv_path = str(DATA_DIR / "movies.csv")
         if _check_cache_valid(_GENRE_CACHE_PATH, movies_csv_path):
             try:
-                data = np.load(_GENRE_CACHE_PATH, allow_pickle=True)
+                data = np.load(_GENRE_CACHE_PATH, allow_pickle=False)
                 self._genre_vectors = data["vectors"]
                 self._genre_norms = data["norms"]
-                self.genre_cols = list(data["cols"])
+                self.genre_cols = [str(c) for c in data["cols"]]
                 # Rebuild genre_dummies from vectors (needed by some methods)
                 self.genre_dummies = pd.DataFrame(
                     self._genre_vectors,
@@ -164,7 +164,9 @@ class CoreMixin:
                 _GENRE_CACHE_PATH,
                 vectors=self._genre_vectors,
                 norms=self._genre_norms,
-                cols=np.array(self.genre_cols, dtype=object),
+                # Fixed-width unicode (not object dtype) so the cache loads
+                # with allow_pickle=False — .npy object arrays require pickle.
+                cols=np.array(self.genre_cols),
             )
             logger.info("%s Saved genre vectors to cache", _LOG_PREFIX)
         except (OSError, ValueError) as e:
