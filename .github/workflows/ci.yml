@@ -152,9 +152,8 @@ jobs:
 
       - name: Run pytest test suite
         run: python -m pytest tests/ -v --tb=short --cov=. --cov-report=term-missing --cov-fail-under=55
-        # Exit code 5 means no tests collected (test_model.py is a standalone script, not a pytest suite)
-        # Any other failure exit code will still fail the job
-        continue-on-error: true
+        # Fail the job on any test failure. Slow/integration tests are deselected
+        # by the repo's `-m 'not slow'` addopts in pyproject.toml.
 
       - name: Verify Streamlit config
         run: |
