@@ -7,7 +7,8 @@ import io
 
 import streamlit as st
 
-from app.ui.poster_utils import _rating_color
+from app.ui.detail_widgets.rating_widgets import _stars_display
+from app.ui.poster_utils import _genre_chip_class, _rating_color
 
 
 def render_similar_movies(movie_id: int, info: dict, recs: list) -> None:
