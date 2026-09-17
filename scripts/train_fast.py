@@ -7,6 +7,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 from app.model import train_model
+from app.utils import logger
 
 logger.info("=" * 55)
 logger.info("  MovieLens - Training Fast Model (no tuning)")
