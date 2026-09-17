@@ -46,7 +46,7 @@ class TestTmdbTitle:
 
         result = _tmdb_title("The Movie: Part 2")
         assert ":" not in result
-        assert "the movie part 2" == result
+        assert result == "the movie part 2"
 
 
 class TestEnrichmentClass:

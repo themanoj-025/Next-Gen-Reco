@@ -10,6 +10,7 @@ This regex matches (YYYY) and captures YYYY.
 """
 
 import re
+
 import structlog
 
 logger = structlog.get_logger("fix_regex")

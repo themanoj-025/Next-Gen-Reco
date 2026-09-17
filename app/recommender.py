@@ -24,6 +24,7 @@ from __future__ import annotations
 
 # Re-export from the package for backward compatibility.
 from app.recommender_pkg import MovieRecommender
+from app.utils import logger
 
 __all__ = ["MovieRecommender"]
 
