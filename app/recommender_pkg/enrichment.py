@@ -77,9 +77,8 @@ class EnrichmentMixin:
                     seen.add(key)
                     unique_reviews.append(r_clean)
             if unique_reviews:
-                review_section = (
-                    "<br><br>📝 <strong>What users are saying:</strong><br>"
-                    + "<br>".join(f"• \u201c{r}\u201d" for r in unique_reviews)
+                review_section = "<br><br>📝 <strong>What users are saying:</strong><br>" + "<br>".join(
+                    f"• \u201c{r}\u201d" for r in unique_reviews
                 )
                 enriched["overview"] = existing_overview + review_section
 

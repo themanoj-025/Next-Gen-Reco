@@ -65,6 +65,7 @@ python scripts/train_fast.py
 Always use `app/_paths.py` for resolving file paths:
 ```python
 from app._paths import DATA_DIR, MODELS_DIR
+
 data_path = DATA_DIR / "movies.csv"
 model_path = MODELS_DIR / "v1_test" / "model.joblib"
 ```

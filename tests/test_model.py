@@ -166,15 +166,7 @@ class TestBuildFeatures:
             '3,"Movie C (2002)",Action|Comedy\n'
         )
         ratings_csv = tmp_path / "ratings.csv"
-        ratings_csv.write_text(
-            "userId,movieId,rating\n"
-            "1,1,4.0\n"
-            "1,2,3.0\n"
-            "2,1,5.0\n"
-            "2,3,4.0\n"
-            "3,2,2.0\n"
-            "3,3,5.0\n"
-        )
+        ratings_csv.write_text("userId,movieId,rating\n1,1,4.0\n1,2,3.0\n2,1,5.0\n2,3,4.0\n3,2,2.0\n3,3,5.0\n")
         return str(movies_csv), str(ratings_csv)
 
     def test_build_features_returns_tuple(self, sample_data) -> None:
@@ -205,15 +197,7 @@ class TestLoadTags:
 
     @pytest.fixture
     def sample_tags_csv(self, tmp_path) -> str:
-        csv_content = (
-            "userId,movieId,tag\n"
-            "1,1,action\n"
-            "1,1,adventure\n"
-            "2,1,action\n"
-            "2,2,comedy\n"
-            "3,1,drama\n"
-            "3,2,comedy\n"
-        )
+        csv_content = "userId,movieId,tag\n1,1,action\n1,1,adventure\n2,1,action\n2,2,comedy\n3,1,drama\n3,2,comedy\n"
         csv_path = tmp_path / "tags.csv"
         csv_path.write_text(csv_content)
         return str(csv_path)

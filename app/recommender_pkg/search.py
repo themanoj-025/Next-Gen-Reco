@@ -22,9 +22,7 @@ class SearchMixin:
             return [(80.0, row["movieId"]) for _, row in self.movies[start_mask].iterrows()]
 
         # Contains
-        contains_mask = (
-            self.movies["title"].str.lower().str.contains(q_lower, na=False, regex=False)
-        )
+        contains_mask = self.movies["title"].str.lower().str.contains(q_lower, na=False, regex=False)
         if contains_mask.any():
             candidates = self.movies[contains_mask]
             scored = []
@@ -85,8 +83,7 @@ class SearchMixin:
                     info = self.get_movie_info(mid)
                     if info:
                         if rating_min is not None and (
-                            info["predicted_rating"] is None
-                            or info["predicted_rating"] < rating_min
+                            info["predicted_rating"] is None or info["predicted_rating"] < rating_min
                         ):
                             continue
                         info["_search_score"] = s
@@ -98,9 +95,7 @@ class SearchMixin:
         # ── Step 3: Full scoring on filtered set ─────────────────────────
         # Quick bail-out: check if ANY movie contains the query at all
         q_first_word = q_tokens[0] if q_tokens else q_lower
-        any_match_mask = (
-            filtered["title"].str.lower().str.contains(q_first_word, na=False, regex=False)
-        )
+        any_match_mask = filtered["title"].str.lower().str.contains(q_first_word, na=False, regex=False)
         if not any_match_mask.any():
             # No movie contains even the first query word — return empty fast
             return []
@@ -135,9 +130,7 @@ class SearchMixin:
             # 4. Token-based: all query words present in title (any order)
             elif q_tokens:
                 title_tokens = self._tokenize(title)
-                matched = sum(
-                    1 for t in q_tokens if any(t == tt or tt.startswith(t) for tt in title_tokens)
-                )
+                matched = sum(1 for t in q_tokens if any(t == tt or tt.startswith(t) for tt in title_tokens))
                 if matched == len(q_tokens):
                     title_token_set = set(title_tokens)
                     query_token_set = set(q_tokens)
@@ -149,9 +142,7 @@ class SearchMixin:
             # 5. Acronym match
             if score < 30.0 and len(q) >= 2 and len(q) <= 6:
                 q_upper = q.upper()
-                acronym = "".join(
-                    w[0].upper() for w in title.split() if w[0].isalpha() and len(w) > 1
-                )
+                acronym = "".join(w[0].upper() for w in title.split() if w[0].isalpha() and len(w) > 1)
                 if acronym and (acronym == q_upper or acronym.startswith(q_upper)):
                     score = max(score, 45.0)
 
@@ -223,9 +214,7 @@ class SearchMixin:
             # Check for token overlap (some words match)
             title_tokens = self._tokenize(title)
             common = sum(
-                1
-                for t in q_tokens
-                if any(t == tt or tt.startswith(t) or t.startswith(tt) for tt in title_tokens)
+                1 for t in q_tokens if any(t == tt or tt.startswith(t) or t.startswith(tt) for tt in title_tokens)
             )
             if common > 0 and common < len(q_tokens):
                 score = common / len(q_tokens) * 50.0

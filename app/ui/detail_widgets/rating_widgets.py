@@ -95,11 +95,7 @@ def render_watchlist_button(movie_id: int) -> None:
         new_cat = st.selectbox(
             "Status",
             WATCHLIST_CATEGORIES,
-            index=(
-                WATCHLIST_CATEGORIES.index(current_cat)
-                if current_cat in WATCHLIST_CATEGORIES
-                else 0
-            ),
+            index=(WATCHLIST_CATEGORIES.index(current_cat) if current_cat in WATCHLIST_CATEGORIES else 0),
             key=f"wl_cat_{movie_id}",
             label_visibility="collapsed",
         )
