@@ -26,11 +26,7 @@ class FeaturesMixin:
         dec_start = decade
         dec_end = decade + 9
 
-        mask = (
-            (self.movies["year"] >= dec_start)
-            & (self.movies["year"] <= dec_end)
-            & (self.movies["year"] > 0)
-        )
+        mask = (self.movies["year"] >= dec_start) & (self.movies["year"] <= dec_end) & (self.movies["year"] > 0)
         decade_movies = self.movies[mask].copy()
 
         # Genre distribution
@@ -200,11 +196,7 @@ class FeaturesMixin:
         movie_count = min(max(movie_count, 1), 5)
 
         # Filter movies
-        mask = (
-            (self.movies["year"] >= min_year)
-            & (self.movies["year"] <= max_year)
-            & (self.movies["year"] > 0)
-        )
+        mask = (self.movies["year"] >= min_year) & (self.movies["year"] <= max_year) & (self.movies["year"] > 0)
 
         if genre:
             # Use regex mode so pipe-delimited genres like "Action|Thriller" match individual genres
