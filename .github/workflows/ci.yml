@@ -81,14 +81,14 @@ jobs:
         run: |
           echo "=== Syntax check: all .py files ==="
           FAILED=0
-          for f in $(find . -name '*.py' -not -path './.git/*' -not -path './.cache/*' -not -path './.devcontainer/*'); do
+          while IFS= read -r -d '' f; do
             if python -m py_compile "$f"; then
               echo "  ✓ $f"
             else
               echo "  ✗ FAILED: $f"
               FAILED=$((FAILED + 1))
             fi
-          done
+          done < <(find . -name '*.py' -not -path './.git/*' -not -path './.cache/*' -not -path './.devcontainer/*' -print0)
           echo "=== All files compiled ($FAILED failures) ==="
           if [ "$FAILED" -gt 0 ]; then
             echo "ERROR: $FAILED file(s) failed to compile"
