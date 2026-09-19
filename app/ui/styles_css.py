@@ -5,7 +5,8 @@ block that gets injected via st.markdown.
 """
 
 # The main CSS block — imported by styles.py
-CSS_BLOCK = """
+CSS_BLOCK = (
+    """
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
     * {{ font-family: 'Inter', -apple-system, sans-serif; }}
@@ -587,3 +588,4 @@ CSS_BLOCK = """
 
 </style>
 """,
+)

@@ -34,7 +34,9 @@ def cache_paths(tmp_path: Path, monkeypatch) -> tuple[Path, Path, Path]:
 def _make_enrichment() -> NDEnrichment:
     enrich = NDEnrichment.__new__(NDEnrichment)
     enrich._metadata_map = {1: {"overview": "A movie", "budget": 100, "vote_average": 7.5}}
-    enrich._cast_map = {1: {"director": "Jane", "actors": ["Al", "Bo"], "actors_raw": ["Al", "Bo", "unknown"]}}
+    enrich._cast_map = {
+        1: {"director": "Jane", "actors": ["Al", "Bo"], "actors_raw": ["Al", "Bo", "unknown"]}
+    }
     enrich._reviews_map = {1: ["great", "fun"]}
     enrich._director_to_movies = {"Jane": [1, 2]}
     enrich._actor_to_movies = {"Al": [1]}
@@ -67,8 +69,12 @@ class TestJsonCache:
         fresh._actor_to_movies = {}
         assert fresh._try_load_cache(None) is True
 
-        assert fresh._metadata_map == {1: {"overview": "A movie", "budget": 100, "vote_average": 7.5}}
-        assert fresh._cast_map == {1: {"director": "Jane", "actors": ["Al", "Bo"], "actors_raw": ["Al", "Bo", "unknown"]}}
+        assert fresh._metadata_map == {
+            1: {"overview": "A movie", "budget": 100, "vote_average": 7.5}
+        }
+        assert fresh._cast_map == {
+            1: {"director": "Jane", "actors": ["Al", "Bo"], "actors_raw": ["Al", "Bo", "unknown"]}
+        }
         assert fresh._reviews_map == {1: ["great", "fun"]}
         assert fresh._director_to_movies == {"Jane": [1, 2]}
         assert fresh._actor_to_movies == {"Al": [1]}
@@ -83,7 +89,13 @@ class TestJsonCache:
         assert list(raw["_metadata_map"]) == ["1"]  # JSON stores string keys
 
         fresh = NDEnrichment.__new__(NDEnrichment)
-        for attr in ("_metadata_map", "_cast_map", "_reviews_map", "_director_to_movies", "_actor_to_movies"):
+        for attr in (
+            "_metadata_map",
+            "_cast_map",
+            "_reviews_map",
+            "_director_to_movies",
+            "_actor_to_movies",
+        ):
             setattr(fresh, attr, {})
         assert fresh._try_load_cache(None) is True
         assert 1 in fresh._metadata_map  # int key works for lookup
@@ -99,7 +111,9 @@ class TestJsonCache:
         fresh = NDEnrichment.__new__(NDEnrichment)
         assert fresh._try_load_cache(None) is False
 
-    def test_source_change_invalidates_cache(self, cache_paths, tmp_path: Path, monkeypatch) -> None:
+    def test_source_change_invalidates_cache(
+        self, cache_paths, tmp_path: Path, monkeypatch
+    ) -> None:
         json_path, _, cache_dir = cache_paths
         _make_enrichment()._save_cache()
 
@@ -108,7 +122,6 @@ class TestJsonCache:
         newer.write_text("title\nX\n", encoding="utf-8")
         # Make the source mtime clearly newer than the cache
         import os
-        import time
 
         old = json_path.stat().st_mtime
         os.utime(newer, (old + 100, old + 100))
@@ -140,7 +153,13 @@ class TestLegacyMigration:
         monkeypatch.setattr(_pickle, "loads", _boom)
 
         fresh = NDEnrichment.__new__(NDEnrichment)
-        for attr in ("_metadata_map", "_cast_map", "_reviews_map", "_director_to_movies", "_actor_to_movies"):
+        for attr in (
+            "_metadata_map",
+            "_cast_map",
+            "_reviews_map",
+            "_director_to_movies",
+            "_actor_to_movies",
+        ):
             setattr(fresh, attr, {})
         assert fresh._try_load_cache(None) is False
 

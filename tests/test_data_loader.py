@@ -44,9 +44,7 @@ class TestUserDataPersistence:
 
     def test_load_user_data_creates_empty_state(self) -> None:
         with patch("app.data.loader.st") as mock_st:
-            mock_st.session_state = _SessionState(
-                user_ratings={}, watchlist={}, search_history=[]
-            )
+            mock_st.session_state = _SessionState(user_ratings={}, watchlist={}, search_history=[])
             from app.data.loader import _load_user_data
 
             # Should not raise even with no file
@@ -72,15 +70,14 @@ class TestUserDataPersistence:
                     "1": "Want to Watch",
                     "2": "Want to Watch",
                 }
-                assert data["search_history"] == [
-                    ["toy story", "2024-01-01T12:00:00"]
-                ]
+                assert data["search_history"] == [["toy story", "2024-01-01T12:00:00"]]
 
     def test_save_and_load_roundtrip(self, tmp_path: Path) -> None:
         data_file = tmp_path / "roundtrip.json"
-        with patch("app.data.loader.USER_DATA_FILE", data_file), patch(
-            "app.data.loader.st"
-        ) as mock_st:
+        with (
+            patch("app.data.loader.USER_DATA_FILE", data_file),
+            patch("app.data.loader.st") as mock_st,
+        ):
             mock_st.session_state = _SessionState(
                 user_ratings={10: 4.5},
                 watchlist={10: "Want to Watch"},
@@ -91,9 +88,7 @@ class TestUserDataPersistence:
             _save_user_data()
 
             # Reset session state
-            mock_st.session_state = _SessionState(
-                user_ratings={}, watchlist={}, search_history=[]
-            )
+            mock_st.session_state = _SessionState(user_ratings={}, watchlist={}, search_history=[])
             from app.data.loader import _load_user_data
 
             _load_user_data()

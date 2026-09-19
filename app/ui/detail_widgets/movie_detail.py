@@ -303,5 +303,3 @@ def render_movie_detail(movie_id: int) -> None:
 
 
 # ── Similar Movies ────────────────────────────────────────────────────────────
-
-

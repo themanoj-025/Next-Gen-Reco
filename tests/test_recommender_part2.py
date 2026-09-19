@@ -12,9 +12,6 @@ Covers:
   - movie_night_generator() output
   - find_movies_combo() output — Part 2."""
 
-import numpy as np
-import pytest
-
 
 class TestGetTopPicks:
     """Tests for the global top picks feature."""
@@ -72,8 +69,16 @@ class TestEnrichMovieInfo:
         # When no ND data matched (e.g. in test environments), keys may be absent.
         meta = recommender.get_enriched_metadata(1)
         if meta:
-            for key in ["overview", "tagline", "runtime", "budget",
-                        "revenue", "vote_average", "director", "actors"]:
+            for key in [
+                "overview",
+                "tagline",
+                "runtime",
+                "budget",
+                "revenue",
+                "vote_average",
+                "director",
+                "actors",
+            ]:
                 assert key in enriched, f"Expected key '{key}' when enrichment data exists"
 
 
@@ -85,6 +90,7 @@ class TestCheckCacheValid:
 
     def test_returns_false_for_missing_cache(self, tmp_path) -> None:
         from app.recommender_pkg.core import _check_cache_valid
+
         result = _check_cache_valid(tmp_path / "nonexistent.npz")
         assert result is False
 
@@ -92,6 +98,7 @@ class TestCheckCacheValid:
         import time
 
         from app.recommender_pkg.core import _check_cache_valid
+
         source = tmp_path / "source.csv"
         source.touch()
         time.sleep(1.1)  # Windows needs >1s for distinct mtime
@@ -103,6 +110,7 @@ class TestCheckCacheValid:
         import time
 
         from app.recommender_pkg.core import _check_cache_valid
+
         cache = tmp_path / "cache.npz"
         cache.touch()
         time.sleep(1.1)  # Windows needs >1s for distinct mtime
@@ -112,6 +120,7 @@ class TestCheckCacheValid:
 
     def test_returns_true_when_source_missing(self, tmp_path) -> None:
         from app.recommender_pkg.core import _check_cache_valid
+
         cache = tmp_path / "cache.npz"
         cache.touch()
         assert _check_cache_valid(cache, tmp_path / "nonexistent.csv") is True
@@ -164,14 +173,18 @@ class TestRecommendEdgeCases:
         assert recs[0]["similarity"] > 0
 
     def test_all_genres_no_tags(self, recommender) -> None:
-        recs = recommender.recommend(1, n=5, genre_weight=1.0, tag_weight=0.0, year_weight=0.0, rating_weight=0.0)
+        recs = recommender.recommend(
+            1, n=5, genre_weight=1.0, tag_weight=0.0, year_weight=0.0, rating_weight=0.0
+        )
         assert len(recs) > 0
         # genre_similarity should be the main component
         for r in recs:
             assert r["genre_similarity"] > 0
 
     def test_all_tags_no_genres(self, recommender) -> None:
-        recs = recommender.recommend(1, n=5, genre_weight=0.0, tag_weight=1.0, year_weight=0.0, rating_weight=0.0)
+        recs = recommender.recommend(
+            1, n=5, genre_weight=0.0, tag_weight=1.0, year_weight=0.0, rating_weight=0.0
+        )
         assert len(recs) > 0
 
     def test_large_n(self, recommender) -> None:
@@ -185,7 +198,9 @@ class TestRecommendEdgeCases:
 
     def test_movie_with_no_genres(self, recommender) -> None:
         # Find a movie with (no genres listed)
-        no_genre = recommender.movies[recommender.movies["genres"].str.contains("no genres listed", na=False)]
+        no_genre = recommender.movies[
+            recommender.movies["genres"].str.contains("no genres listed", na=False)
+        ]
         if len(no_genre) > 0:
             mid = no_genre.iloc[0]["movieId"]
             recs = recommender.recommend(int(mid), n=3)
@@ -194,8 +209,17 @@ class TestRecommendEdgeCases:
     def test_all_rec_keys_present(self, recommender) -> None:
         recs = recommender.recommend(1, n=3)
         for r in recs:
-            required = {"movieId", "title", "genres", "genres_str", "similarity",
-                        "predicted_rating", "genre_similarity", "tag_similarity", "year_proximity"}
+            required = {
+                "movieId",
+                "title",
+                "genres",
+                "genres_str",
+                "similarity",
+                "predicted_rating",
+                "genre_similarity",
+                "tag_similarity",
+                "year_proximity",
+            }
             assert required.issubset(set(r.keys()))
 
 
@@ -331,12 +355,14 @@ class TestPredictionCache:
 
     def test_cache_cleared_on_init(self, recommender) -> None:
         from app.recommender_pkg.core import _prediction_cache
+
         # Cache may be populated by earlier tests in this module-scoped fixture.
         # Verify the cache is a dict and was set up during __init__.
         assert isinstance(_prediction_cache, dict)
 
     def test_cache_populated_after_predict(self, recommender) -> None:
         from app.recommender_pkg.core import _predict_model_result, _prediction_cache
+
         if _predict_model_result is not None:
             row = recommender.movies_by_id.get(1)
             if row is not None:
@@ -346,6 +372,7 @@ class TestPredictionCache:
 
     def test_cache_returns_same_value(self, recommender) -> None:
         from app.recommender_pkg.core import _predict_model_result
+
         if _predict_model_result is not None:
             row = recommender.movies_by_id.get(1)
             if row is not None:
@@ -406,6 +433,7 @@ class TestBuildGenreVectors:
 
     def test_genre_dummies_is_dataframe(self, recommender) -> None:
         import pandas as pd
+
         assert isinstance(recommender.genre_dummies, pd.DataFrame)
 
 

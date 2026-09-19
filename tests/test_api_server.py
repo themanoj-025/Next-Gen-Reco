@@ -7,8 +7,6 @@ Tests both open access and API key auth modes.
 
 import asyncio
 import os
-import sys
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -25,6 +23,7 @@ from app.api_server import app, verify_api_key
 
 # ── Fixtures ──────────────────────────────────────────────────────────────
 
+
 @pytest.fixture
 def client() -> None:
     """Create a TestClient for the FastAPI app."""
@@ -32,6 +31,7 @@ def client() -> None:
 
 
 # ── Health Endpoint ───────────────────────────────────────────────────────
+
 
 class TestHealthEndpoint:
     def test_health_returns_ok(self, client) -> None:
@@ -72,6 +72,7 @@ class TestHealthEndpoint:
 
 # ── Search Endpoint ───────────────────────────────────────────────────────
 
+
 class TestSearchMovies:
     @patch("app.api_server._get_recommender")
     def test_search_returns_results(self, mock_get, client) -> None:
@@ -109,12 +110,15 @@ class TestSearchMovies:
 
 # ── Movie Info Endpoint ───────────────────────────────────────────────────
 
+
 class TestGetMovie:
     @patch("app.api_server._get_recommender")
     def test_get_movie_found(self, mock_get, client) -> None:
         mock_rec = MagicMock()
         mock_rec.get_movie_info.return_value = {
-            "movieId": 1, "title": "Toy Story", "genres": "Animation"
+            "movieId": 1,
+            "title": "Toy Story",
+            "genres": "Animation",
         }
         mock_get.return_value = mock_rec
 
@@ -135,14 +139,13 @@ class TestGetMovie:
 
 # ── Recommendations Endpoint ──────────────────────────────────────────────
 
+
 class TestGetRecommendations:
     @patch("app.api_server._get_recommender")
     def test_get_recommendations(self, mock_get, client) -> None:
         mock_rec = MagicMock()
         mock_rec.get_movie_info.return_value = {"movieId": 1}
-        mock_rec.recommend.return_value = [
-            {"movieId": 2, "title": "Toy Story 2", "score": 0.95}
-        ]
+        mock_rec.recommend.return_value = [{"movieId": 2, "title": "Toy Story 2", "score": 0.95}]
         mock_get.return_value = mock_rec
 
         response = client.get("/api/v1/recommendations/1?n=5")
@@ -163,15 +166,16 @@ class TestGetRecommendations:
 
 # ── Stats Endpoint ────────────────────────────────────────────────────────
 
+
 class TestDatasetStats:
     @patch("app.api_server._get_recommender")
     def test_stats_returns_metrics(self, mock_get, client) -> None:
         import pandas as pd
+
         mock_rec = MagicMock()
-        mock_rec.movies = pd.DataFrame({
-            "year": [1995, 2000, 2010],
-            "rating_count": [100, 200, 300]
-        })
+        mock_rec.movies = pd.DataFrame(
+            {"year": [1995, 2000, 2010], "rating_count": [100, 200, 300]}
+        )
         mock_rec.model_result = {"r2": 0.85}
         mock_get.return_value = mock_rec
 
@@ -186,6 +190,7 @@ class TestDatasetStats:
 
 
 # ── API Key Auth ──────────────────────────────────────────────────────────
+
 
 class TestAPIKeyAuth:
     def test_no_key_allows_open_access(self) -> None:
@@ -222,6 +227,7 @@ class TestAPIKeyAuth:
 
 # ── HTTP Method Validation ────────────────────────────────────────────────
 
+
 class TestHTTPMethods:
     def test_health_only_accepts_get(self, client) -> None:
         response = client.post("/health")
@@ -237,6 +243,7 @@ class TestHTTPMethods:
 
 
 # ── Response Format Validation ────────────────────────────────────────────
+
 
 class TestResponseFormat:
     def test_health_response_structure(self, client) -> None:
@@ -257,7 +264,6 @@ class TestResponseFormat:
     @patch("app.api_server._get_recommender")
     def test_stats_response_structure(self, mock_get, client) -> None:
         import pandas as pd
-
 
         mock_rec = MagicMock()
         mock_rec.movies = pd.DataFrame({"year": [2000], "rating_count": [50]})
