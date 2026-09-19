@@ -88,7 +88,6 @@ def render_similar_movies(movie_id: int, info: dict, recs: list) -> None:
 # ── Feature Explanation ───────────────────────────────────────────────────────
 
 
-
 def render_feature_explanation(movie_id: int) -> None:
     rec = st.session_state.recommender
     fb = rec.get_feature_breakdown(movie_id)
@@ -115,7 +114,6 @@ def render_feature_explanation(movie_id: int) -> None:
 
 
 # ── Metrics ───────────────────────────────────────────────────────────────────
-
 
 
 def render_metrics_card(info: dict) -> None:
@@ -162,7 +160,6 @@ def render_metrics_card(info: dict) -> None:
 
 
 # ── Visualization Charts ──────────────────────────────────────────────────────
-
 
 
 def render_export(movie_id: int, info: dict, recs: list) -> None:

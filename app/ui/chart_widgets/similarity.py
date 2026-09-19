@@ -82,5 +82,3 @@ def render_similarity_breakdown(movie_id: int, recs: list) -> None:
 
 
 # ── Export ────────────────────────────────────────────────────────────────────
-
-

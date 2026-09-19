@@ -64,7 +64,16 @@ class TestLoadMovies:
         assert isinstance(movies_df, pd.DataFrame)
 
     def test_has_expected_columns(self, movies_df) -> None:
-        expected = {"movieId", "title", "genres", "year", "genre_list", "genre_count", "title_length", "title_words"}
+        expected = {
+            "movieId",
+            "title",
+            "genres",
+            "year",
+            "genre_list",
+            "genre_count",
+            "title_length",
+            "title_words",
+        }
         assert expected.issubset(set(movies_df.columns))
 
     def test_non_empty(self, movies_df) -> None:
@@ -203,7 +212,6 @@ class TestPredictRating:
 
     def test_rating_count_affects_prediction(self, model_result, movies_df) -> None:
         from app.model import predict_rating
-
 
         row = movies_df.iloc[0]
         pred_low = predict_rating(

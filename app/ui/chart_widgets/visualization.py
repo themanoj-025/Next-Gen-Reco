@@ -143,11 +143,12 @@ def render_visualization_charts(movie_id: int, info: dict, recs: list) -> None:
                     "title": "Predicted Rating",
                     "range": [0, 5.5],
                 },
-                hoverlabel={"bgcolor": "rgba(30,30,60,0.95)", "font": {"color": "white", "size": 12}},
+                hoverlabel={
+                    "bgcolor": "rgba(30,30,60,0.95)",
+                    "font": {"color": "white", "size": 12},
+                },
             )
             st.plotly_chart(fig2, use_container_width=True)
 
 
 # ── Similarity Breakdown ──────────────────────────────────────────────────────
-
-

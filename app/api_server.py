@@ -15,7 +15,6 @@ Auth:
 import logging
 import os
 import secrets
-from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Response, Security
@@ -83,9 +82,11 @@ app = FastAPI(
     ],
 )
 
+
 @app.middleware("http")
 async def track_metrics(request, call_next) -> Response:
     import time as _time
+
     request.state.start_time = _time.time()
     response = await call_next(request)
     if _PROM_AVAILABLE:
@@ -98,6 +99,7 @@ async def track_metrics(request, call_next) -> Response:
                 _time.time() - request.state.start_time
             )
     return response
+
 
 _allowed_origins = os.environ.get(
     "NGRECO_CORS_ORIGINS", "http://localhost:8501,http://localhost:3000"
@@ -123,10 +125,9 @@ async def add_security_headers(request, call_next) -> Response:
     response.headers["Permissions-Policy"] = (
         "camera=(), microphone=(), geolocation=(), interest-cohort=()"
     )
-    response.headers["Content-Security-Policy"] = (
-        "default-src 'none'; frame-ancestors 'none';"
-    )
+    response.headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none';"
     return response
+
 
 # Rate limiting
 limiter = Limiter(key_func=get_remote_address, default_limits=["60/minute"])
@@ -232,7 +233,9 @@ async def dataset_stats() -> dict[str, Any]:
     rec = _get_recommender()
     return {
         "total_movies": len(rec.movies),
-        "total_ratings": int(rec.movies["rating_count"].sum()) if "rating_count" in rec.movies.columns else 0,
+        "total_ratings": (
+            int(rec.movies["rating_count"].sum()) if "rating_count" in rec.movies.columns else 0
+        ),
         "year_range": {
             "min": int(rec.movies["year"].min()) if "year" in rec.movies.columns else 0,
             "max": int(rec.movies["year"].max()) if "year" in rec.movies.columns else 0,

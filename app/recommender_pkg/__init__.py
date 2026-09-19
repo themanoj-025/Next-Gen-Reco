@@ -42,5 +42,4 @@ class MovieRecommender(
     """
 
 
-
 __all__ = ["MovieRecommender"]

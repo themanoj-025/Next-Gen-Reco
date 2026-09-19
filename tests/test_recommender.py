@@ -216,7 +216,15 @@ class TestRecommend:
         recs = recommender.recommend(1, n=3)
         assert len(recs) > 0
         r = recs[0]
-        required = {"movieId", "title", "genres", "similarity", "genre_similarity", "tag_similarity", "year_proximity"}
+        required = {
+            "movieId",
+            "title",
+            "genres",
+            "similarity",
+            "genre_similarity",
+            "tag_similarity",
+            "year_proximity",
+        }
         assert required.issubset(set(r.keys()))
 
     def test_similarity_is_bounded(self, recommender) -> None:
@@ -230,7 +238,9 @@ class TestRecommend:
 
     def test_different_weights_produce_different_results(self, recommender) -> None:
         recs_default = recommender.recommend(1, n=5)
-        recs_genre_heavy = recommender.recommend(1, n=5, genre_weight=0.9, tag_weight=0.05, year_weight=0.03, rating_weight=0.02)
+        recs_genre_heavy = recommender.recommend(
+            1, n=5, genre_weight=0.9, tag_weight=0.05, year_weight=0.03, rating_weight=0.02
+        )
         # The order or content should differ
         default_ids = [r["movieId"] for r in recs_default]
         genre_ids = [r["movieId"] for r in recs_genre_heavy]
@@ -446,4 +456,3 @@ class TestExactSearch:
 
 
 # ── get_top_picks ─────────────────────────────────────────────────────────────
-

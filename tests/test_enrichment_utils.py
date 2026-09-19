@@ -3,8 +3,6 @@
 Tests title normalization, caching, and data merging logic.
 """
 
-import pandas as pd
-
 
 class TestTitleNormalization:
     """Test movie title normalization for matching."""
