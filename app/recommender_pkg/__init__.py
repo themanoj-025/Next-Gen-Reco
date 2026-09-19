@@ -6,19 +6,7 @@ continues to work unchanged.
 
 from __future__ import annotations
 
-from typing import Any
-
-from app.recommender_pkg.core import (
-    _CACHE_DIR,
-    _GENRE_CACHE_PATH,
-    _MOVIES_CACHE_PATH,
-    CoreMixin,
-    _check_cache_valid,
-    _predict_model_result,
-    _predict_movies_by_id,
-    _predict_tag_pivot,
-    _prediction_cache,
-)
+from app.recommender_pkg.core import CoreMixin
 from app.recommender_pkg.enrichment import EnrichmentMixin
 from app.recommender_pkg.explain import ExplainMixin
 from app.recommender_pkg.features import FeaturesMixin
