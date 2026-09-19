@@ -76,9 +76,9 @@ def render_decade_explorer() -> None:
             unsafe_allow_html=True,
         )
     with col2:
-        avg_pred = sum(
-            m.get("predicted_rating", 0) or 0 for m in decade_data["top_movies"][:10]
-        ) / min(10, len(decade_data["top_movies"]))
+        avg_pred = sum(m.get("predicted_rating", 0) or 0 for m in decade_data["top_movies"][:10]) / min(
+            10, len(decade_data["top_movies"])
+        )
         st.markdown(
             f"""
         <div class="stat-card">
@@ -121,9 +121,9 @@ def render_decade_explorer() -> None:
             f"Genre distribution in the {selected_decade}:</div>",
             unsafe_allow_html=True,
         )
-        df_genre = pd.DataFrame(
-            [{"Genre": g, "Count": c} for g, c in genre_dist.items()]
-        ).sort_values("Count", ascending=True)
+        df_genre = pd.DataFrame([{"Genre": g, "Count": c} for g, c in genre_dist.items()]).sort_values(
+            "Count", ascending=True
+        )
 
         fig = go.Figure()
         fig.add_trace(

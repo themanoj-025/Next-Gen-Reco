@@ -28,8 +28,7 @@ def render_home() -> None:
         f_year = f"({f['year']})" if f.get("year") else ""
         f_director = f.get("director", "")
         f_genres = "".join(
-            f'<span class="genre-chip {_genre_chip_class(g)}">{g}</span>'
-            for g in f.get("genres", [])[:4]
+            f'<span class="genre-chip {_genre_chip_class(g)}">{g}</span>' for g in f.get("genres", [])[:4]
         )
 
         st.markdown(
@@ -72,11 +71,7 @@ def render_home() -> None:
                 st.session_state.search_query = f["title"]
                 st.rerun()
         with hc2:
-            wl_label = (
-                "Remove from Watchlist"
-                if f["movieId"] in st.session_state.watchlist
-                else "+ Add to Watchlist"
-            )
+            wl_label = "Remove from Watchlist" if f["movieId"] in st.session_state.watchlist else "+ Add to Watchlist"
             if st.button(wl_label, key="hero_wl", use_container_width=True):
                 if f["movieId"] in st.session_state.watchlist:
                     del st.session_state.watchlist[f["movieId"]]
@@ -110,9 +105,7 @@ def render_home() -> None:
                 r_pred_str = f"{r_pred:.2f}" if r_pred is not None else "N/A"
                 r_year = f"({info['year']})" if info.get("year") else ""
                 r_title = info["title"][:27] + "..." if len(info["title"]) > 30 else info["title"]
-                gcs = "".join(
-                    f'<span class="imdb-card-genre-chip">{g[:6]}</span>' for g in info["genres"][:2]
-                )
+                gcs = "".join(f'<span class="imdb-card-genre-chip">{g[:6]}</span>' for g in info["genres"][:2])
                 wl_badge = " &#128203;" if mid in st.session_state.watchlist else ""
 
                 st.markdown(

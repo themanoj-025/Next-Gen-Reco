@@ -51,9 +51,7 @@ class StatsMixin:
                 if m.get("popularity") and m["popularity"] > 0
             ]
             if all_popularities:
-                pct = (
-                    sum(1 for p in all_popularities if p < popularity) / len(all_popularities)
-                ) * 100
+                pct = (sum(1 for p in all_popularities if p < popularity) / len(all_popularities)) * 100
                 stats["popularity_percentile"] = round(pct, 1)
 
         # Vote average from TMDB

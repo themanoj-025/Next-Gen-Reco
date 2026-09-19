@@ -130,9 +130,7 @@ class CoreMixin:
             self.enrichment = None
 
         # Build movie lookup by ID
-        self.movies_by_id: dict[int, pd.Series] = {
-            row["movieId"]: row for _, row in self.movies.iterrows()
-        }
+        self.movies_by_id: dict[int, pd.Series] = {row["movieId"]: row for _, row in self.movies.iterrows()}
 
         # Year stats for year proximity scoring
         years = self.movies["year"]

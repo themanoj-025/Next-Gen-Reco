@@ -101,12 +101,10 @@ class NDEnrichment:
         self._metadata_map: dict[int, dict[str, Any]] = {}  # movieId -> tmdb metadata
         self._cast_map: dict[int, dict[str, Any]] = {}  # movieId -> director + actors
         self._reviews_map: dict[int, list[str]] = {}  # movieId -> list of review texts
-        self._director_to_movies: dict[str, list[int]] = (
-            {}
-        )  # director name -> list of movieIds (sorted after index_data)
-        self._actor_to_movies: dict[str, list[int]] = (
-            {}
-        )  # actor name -> list of movieIds (sorted after index_data)
+        self._director_to_movies: dict[
+            str, list[int]
+        ] = {}  # director name -> list of movieIds (sorted after index_data)
+        self._actor_to_movies: dict[str, list[int]] = {}  # actor name -> list of movieIds (sorted after index_data)
 
         self._loaded = False
         self._tfidf = None  # For keyword-based similarity (future)
@@ -219,7 +217,9 @@ class NDEnrichment:
         cache_path = (
             _ENRICHMENT_CACHE
             if _ENRICHMENT_CACHE.exists()
-            else _LEGACY_ENRICHMENT_CACHE if _LEGACY_ENRICHMENT_CACHE.exists() else None
+            else _LEGACY_ENRICHMENT_CACHE
+            if _LEGACY_ENRICHMENT_CACHE.exists()
+            else None
         )
         if cache_path is None:
             return False
@@ -293,9 +293,7 @@ class NDEnrichment:
         # Build normalized title lookup using pandas groupby (much faster)
         titles_normalized = movies_df["title"].apply(_normalize)
         norm_series = pd.Series(titles_normalized.values, index=movies_df["movieId"])
-        norm_to_id: dict[str, list[int]] = (
-            norm_series.groupby(norm_series).apply(lambda x: x.index.tolist()).to_dict()
-        )
+        norm_to_id: dict[str, list[int]] = norm_series.groupby(norm_series).apply(lambda x: x.index.tolist()).to_dict()
 
         # ── 1. Index TMDB metadata (vectorized merge approach) ────────────
         tmdb_df = self._load_tmdb_data()
@@ -480,11 +478,7 @@ class NDEnrichment:
 
     def has_data(self, movie_id: int) -> bool:
         """Check if any enrichment data exists for this movie."""
-        return (
-            movie_id in self._metadata_map
-            or movie_id in self._cast_map
-            or movie_id in self._reviews_map
-        )
+        return movie_id in self._metadata_map or movie_id in self._cast_map or movie_id in self._reviews_map
 
     # ── Utility ──────────────────────────────────────────────────────────
 
@@ -574,11 +568,7 @@ class NDEnrichment:
                 summary["popularity"] = f"{meta['popularity']:.1f}"
 
         if cast:
-            if (
-                cast.get("director")
-                and cast["director"].lower() != "unknown"
-                and cast["director"].lower() != "nan"
-            ):
+            if cast.get("director") and cast["director"].lower() != "unknown" and cast["director"].lower() != "nan":
                 summary["director"] = cast["director"]
             if cast.get("actors"):
                 summary["actors"] = cast["actors"]

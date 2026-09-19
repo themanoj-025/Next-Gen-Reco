@@ -168,9 +168,7 @@ def train_model(
     X, y, feature_cols, num_cols, mf = _build_features(movies, ratings, tag_pivot)
     logger.info(f"  Features: {len(feature_cols)}  |  Samples: {len(X):,}")
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=random_state
-    )
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=random_state)
 
     # Scale numeric features
     num_cols_present = [c for c in num_cols if c in X_train.columns]

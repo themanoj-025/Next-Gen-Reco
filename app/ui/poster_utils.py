@@ -107,9 +107,7 @@ def _search_tmdb_poster(movie_id: int, title: str, year: int | None = None) -> s
     return url
 
 
-def _movie_poster_html(
-    movie_id: int, title: str, year: int | None = None, size: str = "100%"
-) -> str:
+def _movie_poster_html(movie_id: int, title: str, year: int | None = None, size: str = "100%") -> str:
     """Render movie poster — TMDB image if available and enabled, otherwise gradient placeholder."""
     if st.session_state.get("use_tmdb_posters", False):
         poster_url = _search_tmdb_poster(movie_id, title, year)

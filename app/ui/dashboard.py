@@ -95,9 +95,7 @@ def render_dashboard() -> None:
     # TABS
     # ════════════════════════════════════════════════════════════════
 
-    tab_ratings, tab_watchlist, tab_settings = st.tabs(
-        ["⭐ My Ratings", "📋 Watchlist", "⚙️ Settings"]
-    )
+    tab_ratings, tab_watchlist, tab_settings = st.tabs(["⭐ My Ratings", "📋 Watchlist", "⚙️ Settings"])
 
     # ──────────────────────────────────────────────────────────────────
     # TAB 1: MY RATINGS
@@ -127,9 +125,7 @@ def render_dashboard() -> None:
                 count = dist_counts.get(rval, 0)
                 pct = count / len(ratings) * 100 if ratings else 0
                 bar_color = (
-                    "#22c55e"
-                    if rval >= 4
-                    else "#fbbf24" if rval >= 3 else "#f97316" if rval >= 2 else "#ef4444"
+                    "#22c55e" if rval >= 4 else "#fbbf24" if rval >= 3 else "#f97316" if rval >= 2 else "#ef4444"
                 )
                 bars_html += f"""
                 <figure class="dash-dist-bar">
@@ -327,9 +323,7 @@ def render_dashboard() -> None:
         if st.session_state.watchlist:
             wl_output = io.StringIO()
             wl_writer = csv.writer(wl_output)
-            wl_writer.writerow(
-                ["Movie ID", "Title", "Category", "Year", "Genres", "Predicted Rating"]
-            )
+            wl_writer.writerow(["Movie ID", "Title", "Category", "Year", "Genres", "Predicted Rating"])
             for mid, cat in sorted(st.session_state.watchlist.items()):
                 info = rec.get_movie_info(mid)
                 if info:
@@ -340,11 +334,7 @@ def render_dashboard() -> None:
                             cat,
                             info.get("year", ""),
                             "; ".join(info["genres"]),
-                            (
-                                f"{info['predicted_rating']:.2f}"
-                                if info["predicted_rating"]
-                                else "N/A"
-                            ),
+                            (f"{info['predicted_rating']:.2f}" if info["predicted_rating"] else "N/A"),
                         ]
                     )
             st.download_button(
@@ -381,11 +371,7 @@ def render_dashboard() -> None:
                             mid,
                             info["title"],
                             rval,
-                            (
-                                f"{info['predicted_rating']:.2f}"
-                                if info["predicted_rating"]
-                                else "N/A"
-                            ),
+                            (f"{info['predicted_rating']:.2f}" if info["predicted_rating"] else "N/A"),
                             info.get("year", ""),
                             "; ".join(info["genres"]),
                         ]

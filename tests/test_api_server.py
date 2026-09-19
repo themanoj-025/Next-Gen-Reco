@@ -77,9 +77,7 @@ class TestSearchMovies:
     @patch("app.api_server._get_recommender")
     def test_search_returns_results(self, mock_get, client) -> None:
         mock_rec = MagicMock()
-        mock_rec.search_movies.return_value = [
-            {"movieId": 1, "title": "Toy Story", "genres": "Animation|Children"}
-        ]
+        mock_rec.search_movies.return_value = [{"movieId": 1, "title": "Toy Story", "genres": "Animation|Children"}]
         mock_get.return_value = mock_rec
 
         response = client.get("/api/v1/movies/search?q=toy")
@@ -173,9 +171,7 @@ class TestDatasetStats:
         import pandas as pd
 
         mock_rec = MagicMock()
-        mock_rec.movies = pd.DataFrame(
-            {"year": [1995, 2000, 2010], "rating_count": [100, 200, 300]}
-        )
+        mock_rec.movies = pd.DataFrame({"year": [1995, 2000, 2010], "rating_count": [100, 200, 300]})
         mock_rec.model_result = {"r2": 0.85}
         mock_get.return_value = mock_rec
 

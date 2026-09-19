@@ -36,9 +36,7 @@ def render_movie_detail(movie_id: int) -> None:
     stars = _rating_stars(pred) if pred else "—"
     pred_str = f"{pred:.2f}" if pred is not None else "N/A"
 
-    genre_chips = "".join(
-        f'<span class="genre-chip {_genre_chip_class(g)}">{g}</span>' for g in genres
-    )
+    genre_chips = "".join(f'<span class="genre-chip {_genre_chip_class(g)}">{g}</span>' for g in genres)
 
     # Layout: poster on left, detail on right
     col_left, col_right = st.columns([1, 2.5])
@@ -112,25 +110,13 @@ def render_movie_detail(movie_id: int) -> None:
             h = runtime // 60
             m = runtime % 60
             runtime_str = f"{h}h {m}m" if h > 0 else f"{m}m"
-            stat_parts.append(
-                f'<span class="detail-stat-chip"><span class="chip-icon">⏱</span> {runtime_str}</span>'
-            )
+            stat_parts.append(f'<span class="detail-stat-chip"><span class="chip-icon">⏱</span> {runtime_str}</span>')
         if budget and budget > 0:
-            budget_str = (
-                f"${budget / 1_000_000:.0f}M" if budget >= 1_000_000 else f"${budget / 1_000:.0f}K"
-            )
-            stat_parts.append(
-                f'<span class="detail-stat-chip"><span class="chip-icon">💰</span> {budget_str}</span>'
-            )
+            budget_str = f"${budget / 1_000_000:.0f}M" if budget >= 1_000_000 else f"${budget / 1_000:.0f}K"
+            stat_parts.append(f'<span class="detail-stat-chip"><span class="chip-icon">💰</span> {budget_str}</span>')
         if revenue and revenue > 0:
-            rev_str = (
-                f"${revenue / 1_000_000:.0f}M"
-                if revenue >= 1_000_000
-                else f"${revenue / 1_000:.0f}K"
-            )
-            stat_parts.append(
-                f'<span class="detail-stat-chip"><span class="chip-icon">💵</span> {rev_str}</span>'
-            )
+            rev_str = f"${revenue / 1_000_000:.0f}M" if revenue >= 1_000_000 else f"${revenue / 1_000:.0f}K"
+            stat_parts.append(f'<span class="detail-stat-chip"><span class="chip-icon">💵</span> {rev_str}</span>')
         if vote_avg:
             tmdb_color = "#01b4e4" if vote_avg >= 7 else "#fbbf24" if vote_avg >= 5 else "#ef4444"
             stat_parts.append(
@@ -227,11 +213,7 @@ def render_movie_detail(movie_id: int) -> None:
                     d_pred = dir_info["predicted_rating"]
                     d_col = _rating_color(d_pred)
                     d_year = f"({dir_info['year']})" if dir_info.get("year") else "—"
-                    d_title = (
-                        dir_info["title"][:32] + "…"
-                        if len(dir_info["title"]) > 32
-                        else dir_info["title"]
-                    )
+                    d_title = dir_info["title"][:32] + "…" if len(dir_info["title"]) > 32 else dir_info["title"]
                     gcs = "".join(
                         f'<span class="genre-chip {_genre_chip_class(g)}" style="font-size:0.5rem;padding:0.1rem 0.35rem;margin:0.05rem 0.1rem;">{g[:5]}</span>'
                         for g in dir_info["genres"][:2]
@@ -278,11 +260,7 @@ def render_movie_detail(movie_id: int) -> None:
                         a_pred = act_info["predicted_rating"]
                         a_col = _rating_color(a_pred)
                         a_year = f"({act_info['year']})" if act_info.get("year") else "—"
-                        a_title = (
-                            act_info["title"][:28] + "…"
-                            if len(act_info["title"]) > 28
-                            else act_info["title"]
-                        )
+                        a_title = act_info["title"][:28] + "…" if len(act_info["title"]) > 28 else act_info["title"]
                         st.markdown(
                             f"""
                         <div class="detail-mini-card" data-mid="{act_mid}">

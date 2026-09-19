@@ -173,18 +173,14 @@ class TestRecommendEdgeCases:
         assert recs[0]["similarity"] > 0
 
     def test_all_genres_no_tags(self, recommender) -> None:
-        recs = recommender.recommend(
-            1, n=5, genre_weight=1.0, tag_weight=0.0, year_weight=0.0, rating_weight=0.0
-        )
+        recs = recommender.recommend(1, n=5, genre_weight=1.0, tag_weight=0.0, year_weight=0.0, rating_weight=0.0)
         assert len(recs) > 0
         # genre_similarity should be the main component
         for r in recs:
             assert r["genre_similarity"] > 0
 
     def test_all_tags_no_genres(self, recommender) -> None:
-        recs = recommender.recommend(
-            1, n=5, genre_weight=0.0, tag_weight=1.0, year_weight=0.0, rating_weight=0.0
-        )
+        recs = recommender.recommend(1, n=5, genre_weight=0.0, tag_weight=1.0, year_weight=0.0, rating_weight=0.0)
         assert len(recs) > 0
 
     def test_large_n(self, recommender) -> None:
@@ -198,9 +194,7 @@ class TestRecommendEdgeCases:
 
     def test_movie_with_no_genres(self, recommender) -> None:
         # Find a movie with (no genres listed)
-        no_genre = recommender.movies[
-            recommender.movies["genres"].str.contains("no genres listed", na=False)
-        ]
+        no_genre = recommender.movies[recommender.movies["genres"].str.contains("no genres listed", na=False)]
         if len(no_genre) > 0:
             mid = no_genre.iloc[0]["movieId"]
             recs = recommender.recommend(int(mid), n=3)
