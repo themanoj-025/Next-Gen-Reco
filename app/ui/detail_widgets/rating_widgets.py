@@ -120,5 +120,3 @@ def render_watchlist_button(movie_id: int) -> None:
 
 
 # ── Movie Detail ──────────────────────────────────────────────────────────────
-
-

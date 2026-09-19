@@ -47,10 +47,12 @@ def mock_recommender() -> None:
         {"movieId": 2, "title": "Jumanji", "score": 0.95},
         {"movieId": 3, "title": "Grumpier Old Men", "score": 0.88},
     ]
-    rec.movies = pd.DataFrame({
-        "year": [1995, 2000, 2010, 2015, 2020],
-        "rating_count": [100, 200, 150, 300, 250],
-    })
+    rec.movies = pd.DataFrame(
+        {
+            "year": [1995, 2000, 2010, 2015, 2020],
+            "rating_count": [100, 200, 150, 300, 250],
+        }
+    )
     rec.model_result = {"r2": 0.85}
     return rec
 

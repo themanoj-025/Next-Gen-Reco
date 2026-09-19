@@ -6,19 +6,15 @@ Features: genres (one-hot), tags (top 100), derived stats (genre count,
 title length), rating_count, and release year.
 """
 
-import os
 import re
-import time
 import warnings
 from pathlib import Path
 
-import joblib
-import numpy as np
 import pandas as pd
 
 warnings.filterwarnings("ignore")
 
-from app._paths import CACHE_DIR, DATA_DIR, MODELS_DIR
+from app._paths import CACHE_DIR, DATA_DIR
 from app.utils import logger
 
 # ── Cache helpers ──────────────────────────────────────────────────────────────
@@ -189,5 +185,3 @@ def _build_features(
     y = y[mask]
 
     return X, y, all_cols, num_cols, mf
-
-

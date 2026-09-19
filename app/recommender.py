@@ -48,7 +48,9 @@ if __name__ == "__main__":
         recs = rec.recommend(mid, n=8)
         for r in recs:
             genres = ", ".join(r["genres"][:3])
-            logger.info(f"  [{r['movieId']}] {r['title']}  sim={r['similarity']:.3f}  pred={r['predicted_rating']}  [{genres}]")
+            logger.info(
+                f"  [{r['movieId']}] {r['title']}  sim={r['similarity']:.3f}  pred={r['predicted_rating']}  [{genres}]"
+            )
 
         logger.info(f"\n--- Feature breakdown for {mid} ---")
         fb = rec.get_feature_breakdown(mid)

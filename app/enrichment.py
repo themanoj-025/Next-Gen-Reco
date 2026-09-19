@@ -219,9 +219,7 @@ class NDEnrichment:
         cache_path = (
             _ENRICHMENT_CACHE
             if _ENRICHMENT_CACHE.exists()
-            else _LEGACY_ENRICHMENT_CACHE
-            if _LEGACY_ENRICHMENT_CACHE.exists()
-            else None
+            else _LEGACY_ENRICHMENT_CACHE if _LEGACY_ENRICHMENT_CACHE.exists() else None
         )
         if cache_path is None:
             return False

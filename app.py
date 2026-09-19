@@ -6,7 +6,6 @@ It directly imports all components and runs the app.
 """
 
 import logging
-import os
 import warnings
 
 warnings.filterwarnings("ignore")

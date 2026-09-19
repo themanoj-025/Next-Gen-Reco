@@ -9,25 +9,19 @@ title length), rating_count, and release year.
 import os
 import time
 import warnings
-from pathlib import Path
 from typing import Any
 
 import joblib
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 warnings.filterwarnings("ignore")
 
-from app._paths import CACHE_DIR, DATA_DIR, MODELS_DIR
+from app._paths import DATA_DIR, MODELS_DIR
 from app.model_data import (
-    _CACHE_DIR,
-    _cache_path,
-    _extract_year,
-    _is_cache_valid,
     load_movies,
     load_ratings_sample,
     load_tags,
@@ -47,6 +41,7 @@ __all__ = [
 ]
 
 DEFAULT_MODEL_DIR = str(MODELS_DIR)
+
 
 def _build_features(
     movies: pd.DataFrame,
@@ -157,9 +152,6 @@ def train_model(
         ratings_path = str(DATA_DIR / "ratings.csv")
     if tags_path is None:
         tags_path = str(DATA_DIR / "tags.csv")
-    from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-    from sklearn.model_selection import train_test_split
-    from sklearn.preprocessing import StandardScaler
 
     logger.info("Loading data...")
     movies = load_movies(movies_path)
@@ -242,8 +234,10 @@ def train_model(
         "R2": float(r2_score(y_test, y_pred_rf)),
     }
     metrics["RandomForest"] = rf_metrics
-    logger.info(f"   RF - R^2: {rf_metrics['R2']:.4f}  RMSE: {rf_metrics['RMSE']:.4f}  "
-        f"MAE: {rf_metrics['MAE']:.4f}  ({time.time() - rf_start:.1f}s)")
+    logger.info(
+        f"   RF - R^2: {rf_metrics['R2']:.4f}  RMSE: {rf_metrics['RMSE']:.4f}  "
+        f"MAE: {rf_metrics['MAE']:.4f}  ({time.time() - rf_start:.1f}s)"
+    )
 
     best_model = rf_model
     best_name = "RandomForest"
@@ -295,8 +289,10 @@ def train_model(
             "R2": float(r2_score(y_test, y_pred_xgb)),
         }
         metrics["XGBoost"] = xgb_metrics
-        logger.info(f"   XGB - R^2: {xgb_metrics['R2']:.4f}  RMSE: {xgb_metrics['RMSE']:.4f}  "
-            f"MAE: {xgb_metrics['MAE']:.4f}  ({time.time() - xgb_start:.1f}s)")
+        logger.info(
+            f"   XGB - R^2: {xgb_metrics['R2']:.4f}  RMSE: {xgb_metrics['RMSE']:.4f}  "
+            f"MAE: {xgb_metrics['MAE']:.4f}  ({time.time() - xgb_start:.1f}s)"
+        )
 
         # Pick the best model
         if xgb_metrics["R2"] > rf_metrics["R2"]:
@@ -489,4 +485,3 @@ def predict_rating(
 
 
 # ── CLI entry point ────────────────────────────────────────────────────────────
-
