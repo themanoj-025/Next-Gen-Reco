@@ -36,6 +36,7 @@
 - [📊 Dataset](#-dataset)
 - [🗺️ Roadmap](#️-roadmap)
 - [🤝 Contributing](#-contributing)
+- [📬 Support](#-support)
 - [📄 License](#-license)
 - [🙏 Acknowledgements](#-acknowledgements)
 
@@ -273,6 +274,14 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) for deta
 - [Streamlit](https://streamlit.io/) - Dashboard framework
 - [scikit-learn](https://scikit-learn.org/) - ML framework
 - [XGBoost](https://xgboost.readthedocs.io/) - Gradient boosting
+
+---
+
+## 📬 Support
+
+- 🐛 [Report a bug](https://github.com/themanoj-025/Next-Gen-Reco/issues)
+- 💡 [Request a feature](https://github.com/themanoj-025/Next-Gen-Reco/issues)
+- ⭐ [Star the repository](https://github.com/themanoj-025/Next-Gen-Reco)
 
 ---
 
