@@ -58,7 +58,7 @@
 
 ## 3. High-Level Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │                    Streamlit App (app.py)                            │
 │                                                                     │
@@ -91,7 +91,7 @@
 
 ## 4. Complete Folder Structure Tree
 
-```
+```text
 Next-Gen-Reco/
 ├── .devcontainer/
 │   └── devcontainer.json
@@ -293,7 +293,7 @@ docker compose up -d
 
 ## 11. Dependency Graph Summary
 
-```
+```text
 app.py → app/ui/* → app/recommender.py → app/model.py → app/data/loader.py
 ```
 

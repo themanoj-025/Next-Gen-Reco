@@ -9,7 +9,7 @@ rating & recommendation app (MovieLens AI) with ML-driven recommendations.
 
 ## Structure
 
-```
+```text
 docs/
 ├── README.md                      ← this index
 ├── architecture.md                system architecture
