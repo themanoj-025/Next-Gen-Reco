@@ -2,7 +2,7 @@
 
 ## 1. App Boot (Streamlit)
 
-```
+```text
 streamlit run app.py            # local / Docker CMD / Streamlit Cloud entry
 │
 ├─ 1. app.py inserts repo root into sys.path
@@ -17,7 +17,7 @@ Data/artifacts are loaded lazily and cached through `app.recommender.MovieRecomm
 
 ## 2. Training Flow
 
-```
+```text
 python -m app.main --save        # CLI (app/main.py → app/model.main)
 │
 ├─ 1. Load catalog + tags from data/ (via _paths)

@@ -5,7 +5,7 @@ circular imports.
 
 ## 1. Dependency Graph
 
-```
+```text
   app.py (bootstrap, RUN-only)
        │
        ▼

@@ -24,7 +24,7 @@
 - Formatter: black; linter: ruff.
 - Structure:
 
-```
+```text
 app.py              # Streamlit entry
 recommender.py      # similarity engine
 scripts/            # training utilities

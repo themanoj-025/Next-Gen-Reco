@@ -53,7 +53,7 @@
 
 **Movie result card:**
 
-```
+```text
 ┌──────────────────────────────┐
 │ Inception (2010)      ★ 4.6 │
 │ Sci-Fi · Thriller           │
