@@ -90,7 +90,7 @@ The system uses a hybrid similarity engine trained on 87K movies, 32M ratings, a
 
 ## 🏗️ Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                    Streamlit Dashboard                           │
 │  Search │ Recommendations │ Analysis │ Dashboard │ Explorer     │
@@ -138,7 +138,7 @@ streamlit run app.py
 
 ## 📁 Project Structure
 
-```
+```text
 Next-Gen-Reco/
 ├── app.py                    # Streamlit app entry point
 ├── recommender.py            # Recommendation engine
