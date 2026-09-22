@@ -8,7 +8,7 @@
 
 ## 1. System Overview
 
-```
+```text
                      ┌────────────────────────────────────────────────┐
                      │  app.py (root)  — Streamlit bootstrap          │
                      │  Streamlit Cloud / Docker entry (RUN-only)     │

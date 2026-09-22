@@ -7,7 +7,7 @@ the real Phase 6 suite. **Zero code/import/entry-point changes.**
 
 ## Before (2026-08-10)
 
-```
+```text
 Next-Gen-Reco/
 ├── app.py                        (Streamlit bootstrap)
 ├── app/ (paths, main, model, recommender, enrichment, data/loader, ui/*)
@@ -29,7 +29,7 @@ Next-Gen-Reco/
 
 ## After (2026-08-11)
 
-```
+```text
 Next-Gen-Reco/
 ├── app.py                        (unchanged — entry contract)
 ├── app/ · data/ · models/ · scripts/ · tests/   (all unchanged)
