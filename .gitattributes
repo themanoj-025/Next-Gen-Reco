@@ -32,8 +32,13 @@ Dockerfile.* text
 requirements.txt text
 runtime.txt text
 
-# Data files
-*.csv text
+# Data files — datasets are large (tags.csv is ~67MB) and belong in Git LFS.
+# NOTE: `*.csv text` was removed deliberately — LFS rules must own these files
+# (a `text` attribute on an LFS-tracked file corrupts checkout semantics).
+*.csv filter=lfs diff=lfs merge=lfs -text
+
+# ML model artifacts — meta.joblib is ~56MB (tracked for deployment per .gitignore)
+*.joblib filter=lfs diff=lfs merge=lfs -text
 
 # Binary / ML model files - don't modify
 *.png binary

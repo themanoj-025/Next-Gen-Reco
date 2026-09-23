@@ -123,7 +123,8 @@ The system uses a hybrid similarity engine trained on 87K movies, 32M ratings, a
 ### Installation
 
 ```bash
-# Clone the repository
+# Clone the repository (install git-lfs first: datasets are stored via LFS)
+git lfs install
 git clone https://github.com/themanoj-025/Next-Gen-Reco.git
 cd Next-Gen-Reco
 
