@@ -68,8 +68,11 @@ jobs:
         python-version: ["3.11", "3.12"]
 
     steps:
+      # lfs: true — the existence-check and pytest steps touch real data/model files
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          lfs: true
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
@@ -259,7 +262,10 @@ jobs:
     timeout-minutes: 90
     needs: validate
     steps:
+      # lfs: true — Dockerfile COPYs data/ and models/ into the image
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          lfs: true
 
       - name: Validate compose files
         run: |
