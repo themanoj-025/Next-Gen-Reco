@@ -49,7 +49,7 @@ Next-Gen-Reco/
 ├── docker-compose.yml / .dev.yml / .prod.yml
 ├── Makefile                       # compose ergonomics + test/lint targets
 ├── pyproject.toml · requirements.txt · runtime.txt
-└── .env.example · .env.template   # Env templates (see ledger — duplication flagged)
+└── .env.example                   # Env template
 ```
 
 ## Top-level folder purposes

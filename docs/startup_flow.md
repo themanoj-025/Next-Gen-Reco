@@ -45,7 +45,7 @@ Docker build + Trivy.
 
 ## 5. Environment
 
-`.env.example` / `.env.template` list config (e.g. `TMDB_API_KEY` for poster URLs).
+`.env.example` lists config (e.g. `TMDB_API_KEY` for poster URLs).
 `.env` is gitignored. `.movie_user_data.json` is a gitignored runtime file created on
 first user interaction.
 
