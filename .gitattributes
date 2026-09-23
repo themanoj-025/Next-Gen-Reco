@@ -19,7 +19,6 @@
 *.cfg text
 *.ini text
 *.env text
-*.env.template text
 
 # Shell / batch scripts
 *.sh text eol=lf

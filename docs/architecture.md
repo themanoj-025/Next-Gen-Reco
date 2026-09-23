@@ -73,7 +73,7 @@
 
 ## 5. Configuration
 
-`.env.example` / `.env.template` document vars (e.g. TMDB API key used by
+`.env.example` documents vars (e.g. TMDB API key used by
 `app/ui/poster_utils.py` for poster URLs). `.env` is gitignored.
 
 ## 6. Deployment
