@@ -3,11 +3,24 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from typing import Any
+
+import pandas as pd
 
 
 class SearchMixin:
     """Search methods for movie discovery."""
+
+    # Attributes/methods provided by CoreMixin (RMR) — declared here so mypy
+    # resolves them on concrete subclasses that only inherit SearchMixin
+    # (e.g. tests). Same convention as StatsMixin.
+    movies: pd.DataFrame
+    movies_by_id: dict[int, pd.Series]
+    _tokenize: Callable[[str], list[str]]
+    _prefilter_movies: Callable[[str | None, int | None, int | None], pd.DataFrame]
+    _query_edit_distance: Callable[[str, str], int]
+    get_movie_info: Callable[[int], dict[str, Any] | None]
 
     def _exact_search(self, q_lower: str) -> list[tuple[float, int]]:
         """Fast path: check for exact matches using pandas vectorized string ops."""

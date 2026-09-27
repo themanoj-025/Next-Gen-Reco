@@ -50,6 +50,19 @@ class TestNormalize:
 
         assert _normalize("") == ""
 
+    # Merged from the second (shadowing) TestNormalize class that used to live
+    # at the bottom of this file — it replaced this class at runtime, leaving
+    # the tests above dead. Unique cases preserved here.
+    def test_only_year(self) -> None:
+        from app.enrichment import _normalize
+
+        assert _normalize("(1995)") == ""
+
+    def test_apostrophes_removed(self) -> None:
+        from app.enrichment import _normalize
+
+        assert _normalize("Bill & Ted's Excellent Adventure") == "bill ted s excellent adventure"
+
 
 # ── Type coercion helpers ─────────────────────────────────────────────────────
 
@@ -281,48 +294,6 @@ class TestNDEnrichment:
         enrich = NDEnrichment()
         summary = enrich.get_status_summary(1)
         assert isinstance(summary, dict)
-
-
-class TestNormalize:
-    def test_basic_lowercasing(self) -> None:
-        from app.enrichment import _normalize
-
-        assert _normalize("Toy Story") == "toy story"
-
-    def test_removes_year_in_parens(self) -> None:
-        from app.enrichment import _normalize
-
-        assert _normalize("Toy Story (1995)") == "toy story"
-
-    def test_removes_special_chars(self) -> None:
-        from app.enrichment import _normalize
-
-        assert _normalize("Star Wars: A New Hope") == "star wars a new hope"
-
-    def test_collapses_whitespace(self) -> None:
-        from app.enrichment import _normalize
-
-        assert _normalize("  Toy   Story  ") == "toy story"
-
-    def test_strips_whitespace(self) -> None:
-        from app.enrichment import _normalize
-
-        assert _normalize("  Toy Story  ") == "toy story"
-
-    def test_empty_string(self) -> None:
-        from app.enrichment import _normalize
-
-        assert _normalize("") == ""
-
-    def test_only_year(self) -> None:
-        from app.enrichment import _normalize
-
-        assert _normalize("(1995)") == ""
-
-    def test_apostrophes_removed(self) -> None:
-        from app.enrichment import _normalize
-
-        assert _normalize("Bill & Ted's Excellent Adventure") == "bill ted s excellent adventure"
 
 
 class TestTmdbTitle:

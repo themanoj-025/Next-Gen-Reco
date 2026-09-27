@@ -2,11 +2,24 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+from typing import Any
+
 import pandas as pd
 
 
 class FeaturesMixin:
     """Advanced feature methods for movie discovery."""
+
+    # Attributes/methods provided by CoreMixin (RMR) / EnrichmentMixin —
+    # declared here so mypy resolves them on concrete subclasses that only
+    # inherit FeaturesMixin (e.g. tests). Same convention as StatsMixin.
+    movies: pd.DataFrame
+    _predict_cached: Callable[[int], float | None]
+    get_movie_info: Callable[[int], dict[str, Any] | None]
+    get_enriched_metadata: Callable[[int], dict[str, Any] | None]
+    get_enriched_cast: Callable[[int], dict[str, Any] | None]
+    enrich_movie_info: Callable[[dict[str, Any]], dict[str, Any]]
 
     def get_movies_by_decade(
         self,
@@ -240,7 +253,7 @@ class FeaturesMixin:
         scored.sort(key=lambda x: x["predicted_rating"], reverse=True)
 
         # Greedy knapsack-style selection: pick best movies that fit
-        selected = []
+        selected: list[dict[str, Any]] = []
         remaining_budget = max_runtime_minutes
 
         for movie in scored:
