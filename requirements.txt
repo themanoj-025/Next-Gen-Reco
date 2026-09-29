@@ -20,7 +20,7 @@ prometheus-client>=0.26.0
 # xgboost>=1.7.0
 
 # ── Dev-only (not needed on Streamlit Cloud) ──────────────────────────────────
-httpx2>=0.28.1
+httpx2>=2.13.1
 nbformat>=5.11.1
 pytest>=8.0.0
 pytest-cov>=7.1.0
