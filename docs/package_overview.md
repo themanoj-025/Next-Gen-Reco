@@ -39,8 +39,8 @@ Inventory of every module (post-restructure).
 
 | Path | Responsibility |
 | --- | --- |
-| `data/movies.csv` · `data/tags.csv` · `data/links.csv` | MovieLens catalog + tags + links. |
-| `data/ND/` | External enrichment dataset (`main_data.csv`, `movies.csv`, `reviews.txt`). |
+| `data/movies.parquet` · `data/tags.parquet` · `data/links.csv` | MovieLens catalog + tags + links (Parquet migrated from CSV; CSV fallback supported). |
+| `data/ND/` | External enrichment dataset (`main_data.csv`, `movies.parquet`, `reviews.txt`). |
 | `models/v1_test/meta.joblib` + `model.joblib` | Committed trained artifacts. |
 
 ## 6. Infrastructure

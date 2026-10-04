@@ -154,7 +154,7 @@ jobs:
       - name: Verify data files exist
         run: |
           echo "=== Data file check ==="
-          for f in data/movies.csv data/tags.csv data/links.csv models/v1_test/model.joblib models/v1_test/meta.joblib; do
+          for f in data/movies.parquet data/tags.parquet data/links.csv models/v1_test/model.joblib models/v1_test/meta.joblib; do
             if [ -f "$f" ]; then
               size=$(du -h "$f" | cut -f1)
               echo "  ✓ $f ($size)"

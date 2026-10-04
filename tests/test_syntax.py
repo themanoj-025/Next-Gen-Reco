@@ -4,12 +4,14 @@ import structlog
 logger = structlog.get_logger("test_syntax")
 
 
-def md_cell(source) -> None:
-    return nbf.v4.new_markdown_cell(source)
+def md_cell(source) -> nbf.NotebookNode:
+    cell: nbf.NotebookNode = nbf.v4.new_markdown_cell(source)
+    return cell
 
 
-def nb_cell(source) -> None:
-    return nbf.v4.new_code_cell(source)
+def nb_cell(source) -> nbf.NotebookNode:
+    cell: nbf.NotebookNode = nbf.v4.new_code_cell(source)
+    return cell
 
 
 cells1 = []
