@@ -1,1 +1,0 @@
-"""MovieLens AI application package."""
