@@ -37,6 +37,10 @@ runtime.txt text
 # (a `text` attribute on an LFS-tracked file corrupts checkout semantics).
 *.csv filter=lfs diff=lfs merge=lfs -text
 
+# Parquet siblings migrated from the tracked CSVs (migrate_to_parquet.py);
+# also LFS — tags.parquet is ~21MB.
+*.parquet filter=lfs diff=lfs merge=lfs -text
+
 # ML model artifacts — meta.joblib is ~56MB (tracked for deployment per .gitignore)
 *.joblib filter=lfs diff=lfs merge=lfs -text
 
