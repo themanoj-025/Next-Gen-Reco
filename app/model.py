@@ -7,6 +7,7 @@ title length), rating_count, and release year.
 """
 
 import os
+import random
 import time
 import warnings
 from typing import Any
@@ -153,7 +154,13 @@ def train_model(
     if tags_path is None:
         tags_path = str(DATA_DIR / "tags.csv")
 
-    logger.info("Loading data...")
+    # Seed every RNG on the training path: sklearn's split/RF, XGBoost, and
+    # numpy (any incidental draw). Two calls with the same seed produce
+    # bit-identical models — covered by tests/test_model_seeding.py.
+    np.random.seed(random_state)
+    random.seed(random_state)
+
+    logger.info(f"Loading data... (random_state={random_state})")
     movies = load_movies(movies_path)
     ratings = load_ratings_sample(ratings_path, n=sample_size)
     logger.info(f"  Movies: {len(movies):,}  |  Ratings: {len(ratings):,}")
@@ -168,7 +175,9 @@ def train_model(
     X, y, feature_cols, num_cols, mf = _build_features(movies, ratings, tag_pivot)
     logger.info(f"  Features: {len(feature_cols)}  |  Samples: {len(X):,}")
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=random_state)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=random_state
+    )
 
     # Scale numeric features
     num_cols_present = [c for c in num_cols if c in X_train.columns]
@@ -338,6 +347,7 @@ def train_model(
         "importance": imp,
         "merged_data": mf,
         "rf_params": rf_params,
+        "random_state": random_state,
     }
 
     if save_path is not None:
@@ -384,6 +394,7 @@ def save_model(result: dict, name: str = "best", dir_path: str = DEFAULT_MODEL_D
         "metrics": result["metrics"],
         "importance": result["importance"],
         "rf_params": result.get("rf_params"),
+        "random_state": result.get("random_state", 42),
     }
     joblib.dump(meta, meta_path)
 

@@ -28,8 +28,8 @@ Next-Gen-Reco/
 │       │                          #   home, dashboard, explore, search, for_you, compare, stats,
 │       │                          #   decade_explorer, movie_night, combo_finder, components)
 ├── data/                          # Datasets
-│   ├── movies.csv · tags.csv · links.csv
-│   └── ND/                        # Enrichment data (main_data.csv, movies.csv, reviews.txt)
+│   ├── movies.parquet · tags.parquet · links.csv
+│   └── ND/                        # Enrichment data (main_data.csv, movies.parquet, reviews.txt)
 ├── models/
 │   └── v1_test/                   # Committed artifacts: meta.joblib + model.joblib
 ├── docs/

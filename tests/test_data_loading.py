@@ -21,33 +21,33 @@ class TestExtractYear:
     """Tests for the year extraction helper."""
 
     def test_extracts_year_from_parentheses(self) -> None:
-        from app.model import _extract_year
+        from app.model_data import _extract_year
 
         assert _extract_year("Toy Story (1995)") == 1995.0
 
     def test_extracts_year_with_special_chars(self) -> None:
-        from app.model import _extract_year
+        from app.model_data import _extract_year
 
         assert _extract_year("The Matrix (1999)") == 1999.0
 
     def test_returns_none_when_no_year(self) -> None:
-        from app.model import _extract_year
+        from app.model_data import _extract_year
 
         assert _extract_year("No Year Here") is None
 
     def test_returns_none_for_empty_string(self) -> None:
-        from app.model import _extract_year
+        from app.model_data import _extract_year
 
         assert _extract_year("") is None
 
     def test_extracts_year_from_long_title(self) -> None:
-        from app.model import _extract_year
+        from app.model_data import _extract_year
 
         result = _extract_year("Star Wars: Episode IV - A New Hope (1977)")
         assert result == 1977.0
 
     def test_handles_year_in_middle(self) -> None:
-        from app.model import _extract_year
+        from app.model_data import _extract_year
 
         # regex looks for (YYYY) anywhere, returns first match
         result = _extract_year("Movie (1999) Sequel")

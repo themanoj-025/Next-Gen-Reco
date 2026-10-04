@@ -8,33 +8,33 @@ class TestExtractYear:
     """Tests for year extraction from movie titles."""
 
     def test_extracts_year_from_parentheses(self) -> None:
-        from app.model import _extract_year
+        from app.model_data import _extract_year
 
         assert _extract_year("Toy Story (1995)") == 1995.0
 
     def test_returns_none_for_no_year(self) -> None:
-        from app.model import _extract_year
+        from app.model_data import _extract_year
 
         assert _extract_year("No Year Here") is None
 
     def test_extracts_year_from_complex_title(self) -> None:
-        from app.model import _extract_year
+        from app.model_data import _extract_year
 
         assert _extract_year("The Matrix (1999) [Some Tag]") == 1999.0
 
     def test_extracts_four_digit_year(self) -> None:
-        from app.model import _extract_year
+        from app.model_data import _extract_year
 
         assert _extract_year("Movie (2024)") == 2024.0
 
     def test_returns_none_for_empty_string(self) -> None:
-        from app.model import _extract_year
+        from app.model_data import _extract_year
 
         assert _extract_year("") is None
 
     def test_handles_year_outside_parens(self) -> None:
         """Year not in parentheses should return None."""
-        from app.model import _extract_year
+        from app.model_data import _extract_year
 
         assert _extract_year("Movie 1995") is None
 
@@ -45,13 +45,13 @@ class TestCachePath:
     def test_returns_path_object(self) -> None:
         from pathlib import Path
 
-        from app.model import _cache_path
+        from app.model_data import _cache_path
 
         result = _cache_path("test_cache.pkl")
         assert isinstance(result, Path)
 
     def test_uses_cache_dir(self) -> None:
-        from app.model import _CACHE_DIR, _cache_path
+        from app.model_data import _CACHE_DIR, _cache_path
 
         result = _cache_path("test.pkl")
         assert str(_CACHE_DIR) in str(result)
@@ -61,7 +61,7 @@ class TestIsCacheValid:
     """Tests for cache freshness validation."""
 
     def test_nonexistent_cache_returns_false(self, tmp_path) -> None:
-        from app.model import _is_cache_valid
+        from app.model_data import _is_cache_valid
 
         fake_path = tmp_path / "nonexistent.pkl"
         assert _is_cache_valid(fake_path) is False
@@ -69,7 +69,7 @@ class TestIsCacheValid:
     def test_cache_newer_than_source_returns_true(self, tmp_path) -> None:
         import time
 
-        from app.model import _is_cache_valid
+        from app.model_data import _is_cache_valid
 
         cache = tmp_path / "cache.pkl"
         source = tmp_path / "source.csv"
@@ -82,7 +82,7 @@ class TestIsCacheValid:
     def test_cache_newer_than_all_sources(self, tmp_path) -> None:
         import time
 
-        from app.model import _is_cache_valid
+        from app.model_data import _is_cache_valid
 
         source1 = tmp_path / "s1.csv"
         source2 = tmp_path / "s2.csv"
@@ -94,7 +94,7 @@ class TestIsCacheValid:
         assert _is_cache_valid(cache, source1, source2) is True
 
     def test_missing_source_ignored(self, tmp_path) -> None:
-        from app.model import _is_cache_valid
+        from app.model_data import _is_cache_valid
 
         cache = tmp_path / "cache.pkl"
         cache.write_text("cached")
@@ -166,7 +166,9 @@ class TestBuildFeatures:
             '3,"Movie C (2002)",Action|Comedy\n'
         )
         ratings_csv = tmp_path / "ratings.csv"
-        ratings_csv.write_text("userId,movieId,rating\n1,1,4.0\n1,2,3.0\n2,1,5.0\n2,3,4.0\n3,2,2.0\n3,3,5.0\n")
+        ratings_csv.write_text(
+            "userId,movieId,rating\n1,1,4.0\n1,2,3.0\n2,1,5.0\n2,3,4.0\n3,2,2.0\n3,3,5.0\n"
+        )
         return str(movies_csv), str(ratings_csv)
 
     def test_build_features_returns_tuple(self, sample_data) -> None:

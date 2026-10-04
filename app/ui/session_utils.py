@@ -17,16 +17,18 @@ def _check_data_files() -> list[str]:
     from app._paths import PROJECT_ROOT
 
     missing = []
+    # (description, candidates) — Parquet migration keeps the CSV as a
+    # fallback, so either form satisfies the check.
     required = {
-        "data/movies.csv": "Movie database",
-        "data/tags.csv": "Movie tags",
-        "data/links.csv": "Movie links (TMDB IDs)",
-        "models/v1_test/model.joblib": "ML model",
-        "models/v1_test/meta.joblib": "Model metadata",
+        "Movie database": ("data/movies.parquet", "data/movies.csv"),
+        "Movie tags": ("data/tags.parquet", "data/tags.csv"),
+        "Movie links (TMDB IDs)": ("data/links.csv",),
+        "ML model": ("models/v1_test/model.joblib",),
+        "Model metadata": ("models/v1_test/meta.joblib",),
     }
-    for rel_path, desc in required.items():
-        if not (PROJECT_ROOT / rel_path).exists():
-            missing.append(f"{desc} ({rel_path})")
+    for desc, candidates in required.items():
+        if not any((PROJECT_ROOT / rel).exists() for rel in candidates):
+            missing.append(f"{desc} ({' or '.join(candidates)})")
     return missing
 
 
@@ -114,7 +116,7 @@ def init_session() -> None:
                     ### 🚨 Application Error
 
                     The app could not initialize. This is often due to:
-                    - **Missing data files** — `movies.csv`, `tags.csv`, and `links.csv` must be in the app directory
+                    - **Missing data files** — `movies`, `tags`, and `links` tables must be in the app directory (Parquet or CSV)
                     - **Missing model files** — `models/v1_test/` must contain `model.joblib` and `meta.joblib`
                     - **Out of memory** — The app needs ~512 MB of available RAM
                     - **Dependency conflicts** — Check the requirements.txt

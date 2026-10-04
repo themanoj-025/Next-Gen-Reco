@@ -4,9 +4,15 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.enrichment import NDEnrichment
+
 
 class EnrichmentMixin:
     """ND folder enrichment methods (TMDB metadata, cast, reviews)."""
+
+    # Provided by CoreMixin (RMR) — declared so mypy resolves it on
+    # subclasses that only inherit this mixin (e.g. tests).
+    enrichment: NDEnrichment | None
 
     def get_enriched_metadata(self, movie_id: int) -> dict[str, Any] | None:
         """Get TMDB-enriched metadata for a movie (overview, budget, runtime, etc.)."""
@@ -68,8 +74,8 @@ class EnrichmentMixin:
             # Append review text to the overview/description so reviews show as part of description
             existing_overview = enriched.get("overview", "") or ""
             # Take first 10 unique reviews to keep it concise
-            seen = set()
-            unique_reviews = []
+            seen: set[str] = set()
+            unique_reviews: list[str] = []
             for r in reviews:
                 r_clean = r.strip()
                 key = r_clean.lower()[:60]
@@ -77,8 +83,9 @@ class EnrichmentMixin:
                     seen.add(key)
                     unique_reviews.append(r_clean)
             if unique_reviews:
-                review_section = "<br><br>📝 <strong>What users are saying:</strong><br>" + "<br>".join(
-                    f"• \u201c{r}\u201d" for r in unique_reviews
+                review_section = (
+                    "<br><br>📝 <strong>What users are saying:</strong><br>"
+                    + "<br>".join(f"• \u201c{r}\u201d" for r in unique_reviews)
                 )
                 enriched["overview"] = existing_overview + review_section
 

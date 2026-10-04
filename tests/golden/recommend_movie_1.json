@@ -1,0 +1,52 @@
+[
+  {
+    "movieId": 4886,
+    "title": "Monsters, Inc. (2001)",
+    "similarity": 0.6324
+  },
+  {
+    "movieId": 3114,
+    "title": "Toy Story 2 (1999)",
+    "similarity": 0.6039
+  },
+  {
+    "movieId": 5218,
+    "title": "Ice Age (2002)",
+    "similarity": 0.5807
+  },
+  {
+    "movieId": 4990,
+    "title": "Jimmy Neutron: Boy Genius (2001)",
+    "similarity": 0.5806
+  },
+  {
+    "movieId": 4016,
+    "title": "Emperor's New Groove, The (2000)",
+    "similarity": 0.5794
+  },
+  {
+    "movieId": 6377,
+    "title": "Finding Nemo (2003)",
+    "similarity": 0.5783
+  },
+  {
+    "movieId": 4366,
+    "title": "Atlantis: The Lost Empire (2001)",
+    "similarity": 0.5712
+  },
+  {
+    "movieId": 78499,
+    "title": "Toy Story 3 (2010)",
+    "similarity": 0.5679
+  },
+  {
+    "movieId": 588,
+    "title": "Aladdin (1992)",
+    "similarity": 0.5649
+  },
+  {
+    "movieId": 3754,
+    "title": "Adventures of Rocky and Bullwinkle, The (2000)",
+    "similarity": 0.5645
+  }
+]

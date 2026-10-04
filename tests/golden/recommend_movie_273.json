@@ -1,0 +1,52 @@
+[
+  {
+    "movieId": 8092,
+    "title": "Frankenstein Unbound (1990)",
+    "similarity": 0.5803
+  },
+  {
+    "movieId": 2120,
+    "title": "Needful Things (1993)",
+    "similarity": 0.5754
+  },
+  {
+    "movieId": 4560,
+    "title": "Watchers (1988)",
+    "similarity": 0.5603
+  },
+  {
+    "movieId": 56022,
+    "title": "Harrison Bergeron (1995)",
+    "similarity": 0.5546
+  },
+  {
+    "movieId": 2648,
+    "title": "Frankenstein (1931)",
+    "similarity": 0.5518
+  },
+  {
+    "movieId": 89230,
+    "title": "Tooth & Nail (2007)",
+    "similarity": 0.5482
+  },
+  {
+    "movieId": 253,
+    "title": "Interview with the Vampire: The Vampire Chronicles (1994)",
+    "similarity": 0.5475
+  },
+  {
+    "movieId": 93865,
+    "title": "Frankenstein (1910)",
+    "similarity": 0.5383
+  },
+  {
+    "movieId": 512,
+    "title": "Puppet Masters, The (1994)",
+    "similarity": 0.535
+  },
+  {
+    "movieId": 215297,
+    "title": "All the Gods in the Sky (2019)",
+    "similarity": 0.5349
+  }
+]

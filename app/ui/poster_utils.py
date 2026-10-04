@@ -1,10 +1,13 @@
 """Poster, TMDB, and rating display utilities."""
 
 import os
+from typing import Any
 
 import requests
 import streamlit as st
 from dotenv import load_dotenv
+
+from app.ui.poster_cache import cached_poster, remember_poster
 
 # ── TMDB API (optional) ───────────────────────────────────────────────────────
 
@@ -70,9 +73,6 @@ def _poster_html(movie_id: int, title: str, year: int | None = None, size: str =
 # ── TMDB Poster Integration (optional) ───────────────────────────────────────
 
 
-# ── TMDB Poster Integration (optional) ───────────────────────────────────────
-
-
 @st.cache_data(ttl=3600, max_entries=500)
 def _tmdb_poster_cached(title: str, year: int | None = None) -> str | None:
     """Cached TMDB poster lookup. Reduces network calls on reruns."""
@@ -80,7 +80,7 @@ def _tmdb_poster_cached(title: str, year: int | None = None) -> str | None:
     if not api_key:
         return None
     try:
-        params = {"query": title, "api_key": api_key, "language": "en-US"}
+        params: dict[str, Any] = {"query": title, "api_key": api_key, "language": "en-US"}
         if year:
             params["year"] = year
         resp = requests.get(TMDB_SEARCH_BASE, params=params, timeout=3)
@@ -97,17 +97,32 @@ def _tmdb_poster_cached(title: str, year: int | None = None) -> str | None:
 
 
 def _search_tmdb_poster(movie_id: int, title: str, year: int | None = None) -> str | None:
-    """Search TMDB for a movie poster URL. Uses @st.cache_data for persistence."""
+    """Search TMDB for a movie poster URL.
+
+    Three layers, cheapest first: per-session dict, disk-persistent TTL
+    cache (survives restarts), then the network via ``st.cache_data``.
+    Negative results (no poster found) are cached too, so a miss does not
+    re-hit TMDB on every rerun.
+    """
     cache = st.session_state.tmdb_poster_cache
     if movie_id in cache:
-        return cache[movie_id]
+        hit: str | None = cache[movie_id]
+        return hit
+
+    found, disk_url = cached_poster(title, year)
+    if found:
+        cache[movie_id] = disk_url
+        return disk_url
 
     url = _tmdb_poster_cached(title, year)
+    remember_poster(title, year, url)
     cache[movie_id] = url
     return url
 
 
-def _movie_poster_html(movie_id: int, title: str, year: int | None = None, size: str = "100%") -> str:
+def _movie_poster_html(
+    movie_id: int, title: str, year: int | None = None, size: str = "100%"
+) -> str:
     """Render movie poster — TMDB image if available and enabled, otherwise gradient placeholder."""
     if st.session_state.get("use_tmdb_posters", False):
         poster_url = _search_tmdb_poster(movie_id, title, year)

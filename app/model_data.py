@@ -15,6 +15,7 @@ import pandas as pd
 warnings.filterwarnings("ignore")
 
 from app._paths import CACHE_DIR, DATA_DIR
+from app.data.tables import CSV_CHUNKSIZE, parquet_preferred, read_table
 from app.utils import logger
 
 # ── Cache helpers ──────────────────────────────────────────────────────────────
@@ -53,10 +54,10 @@ def _extract_year(title: str) -> float | None:
 
 
 def load_movies(path: str | None = None) -> pd.DataFrame:
-    """Load movies CSV and add derived features."""
+    """Load movies table (Parquet preferred, CSV fallback) + derived features."""
     if path is None:
         path = str(DATA_DIR / "movies.csv")
-    df = pd.read_csv(path)
+    df = read_table(path)
     df["year"] = df["title"].apply(_extract_year)
     df["genre_list"] = df["genres"].str.split("|")
     df["genre_count"] = df["genre_list"].apply(len)
@@ -84,6 +85,9 @@ def load_tags(path: str | None = None, top_k: int = 100) -> pd.DataFrame:
     """
     if path is None:
         path = str(DATA_DIR / "tags.csv")
+    # Cache invalidation must watch the file actually read (Parquet sibling
+    # when present, otherwise the CSV).
+    path = str(parquet_preferred(path))
     cache_file = _cache_path(f"tag_pivot_top{top_k}.parquet")
 
     # Try loading from cache first
@@ -95,7 +99,13 @@ def load_tags(path: str | None = None, top_k: int = 100) -> pd.DataFrame:
         except (OSError, ValueError, KeyError):
             pass
 
-    tags = pd.read_csv(path, dtype={"userId": "int32", "movieId": "int32", "tag": "object"})
+    # Chunked read on the CSV fallback keeps peak memory bounded on the
+    # 2M-row tags file; the Parquet path ignores chunksize.
+    tags = read_table(
+        path,
+        dtype={"userId": "int32", "movieId": "int32", "tag": "object"},
+        chunksize=CSV_CHUNKSIZE,
+    )
 
     # Find the top K most common tags overall
     top_tags = tags["tag"].str.lower().str.strip().value_counts().head(top_k).index.tolist()
