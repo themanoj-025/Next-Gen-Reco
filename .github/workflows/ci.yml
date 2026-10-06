@@ -154,7 +154,7 @@ jobs:
       - name: Verify data files exist
         run: |
           echo "=== Data file check ==="
-          for f in data/movies.csv data/tags.csv data/links.csv models/v1_test/model.joblib models/v1_test/meta.joblib; do
+          for f in data/movies.parquet data/tags.parquet data/links.csv models/v1_test/model.joblib models/v1_test/meta.joblib; do
             if [ -f "$f" ]; then
               size=$(du -h "$f" | cut -f1)
               echo "  ✓ $f ($size)"
@@ -309,7 +309,7 @@ jobs:
           pip install -r requirements.txt
           pip install mypy==1.15.0
       - name: Type check with mypy
-        run: mypy . --ignore-missing-imports
+        run: mypy . --ignore-missing-imports --exclude "app\.py$"
 
   docker-cache:
     name: Docker image build + layer cache

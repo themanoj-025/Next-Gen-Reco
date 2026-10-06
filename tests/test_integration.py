@@ -24,15 +24,15 @@ pytestmark = pytest.mark.slow
 
 
 @pytest.fixture()
-def client() -> None:
+def client() -> TestClient:
     """Create a TestClient for the FastAPI app."""
     return TestClient(app, raise_server_exceptions=False)
 
 
 @pytest.fixture()
-def mock_recommender() -> None:
+def mock_recommender() -> MagicMock:
     """A fully mocked MovieRecommender."""
-    rec = MagicMock()
+    rec: MagicMock = MagicMock()
     rec.search_movies.return_value = [
         {"movieId": 1, "title": "Toy Story", "genres": "Animation|Children"},
         {"movieId": 2, "title": "Jumanji", "genres": "Adventure|Children"},

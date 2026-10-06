@@ -1,5 +1,7 @@
 """Surprise Me and Mood Explorer."""
 
+from typing import Literal
+
 import pandas as pd
 import streamlit as st
 
@@ -70,7 +72,7 @@ def render_mood_explorer() -> None:
     for i, genre in enumerate(all_genres):
         with cols[i % 5]:
             is_active = genre in selected
-            btn_type = "primary" if is_active else "secondary"
+            btn_type: Literal["primary", "secondary"] = "primary" if is_active else "secondary"
             label = f"✅ {genre}" if is_active else genre
             if st.button(label, key=f"mood_{genre}", use_container_width=True, type=btn_type):
                 if is_active:

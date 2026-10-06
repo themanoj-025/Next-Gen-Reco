@@ -15,8 +15,10 @@ from app.ui.detail_widgets import (
     render_similar_movies,
     render_watchlist_button,
 )
+from app.ui.detail_widgets.rating_widgets import WATCHLIST_CATEGORIES
 
 __all__ = [
+    "WATCHLIST_CATEGORIES",
     "render_export",
     "render_feature_explanation",
     "render_metrics_card",

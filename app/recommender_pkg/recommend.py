@@ -2,13 +2,26 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any
 
 import numpy as np
+import pandas as pd
 
 
 class RecommendMixin:
     """Hybrid recommendation scoring."""
+
+    # Attributes/methods provided by CoreMixin (RMR) — declared here so mypy
+    # resolves them on concrete subclasses that only inherit RecommendMixin
+    # (e.g. tests). Same convention as StatsMixin/SearchMixin.
+    movies: pd.DataFrame
+    movies_by_id: dict[int, pd.Series]
+    _tag_lookup: dict[int, set[int]]
+    _get_movie_idx: Callable[[int], int | None]
+    _genre_similarity_to: Callable[[int], np.ndarray]
+    _jaccard_similarity: Callable[[int, int], float]
+    _predict_rating_safe: Callable[[pd.Series], float | None]
 
     def recommend(
         self,

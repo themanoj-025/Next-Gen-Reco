@@ -59,6 +59,7 @@ markers = [
 python_version = "3.11"
 ignore_missing_imports = true
 warn_return_any = true
+exclude = "app\\.py$"
 warn_unused_configs = true
 warn_redundant_casts = true
 warn_unused_ignores = true

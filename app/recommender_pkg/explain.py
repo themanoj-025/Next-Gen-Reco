@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any
 
 import pandas as pd
@@ -9,6 +10,16 @@ import pandas as pd
 
 class ExplainMixin:
     """Feature breakdown, prediction explanation, and global top picks."""
+
+    # Attributes/methods provided by CoreMixin (RMR) — declared here so mypy
+    # resolves them on concrete subclasses that only inherit ExplainMixin
+    # (e.g. tests). Same convention as StatsMixin/SearchMixin.
+    movies: pd.DataFrame
+    movies_by_id: dict[int, pd.Series]
+    model_result: dict[str, Any] | None
+    tag_pivot: pd.DataFrame | None
+    get_movie_info: Callable[[int], dict[str, Any] | None]
+    _predict_cached: Callable[[int], float | None]
 
     def get_feature_breakdown(self, movie_id: int) -> dict[str, Any] | None:
         """Get feature importance breakdown for a movie's prediction."""

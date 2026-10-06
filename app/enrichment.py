@@ -5,6 +5,7 @@ Integrates data from the ND/ folder into the existing MovieLens system:
 
   - ND/movies.csv (TMDB dataset) — overviews, budget, revenue, runtime,
     popularity, vote_average, tagline, director, cast, keywords
+    (migrated to ND/movies.parquet; CSV kept as fallback)
   - ND/main_data.csv             — director_name + top 3 actors per movie
   - ND/reviews.txt               — user text reviews
 
@@ -23,6 +24,7 @@ import pandas as pd
 warnings.filterwarnings("ignore")
 
 from app._paths import CACHE_DIR, ND_DIR
+from app.data.tables import parquet_preferred, read_table
 
 _LOG_PREFIX = "[ND-Enrich]"
 logger = logging.getLogger(__name__)
@@ -101,10 +103,12 @@ class NDEnrichment:
         self._metadata_map: dict[int, dict[str, Any]] = {}  # movieId -> tmdb metadata
         self._cast_map: dict[int, dict[str, Any]] = {}  # movieId -> director + actors
         self._reviews_map: dict[int, list[str]] = {}  # movieId -> list of review texts
-        self._director_to_movies: dict[
-            str, list[int]
-        ] = {}  # director name -> list of movieIds (sorted after index_data)
-        self._actor_to_movies: dict[str, list[int]] = {}  # actor name -> list of movieIds (sorted after index_data)
+        self._director_to_movies: dict[str, list[int]] = (
+            {}
+        )  # director name -> list of movieIds (sorted after index_data)
+        self._actor_to_movies: dict[str, list[int]] = (
+            {}
+        )  # actor name -> list of movieIds (sorted after index_data)
 
         self._loaded = False
         self._tfidf = None  # For keyword-based similarity (future)
@@ -129,7 +133,8 @@ class NDEnrichment:
             return pd.DataFrame()
 
         try:
-            df = pd.read_csv(TMDB_CSV, low_memory=False)
+            # Parquet preferred; CSV fallback. low_memory only applies to CSV.
+            df = read_table(TMDB_CSV, low_memory=False)
             if "title" not in df.columns:
                 logger.warning("TMDB CSV missing 'title' column. Columns: %s", list(df.columns))
                 return pd.DataFrame()
@@ -217,15 +222,14 @@ class NDEnrichment:
         cache_path = (
             _ENRICHMENT_CACHE
             if _ENRICHMENT_CACHE.exists()
-            else _LEGACY_ENRICHMENT_CACHE
-            if _LEGACY_ENRICHMENT_CACHE.exists()
-            else None
+            else _LEGACY_ENRICHMENT_CACHE if _LEGACY_ENRICHMENT_CACHE.exists() else None
         )
         if cache_path is None:
             return False
 
-        # Check that source files haven't changed
-        source_paths = [TMDB_CSV, MAIN_DATA_CSV, REVIEWS_TXT]
+        # Check that source files haven't changed (watch the file actually
+        # read — Parquet sibling when present, else the CSV)
+        source_paths = [parquet_preferred(TMDB_CSV), parquet_preferred(MAIN_DATA_CSV), REVIEWS_TXT]
         cache_mtime = cache_path.stat().st_mtime
         for sp in source_paths:
             if sp.exists() and sp.stat().st_mtime > cache_mtime:
@@ -293,7 +297,9 @@ class NDEnrichment:
         # Build normalized title lookup using pandas groupby (much faster)
         titles_normalized = movies_df["title"].apply(_normalize)
         norm_series = pd.Series(titles_normalized.values, index=movies_df["movieId"])
-        norm_to_id: dict[str, list[int]] = norm_series.groupby(norm_series).apply(lambda x: x.index.tolist()).to_dict()
+        norm_to_id: dict[str, list[int]] = (
+            norm_series.groupby(norm_series).apply(lambda x: x.index.tolist()).to_dict()
+        )
 
         # ── 1. Index TMDB metadata (vectorized merge approach) ────────────
         tmdb_df = self._load_tmdb_data()
@@ -301,7 +307,7 @@ class NDEnrichment:
 
         if len(tmdb_df) > 0:
             # Build a reverse lookup: norm -> list of TMDB rows (as dicts)
-            tmdb_norm_groups = {}
+            tmdb_norm_groups: dict[str, list[pd.Series]] = {}
             for _, tmdb_row in tmdb_df.iterrows():
                 norm = tmdb_row.get("_norm_title", "")
                 if not norm:
@@ -347,12 +353,18 @@ class NDEnrichment:
 
         if len(cast_df) > 0:
             # Group cast rows by normalized title to minimize dict lookups
-            cast_norm_groups = {}
+            cast_norm_groups: dict[str, list[pd.Series]] = {}
             for _, cast_row in cast_df.iterrows():
                 norm = cast_row.get("_norm_title", "")
                 if not norm:
                     continue
                 cast_norm_groups.setdefault(norm, []).append(cast_row)
+
+            # Accumulate in sets (O(1) add), convert to sorted lists below.
+            director_sets: dict[str, set[int]] = {
+                k: set(v) for k, v in self._director_to_movies.items()
+            }
+            actor_sets: dict[str, set[int]] = {k: set(v) for k, v in self._actor_to_movies.items()}
 
             for norm, cast_rows in cast_norm_groups.items():
                 matched_ids = norm_to_id.get(norm)
@@ -373,16 +385,16 @@ class NDEnrichment:
                                 "actors_raw": [actor1, actor2, actor3],
                             }
                         if director and director.lower() != "unknown":
-                            self._director_to_movies.setdefault(director, set()).add(mid)
+                            director_sets.setdefault(director, set()).add(mid)
                         for actor in actors:
                             if actor and actor.lower() != "unknown":
-                                self._actor_to_movies.setdefault(actor, set()).add(mid)
+                                actor_sets.setdefault(actor, set()).add(mid)
 
                     cast_matched += len(matched_ids)
 
             # Convert sets to sorted lists
-            self._director_to_movies = {k: sorted(v) for k, v in self._director_to_movies.items()}
-            self._actor_to_movies = {k: sorted(v) for k, v in self._actor_to_movies.items()}
+            self._director_to_movies = {k: sorted(v) for k, v in director_sets.items()}
+            self._actor_to_movies = {k: sorted(v) for k, v in actor_sets.items()}
 
         logger.info("Cast: %d movies matched out of %d", cast_matched, len(cast_df))
         logger.info("  %d unique directors indexed", len(self._director_to_movies))
@@ -478,7 +490,11 @@ class NDEnrichment:
 
     def has_data(self, movie_id: int) -> bool:
         """Check if any enrichment data exists for this movie."""
-        return movie_id in self._metadata_map or movie_id in self._cast_map or movie_id in self._reviews_map
+        return (
+            movie_id in self._metadata_map
+            or movie_id in self._cast_map
+            or movie_id in self._reviews_map
+        )
 
     # ── Utility ──────────────────────────────────────────────────────────
 
@@ -568,7 +584,11 @@ class NDEnrichment:
                 summary["popularity"] = f"{meta['popularity']:.1f}"
 
         if cast:
-            if cast.get("director") and cast["director"].lower() != "unknown" and cast["director"].lower() != "nan":
+            if (
+                cast.get("director")
+                and cast["director"].lower() != "unknown"
+                and cast["director"].lower() != "nan"
+            ):
                 summary["director"] = cast["director"]
             if cast.get("actors"):
                 summary["actors"] = cast["actors"]
