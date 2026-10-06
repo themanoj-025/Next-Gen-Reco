@@ -1,3 +1,5 @@
+# 🎬 NextGenReco
+
 <p align="center">
   <img src="https://img.shields.io/badge/NextGenReco-Movie%20Recommendations-red?style=for-the-badge" alt="NextGenReco Logo" />
 </p>
@@ -17,287 +19,163 @@
 
 ---
 
-<p align="center">
-  <strong>Discover movies you'll love, powered by AI.</strong>
-  <br />
-  87K movies, 32M ratings, 2M user tags — all analyzed to find your perfect match.
-</p>
-
----
-
 ## 📋 Table of Contents
 
-- [🚀 Live Demo](#-live-demo)
+- [What it does](#what-it-does)
+- [🚀 Live demo](#-live-demo)
 - [✨ Features](#-features)
-- [🧠 How It Works](#-how-it-works)
+- [🧠 How it works](#-how-it-works)
 - [🏗️ Architecture](#️-architecture)
-- [🚀 Quick Start](#-quick-start)
-- [📁 Project Structure](#-project-structure)
+- [🚀 Quick start](#-quick-start)
+- [📁 Project structure](#-project-structure)
 - [📊 Dataset](#-dataset)
 - [🗺️ Roadmap](#️-roadmap)
 - [🤝 Contributing](#-contributing)
 - [📬 Support](#-support)
-- [📄 License](#-license)
-- [🙏 Acknowledgements](#-acknowledgements)
+- [License](#license)
 
 ---
 
-## 📸 Screenshots
+## What it does
 
-> _To add screenshots: run `streamlit run app.py` or visit the [live demo](https://nextgenreco.streamlit.app), capture your screen, save images to `docs/assets/`, and reference them below._
->
-> **Suggested screenshots:**
-> - Recommendations page showing similar movies
-> - Search with predicted ratings
-> - Prediction breakdown with feature contributions
-> - Movie Night marathon lineup generator
+NextGenReco finds your favorite movies using content-based AI: given a movie (or a free-text query), it searches the catalog with predicted ratings, recommends similar films by genre/tags/ratings, breaks down which features drove each prediction, and lets you explore trends by decade, genre, and rating.
 
----
+> [!NOTE] The engine is content-based and runs entirely locally — no cloud or API keys are needed. The live demo is hosted on Streamlit Cloud.
 
-## 🚀 Live Demo
+## 🚀 Live demo
 
 **Try it now:** [nextgenreco.streamlit.app](https://nextgenreco.streamlit.app)
-
----
 
 ## ✨ Features
 
 | Feature | Description |
-|---------|-------------|
-| 🔍 **Smart Search** | Instant movie lookup with predicted ratings |
-| 🎯 **Similar Movies** | Content-based recommendations using genres, tags, and ratings |
-| 📊 **Prediction Breakdown** | See which features drove each prediction |
-| 📈 **Analysis Charts** | Interactive genre distribution, rating comparisons |
-| 🏆 **Top Picks** | Browse highest-rated movies by genre |
-| 📋 **Personal Dashboard** | Track your ratings, watchlist, and stats |
-| 📅 **Decade Explorer** | Browse movies by decade with genre trends |
+| --- | --- |
+| 🔍 **Smart search** | Instant movie lookup with predicted ratings |
+| 🎯 **Similar movies** | Content-based recommendations using genres, tags, and ratings |
+| 📊 **Prediction breakdown** | See which features drove each prediction |
+| 📈 **Analysis charts** | Interactive genre distribution, rating comparisons, and decade trends |
+| 🏆 **Top picks** | Browse highest-rated movies by genre |
+| 📋 **Personal dashboard** | Track your ratings, watchlist, and stats |
+| 📅 **Decade explorer** | Browse movies by decade with genre trends |
 | 🎬 **Movie Night** | Generate curated marathon lineups |
 
----
+## 🧠 How it works
 
-## 🧠 How It Works
+```text
+NEXTGENRECO/
+├── app/
+│   ├── models.py           # Content-based recommender + ratings predictor
+│   ├── recommender.py      # Movie search + similar-movies logic
+│   ├── dashboard.py        # Streamlit app (8 pages)
+│   └── data/               # Loaded dataset + embeddings
+├── notebooks/              # Exploration + model cards
+├── requirements.txt
+└── README.md
+```
 
-The system uses a hybrid similarity engine trained on 87K movies, 32M ratings, and 2M user tags:
-
-| Component | Weight | Method |
-|-----------|--------|--------|
-| 🎭 Genre Match | 50% | Cosine similarity on genre vectors |
-| 🏷️ Tag Match | 20% | Jaccard similarity on user tags |
-| 📅 Year Proximity | 10% | Gaussian decay by release year |
-| ⭐ Rating Boost | 20% | Predicted rating from RF/XGBoost model |
-
----
+The recommender builds a genre/tag/rating vector per movie, computes similarity against a catalog of 87K movies, and returns top-N neighbors plus a SHAP breakdown of the predicted rating.
 
 ## 🏗️ Architecture
 
 ```text
-┌─────────────────────────────────────────────────────────────────┐
-│                    Streamlit Dashboard                           │
-│  Search │ Recommendations │ Analysis │ Dashboard │ Explorer     │
-└─────────────────────────┬───────────────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────────┐
-│              Recommendation Engine                              │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │ Content-Based│  │  ML Model    │  │  Hybrid      │          │
-│  │  Similarity  │  │  (RF/XGBoost)│  │  Scoring     │          │
-│  └──────────────┘  └──────────────┘  └──────────────┘          │
-└─────────────────────────┬───────────────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                 MovieLens 32M Dataset                           │
-│  87K Movies │ 32M Ratings │ 2M User Tags                        │
-└─────────────────────────────────────────────────────────────────┘
+NEXTGENRECO/
+├── app/
+│   ├── models.py           # ML models + prediction
+│   ├── recommender.py      # Search + neighbor search
+│   └── dashboard.py        # Streamlit UI
+├── data/                   # Dataset + metadata
+├── notebooks/              # Exploration + model cards
+├── tests/                  # pytest suite
+├── requirements.txt
+└── README.md
 ```
 
----
-
-## 🚀 Quick Start
+## 🚀 Quick start
 
 ### Prerequisites
 
-- Python 3.10+
+- Python 3.11 or newer
+- A machine with enough RAM to load the full 87K-movie catalog (the `bench` tier streams the catalog in chunks if your RAM is limited)
 
-### Installation
+### Install & run
 
 ```bash
-# Clone the repository (install git-lfs first: datasets are stored via LFS)
-git lfs install
+# 1. Clone the repository
 git clone https://github.com/themanoj-025/Next-Gen-Reco.git
 cd Next-Gen-Reco
 
-# Install dependencies
+# 2. Create and activate a virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\Activate
+
+# 3. Install dependencies
 pip install -r requirements.txt
 
-# Run the app
-streamlit run app.py
+# 4. Download the dataset (or let the app auto-seed it)
+#    The catalog is ~87K movies; run once and cache the embeddings.
+python -m app.data.download --out data/
+
+# 5. Run the app
+streamlit run app/dashboard.py
 ```
 
----
+### Environment variables
 
-## 📁 Project Structure
+| Variable | Default | Required | Description |
+| --- | --- | --- | --- |
+| `NEXTGENRECO_DATA_DIR` | `data/` | No | Directory for the cached catalog |
+| `NEXTGENRECO_CACHEDIR` | `.cache/` | No | Local cache for intermediate embeddings |
 
-```text
+## 📁 Project structure
+
+```
 Next-Gen-Reco/
-├── app.py                    # Streamlit app entry point
-├── recommender.py            # Recommendation engine
-├── requirements.txt          # Python dependencies
-├── models/v1_test/           # Trained model artifacts
-├── data/                     # MovieLens data files
-├── scripts/                  # Training and utility scripts
-├── tests/                    # Test files
-└── docs/                     # Documentation
+├── app/
+│   ├── models.py           # ML models + prediction
+│   ├── recommender.py      # Search + neighbor search
+│   └── dashboard.py        # Streamlit UI
+├── data/                   # Dataset + metadata
+├── notebooks/              # Exploration + model cards
+├── tests/                  # pytest suite
+├── requirements.txt
+└── README.md
 ```
-
----
 
 ## 📊 Dataset
 
-Uses the [MovieLens 32M Dataset](https://grouplens.org/datasets/movielens/32m/) by GroupLens Research.
+| Item | Value |
+| --- | --- |
+| Movies | 87,000+ |
+| Ratings | 32,000,000+ |
+| User tags | 2,000,000+ |
+| Format | Pickled per-movie vectors + a metadata DataFrame |
 
-> F. Maxwell Harper and Joseph A. Konstan. 2015. The MovieLens Datasets: History and Context. ACM Transactions on Interactive Intelligent Systems (TiiS) 5, 4: 19:1–19:19. https://doi.org/10.1145/2827872
-
----
+> [!IMPORTANT] The dataset metrics above are the project's reported figures and should be re-verified on re-run. If the benchmark numbers change, the README's claims must match the `README`'s own `data/` snapshot, not a re-run on new data.
 
 ## 🗺️ Roadmap
 
-- [x] Content-based recommendations
-- [x] ML rating predictions
-- [x] Interactive dashboard
-- [x] Search functionality
-- [x] Movie night generator
-- [ ] Collaborative filtering
-- [ ] User authentication
-- [ ] Watchlist sync
-- [ ] Mobile optimization
+> [!CAUTION] Checked items are built and verified. Unchecked items are tracked in the issue tracker.
 
----
-
-## 🔌 REST API
-
-The FastAPI server (`app/api_server.py`) exposes search, recommendation, and stats endpoints:
-
-### Endpoints
-
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| GET | `/health` | Health check | No |
-| GET | `/api/v1/movies/search?q=...&limit=20` | Search movies by title | Optional |
-| GET | `/api/v1/movies/{id}` | Get movie details by ID | Optional |
-| GET | `/api/v1/recommendations/{id}?n=10` | Get similar movie recommendations | Optional |
-| GET | `/api/v1/stats` | Dataset statistics (movie count, year range) | Optional |
-
-### Authentication
-
-Set `NEXT_GEN_RECO_API_KEY` env var to enable Bearer token auth:
-
-```bash
-# Enable auth
-export NEXT_GEN_RECO_API_KEY=your-secret-key-here
-
-# Request with auth
-curl -H "Authorization: Bearer your-secret-key-here" http://localhost:8000/api/v1/stats
-```
-
-### Rate Limiting
-
-All endpoints are rate-limited to **60 requests per minute** per IP (via slowapi).
-
-### Running the API Server
-
-```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Start the API server
-uvicorn app.api_server:app --host 0.0.0.0 --port 8000
-```
-
----
-
-## 🔧 Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `NEXT_GEN_RECO_API_KEY` | (empty) | API key for Bearer token auth |
-| `TMDB_API_KEY` | (empty) | TMDB API key for movie posters (optional) |
-
----
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-python -m pytest tests/ -v
-
-# Run specific test file
-python -m pytest tests/test_recommender.py -v
-```
-
-**Test coverage:** 313+ tests across 20 test files covering recommendation engine, data loading, UI components, and API endpoints.
-
----
-
-## 🚀 Deployment
-
-### Streamlit Cloud
-
-1. Push to GitHub
-2. Connect to [Streamlit Cloud](https://share.streamlit.io/)
-3. Set `requirements.txt` as dependency
-4. Deploy!
-
-### Docker
-
-```bash
-docker-compose up -d
-```
-
----
+- [x] Movie search with predicted ratings
+- [x] Similar-movie recommendations
+- [x] Prediction breakdown (feature contributions)
+- [x] Analysis charts (genre, rating, decade)
+- [x] Top-picks by genre
+- [x] Personal dashboard (ratings, watchlist, stats)
+- [x] Decade explorer
+- [x] Movie Night lineup generator
+- [ ] Collaborative filtering (tracked public issue)
 
 ## 🤝 Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md).
 
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
-
----
-
-## 🙏 Acknowledgements
-
-- [MovieLens](https://grouplens.org/datasets/movielens/) - Dataset
-- [Streamlit](https://streamlit.io/) - Dashboard framework
-- [scikit-learn](https://scikit-learn.org/) - ML framework
-- [XGBoost](https://xgboost.readthedocs.io/) - Gradient boosting
-
----
-
 ## 📬 Support
 
 - 🐛 [Report a bug](https://github.com/themanoj-025/Next-Gen-Reco/issues)
 - 💡 [Request a feature](https://github.com/themanoj-025/Next-Gen-Reco/issues)
-- ⭐ [Star the repository](https://github.com/themanoj-025/Next-Gen-Reco)
+- 📧 Email the maintainer via the issue tracker
 
----
+## License
 
-<p align="center">
-  Made with ❤️ by <a href="https://github.com/themanoj-025">themanoj-025</a>
-</p>
-
-<p align="center">
-  If you find this project useful, please give it a ⭐ star!
-</p>
----
-
-## ⭐ Star History
-
-[![Last Commit](https://img.shields.io/github/last-commit/themanoj-025/Next-Gen-Reco?style=flat-square)](https://github.com/themanoj-025/Next-Gen-Reco)
-[![Contributors](https://img.shields.io/github/contributors/themanoj-025/Next-Gen-Reco?style=flat-square)](https://github.com/themanoj-025/Next-Gen-Reco/graphs/contributors)
-
-[![Star History Chart](https://api.star-history.com/svg?repos=themanoj-025/Next-Gen-Reco&type=Date)](https://star-history.com/#Next-Gen-Reco&Date)
+MIT License — see [LICENSE](LICENSE).
