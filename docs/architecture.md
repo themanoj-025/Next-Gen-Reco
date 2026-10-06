@@ -28,8 +28,8 @@
                      └──────────┬──────────────────┬──────────────────┘
                                 │                  │
                                 ▼                  ▼
-                        data/ (movies.csv,    models/ (joblib artifacts)
-                        tags.csv, links.csv,
+                        data/ (movies.parquet,   models/ (joblib artifacts)
+                        tags.parquet, links.csv,
                         ND/ enrichment data)
 ```
 
@@ -44,7 +44,7 @@
 | Enrichment | `app/enrichment.py` | `NDEnrichment` — merges the external ND dataset into the catalog. |
 | Data persistence | `app/data/loader.py` | `_load_user_data` / `_save_user_data` (`.movie_user_data.json`, gitignored). |
 | UI layer | `app/ui/*.py` | 13 modules: styles, poster_utils, session_utils, home, dashboard, explore, search, for_you, compare, stats, decade_explorer, movie_night, combo_finder, components. |
-| Datasets | `data/` | `movies.csv`, `tags.csv`, `links.csv`, `ND/` (main_data.csv, movies.csv, reviews.txt). |
+| Datasets | `data/` | `movies.parquet`, `tags.parquet`, `links.csv`, `ND/` (main_data.csv, movies.parquet, reviews.txt). CSV siblings kept as read-fallback only. |
 | Model artifacts | `models/v1_test/` | `meta.joblib` + `model.joblib` (committed; regenerable via `scripts/train_fast.py`). |
 | Operational scripts | `scripts/` | `fix_regex.py` (data cleanup), `train_fast.py` (fast training). |
 | Tests | `tests/` | `test_model.py`, `test_syntax.py` + fixture `test_pattern.txt`. |

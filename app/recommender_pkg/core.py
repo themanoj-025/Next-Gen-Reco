@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 
 from app._paths import CACHE_DIR, DATA_DIR, PROJECT_ROOT
+from app.data.tables import parquet_preferred
 from app.enrichment import NDEnrichment
 from app.model import load_model, load_movies, load_tags, predict_rating
 
@@ -45,6 +46,10 @@ _prediction_cache: dict[int, float | None] = {}
 class CoreMixin:
     """Core methods: init, build, similarity, movie info."""
 
+    # Declared at class level so __init__ can assign None on failure and
+    # so StatsMixin/EnrichmentMixin see an identical contract (mypy).
+    enrichment: NDEnrichment | None
+
     def __init__(
         self,
         model_name: str = "v1_test",
@@ -57,9 +62,10 @@ class CoreMixin:
         self.movies = load_movies()
         self.movies["year"] = self.movies["year"].fillna(0).astype(float)
 
-        # Try loading genre vectors from cache
-        movies_csv_path = str(DATA_DIR / "movies.csv")
-        if _check_cache_valid(_GENRE_CACHE_PATH, movies_csv_path):
+        # Try loading genre vectors from cache.  Invalidation must watch the
+        # file actually read (Parquet sibling when present, else the CSV).
+        movies_data_path = str(parquet_preferred(DATA_DIR / "movies.csv"))
+        if _check_cache_valid(_GENRE_CACHE_PATH, movies_data_path):
             try:
                 data = np.load(_GENRE_CACHE_PATH, allow_pickle=False)
                 self._genre_vectors = data["vectors"]
@@ -89,8 +95,8 @@ class CoreMixin:
         if self.tag_pivot is not None and len(self.tag_pivot) > 0:
             self._build_tag_lookup()
         else:
-            self._tag_lookup = {}
-            self._tag_cols = []
+            self._tag_lookup: dict[int, set[int]] = {}
+            self._tag_cols: list[str] = []
 
         # Load model
         self.model_result = None
@@ -130,7 +136,9 @@ class CoreMixin:
             self.enrichment = None
 
         # Build movie lookup by ID
-        self.movies_by_id: dict[int, pd.Series] = {row["movieId"]: row for _, row in self.movies.iterrows()}
+        self.movies_by_id: dict[int, pd.Series] = {
+            row["movieId"]: row for _, row in self.movies.iterrows()
+        }
 
         # Year stats for year proximity scoring
         years = self.movies["year"]
@@ -175,7 +183,7 @@ class CoreMixin:
         tag_cols = [c for c in self.tag_pivot.columns if c != "movieId"]
         self._tag_cols = tag_cols
 
-        self._tag_lookup: dict[int, set[int]] = {}
+        self._tag_lookup = {}
         for _, row in self.tag_pivot.iterrows():
             mid = int(row["movieId"])
             tags = set()
@@ -236,7 +244,7 @@ class CoreMixin:
         target_vec = self._genre_vectors[idx]
         # Cosine similarity: dot / (norm1 * norm2)
         dots = self._genre_vectors @ target_vec
-        sim = dots / (self._genre_norms * self._genre_norms[idx])
+        sim: np.ndarray = dots / (self._genre_norms * self._genre_norms[idx])
         return sim.astype(np.float32)
 
     def _jaccard_similarity(self, mid1: int, mid2: int) -> float:

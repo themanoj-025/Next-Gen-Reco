@@ -1,3 +1,5 @@
+from typing import cast
+
 import pytest
 
 pytestmark = pytest.mark.unit
@@ -20,9 +22,12 @@ class TestCoreMixinHelpers:
             pass
 
         mock = MockCore()
-        assert CoreMixin._normalize_title(mock, "The Matrix!") == "the matrix"
-        assert CoreMixin._normalize_title(mock, "  Hello World  ") == "hello world"
-        assert CoreMixin._normalize_title(mock, "Star Wars: Episode IV") == "star wars episode iv"
+        assert CoreMixin._normalize_title(cast(CoreMixin, mock), "The Matrix!") == "the matrix"
+        assert CoreMixin._normalize_title(cast(CoreMixin, mock), "  Hello World  ") == "hello world"
+        assert (
+            CoreMixin._normalize_title(cast(CoreMixin, mock), "Star Wars: Episode IV")
+            == "star wars episode iv"
+        )
 
     def test_tokenize(self) -> None:
         from app.recommender_pkg.core import CoreMixin
@@ -31,7 +36,7 @@ class TestCoreMixinHelpers:
             pass
 
         mock = MockCore()
-        tokens = CoreMixin._tokenize(mock, "The Quick Brown Fox")
+        tokens = CoreMixin._tokenize(cast(CoreMixin, mock), "The Quick Brown Fox")
         assert tokens == ["the", "quick", "brown", "fox"]
 
     def test_tokenize_filters_short_tokens(self) -> None:
@@ -41,7 +46,7 @@ class TestCoreMixinHelpers:
             pass
 
         mock = MockCore()
-        tokens = CoreMixin._tokenize(mock, "A I am OK")
+        tokens = CoreMixin._tokenize(cast(CoreMixin, mock), "A I am OK")
         assert "a" not in tokens
         assert "i" not in tokens
         assert "am" in tokens
@@ -51,34 +56,34 @@ class TestCoreMixinHelpers:
         from app.recommender_pkg.core import CoreMixin
 
         class MockCore:
-            def _normalize_title(self, title) -> None:
-                return CoreMixin._normalize_title(self, title)
+            def _normalize_title(self, title: str) -> str:
+                return CoreMixin._normalize_title(cast(CoreMixin, self), title)
 
         mock = MockCore()
-        dist = CoreMixin._query_edit_distance(mock, "the matrix", "The Matrix")
+        dist = CoreMixin._query_edit_distance(cast(CoreMixin, mock), "the matrix", "The Matrix")
         assert dist == 0
 
     def test_query_edit_distance_typo(self) -> None:
         from app.recommender_pkg.core import CoreMixin
 
         class MockCore:
-            def _normalize_title(self, title) -> None:
-                return CoreMixin._normalize_title(self, title)
+            def _normalize_title(self, title: str) -> str:
+                return CoreMixin._normalize_title(cast(CoreMixin, self), title)
 
         mock = MockCore()
-        dist = CoreMixin._query_edit_distance(mock, "the matrx", "The Matrix")
+        dist = CoreMixin._query_edit_distance(cast(CoreMixin, mock), "the matrx", "The Matrix")
         assert dist == 1
 
     def test_query_edit_distance_empty(self) -> None:
         from app.recommender_pkg.core import CoreMixin
 
         class MockCore:
-            def _normalize_title(self, title) -> None:
-                return CoreMixin._normalize_title(self, title)
+            def _normalize_title(self, title: str) -> str:
+                return CoreMixin._normalize_title(cast(CoreMixin, self), title)
 
         mock = MockCore()
-        assert CoreMixin._query_edit_distance(mock, "", "The Matrix") == 99
-        assert CoreMixin._query_edit_distance(mock, "matrix", "") == 99
+        assert CoreMixin._query_edit_distance(cast(CoreMixin, mock), "", "The Matrix") == 99
+        assert CoreMixin._query_edit_distance(cast(CoreMixin, mock), "matrix", "") == 99
 
 
 # ── Features Mixin Pure Methods ─────────────────────────────────────────────

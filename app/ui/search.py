@@ -72,9 +72,15 @@ def render_search() -> None:
                 st.session_state.search_rating_min = rating_min
 
         genre_param = selected_genre if selected_genre != "All Genres" else None
-        year_min_param = st.session_state.search_year_min if st.session_state.search_year_min > 1900 else None
-        year_max_param = st.session_state.search_year_max if st.session_state.search_year_max < 2026 else None
-        rating_min_param = st.session_state.search_rating_min if st.session_state.search_rating_min > 1.0 else None
+        year_min_param = (
+            st.session_state.search_year_min if st.session_state.search_year_min > 1900 else None
+        )
+        year_max_param = (
+            st.session_state.search_year_max if st.session_state.search_year_max < 2026 else None
+        )
+        rating_min_param = (
+            st.session_state.search_rating_min if st.session_state.search_rating_min > 1.0 else None
+        )
 
         results = rec.search_movies_advanced(
             q,
@@ -194,7 +200,7 @@ def render_search_history() -> None:
         return
 
     st.markdown("### 🔍 Recent Searches")
-    shown = set()
+    shown: set[str] = set()
     for query, ts in st.session_state.search_history:
         if query not in shown and len(shown) < 5:
             shown.add(query)

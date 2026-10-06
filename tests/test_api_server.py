@@ -25,7 +25,7 @@ from app.api_server import app, verify_api_key
 
 
 @pytest.fixture
-def client() -> None:
+def client() -> TestClient:
     """Create a TestClient for the FastAPI app."""
     return TestClient(app)
 
@@ -77,7 +77,9 @@ class TestSearchMovies:
     @patch("app.api_server._get_recommender")
     def test_search_returns_results(self, mock_get, client) -> None:
         mock_rec = MagicMock()
-        mock_rec.search_movies.return_value = [{"movieId": 1, "title": "Toy Story", "genres": "Animation|Children"}]
+        mock_rec.search_movies.return_value = [
+            {"movieId": 1, "title": "Toy Story", "genres": "Animation|Children"}
+        ]
         mock_get.return_value = mock_rec
 
         response = client.get("/api/v1/movies/search?q=toy")
@@ -171,7 +173,9 @@ class TestDatasetStats:
         import pandas as pd
 
         mock_rec = MagicMock()
-        mock_rec.movies = pd.DataFrame({"year": [1995, 2000, 2010], "rating_count": [100, 200, 300]})
+        mock_rec.movies = pd.DataFrame(
+            {"year": [1995, 2000, 2010], "rating_count": [100, 200, 300]}
+        )
         mock_rec.model_result = {"r2": 0.85}
         mock_get.return_value = mock_rec
 
@@ -218,6 +222,7 @@ class TestAPIKeyAuth:
         with patch.dict(os.environ, {"NEXT_GEN_RECO_API_KEY": "my-secret"}):
             creds = HTTPAuthorizationCredentials(scheme="Bearer", credentials="my-secret")
             result = asyncio.run(verify_api_key(credentials=creds))
+            assert result is not None
             assert result.credentials == "my-secret"
 
 

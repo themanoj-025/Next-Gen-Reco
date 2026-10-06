@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from typing import Any, cast
 
+import pandas as pd
+
+from app.enrichment import NDEnrichment
 from app.recommender_pkg.core import CoreMixin
 
 
@@ -12,13 +15,13 @@ class StatsMixin:
 
     # Attributes provided by CoreMixin (RMR) — declared here so mypy resolves them
     # on concrete subclasses that only inherit StatsMixin (e.g. tests).
-    movies: dict[str, object]
-    enrichment: object
+    movies: pd.DataFrame
+    enrichment: NDEnrichment | None
     _avg_runtime_cache: float | None
 
-    def get_movie_info(self, movie_id: int) -> dict[str, object] | None:
+    def get_movie_info(self, movie_id: int) -> dict[str, Any] | None:
         """Delegate movie-info lookup to CoreMixin.get_movie_info()."""
-        return cast(dict[str, object] | None, CoreMixin.get_movie_info(self, movie_id))
+        return CoreMixin.get_movie_info(cast(CoreMixin, self), movie_id)
 
     def movies_with_runtime_avg(self) -> float | None:
         """Get average runtime across all movies with ND enrichment data.
@@ -28,7 +31,7 @@ class StatsMixin:
         if self.enrichment is None:
             return None
         if hasattr(self, "_avg_runtime_cache"):
-            return cast(float | None, self._avg_runtime_cache)
+            return self._avg_runtime_cache
         runtimes: list[float] = []
         for meta in self.enrichment._metadata_map.values():
             if meta.get("runtime") and meta["runtime"] > 0:
@@ -98,7 +101,8 @@ class StatsMixin:
                     if m.get("popularity") and float(m["popularity"]) > 0
                 ]
                 if all_popularities:
-                    pct = (sum(1 for p in all_popularities if p < float(popularity)) / len(all_popularities)) * 100
+                    below = [p for p in all_popularities if p < float(popularity)]
+                    pct = (len(below) / len(all_popularities)) * 100
                     stats["popularity_percentile"] = round(pct, 1)
 
         # Vote average from TMDB
