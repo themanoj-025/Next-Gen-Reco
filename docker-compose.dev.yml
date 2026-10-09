@@ -1,0 +1,27 @@
+# ═══════════════════════════════════════════════════════════════════════
+# Next-Gen-Reco — Development override
+#
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#
+# Adds: hot reload (runOnSave + polling file watcher) and source bind
+# mounts. NEVER use in production.
+# ═══════════════════════════════════════════════════════════════════════
+
+services:
+  app:
+    build:
+      target: dev
+    volumes:
+      - ./app:/app/app
+      - ./app.py:/app/app.py
+      - ./data:/app/data
+      - ./models:/app/models
+      - cache:/app/.cache
+    command: >
+      streamlit run app.py
+      --server.port=8501
+      --server.address=0.0.0.0
+      --server.headless=true
+      --browser.gatherUsageStats=false
+      --server.fileWatcherType=polling
+      --server.runOnSave=true

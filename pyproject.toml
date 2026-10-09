@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools>=84.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "next-gen-reco"
+version = "0.1.0"
+requires-python = ">=3.11"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "BLE", "UP", "SIM", "C4", "RUF", "PLC", "PIE", "I"]
+ignore = [
+    "DTZ005",  # datetime.now() without tz
+    "B008",    # FastAPI Depends() in defaults
+    "E501",    # line too long
+    "BLE001",  # blind except — defensive coding
+    "RUF012",  # mutable class default
+    "UP031",   # printf formatting
+    "PLC0415", # import-outside-top-level — lazy imports
+    "E402",    # module-import-not-at-top — intentional
+    "F401",    # unused import — re-export pattern
+    "RUF059",  # unused loop variable
+    "RUF005",  # collection-literal-in-comparison
+    "SIM102",  # collapsible if — circuit breaker pattern
+    "F821",    # undefined name — pre-existing missing imports
+    "SIM105",  # suppressible-exception
+    "RUF001",  # ambiguous unicode — intentional
+    "B007",    # unused loop variable
+    "SIM117",  # multiple with-statements
+    "F811",    # redefinition of unused name
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.pytest.ini_options]
+addopts = "-m 'not slow' --cov --cov-fail-under=50"
+minversion = "7.0"
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = [
+    "unit: marks pure unit tests (deselect with '-m \"not unit\"')",
+    "integration: marks tests requiring external services (deselect with '-m \"not integration\"')",
+    "slow: long-running tests that iterate over thousands of movies (deselect with '-m \"not slow\"')",
+]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_return_any = true
+exclude = "app\\.py$"
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 80
+skip_empty = true

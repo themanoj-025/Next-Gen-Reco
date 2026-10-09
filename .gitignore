@@ -1,0 +1,93 @@
+__pycache__/
+*.py[cod]
+*.class
+.cache/
+env/
+.env
+venv/
+.venv/
+.vscode/*
+!.vscode/settings.json
+.idea/
+*.ipynb
+.DS_Store
+nul
+checksums.txt
+README.txt
+split_app.py
+
+# ═══ Streamlit Cloud specific ignores ═══════════════════════════════════
+# Ignore secrets file (contains API keys) — NEVER commit this!
+.streamlit/secrets.toml
+# Ignore local user data (generated at runtime)
+.movie_user_data.json
+
+# Node.js
+node_modules/
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
+# Logs
+logs/
+*.log
+
+# ═══ Model files ════════════════════════════════════════════════════════
+# Only ignore specific generated/junk model files, NOT production models
+# Production models in models/v1_test/ are tracked in git for deployment
+*.bak.joblib
+*.tmp.joblib
+models/scratch*
+
+# ═══ Large data files ═══════════════════════════════════════════════════
+# ratings.csv is 857MB — must NOT be tracked in git
+data/ratings.csv
+# Full MovieLens 32M dataset (not used by the app, only for training)
+data/rating_*.csv
+data/genome*
+
+# ═══ Local config (not secrets) — .streamlit/config.toml IS tracked ════
+.streamlit/*.local.toml
+
+.gemini/
+.cursorrules
+
+CLAUDE.md
+
+# === ML model artifacts (general patterns) ===
+*.pkl
+*.h5
+*.pt
+*.ckpt
+*.parquet
+mlruns/
+
+# Parquet data files ARE tracked — migrated from the tracked CSVs
+# (scripts/migrate_to_parquet.py); the blanket *.parquet rule above only
+# applies to generated caches like .cache/tag_pivot_*.parquet.
+!data/*.parquet
+!data/ND/*.parquet
+
+# The migrated CSVs stay on disk locally (rollback / re-migration) but are
+# no longer tracked — their Parquet siblings are the source of truth now.
+# data/links.csv and data/ND/main_data.csv were NOT migrated and stay tracked.
+data/movies.csv
+data/tags.csv
+data/ND/movies.csv
+
+# Production models in models/v1_test/ are tracked in git for deployment
+# (used by the Docker image build via COPY models/). Only ignore scratch.
+!models/v1_test/*.joblib
+
+# Runtime balance log
+radar_balance.txt
+
+# Test coverage artifacts
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# KEEP: AI provenance & transparency files — these must remain

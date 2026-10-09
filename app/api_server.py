@@ -1,0 +1,289 @@
+"""
+api_server.py — FastAPI REST API for MovieLens AI Recommendation Engine
+========================================================================
+Exposes search, recommendation, and movie info endpoints with optional
+API key auth.
+
+Usage:
+    uvicorn app.api_server:app --host 0.0.0.0 --port 8000
+
+Auth:
+    Set NEXT_GEN_RECO_API_KEY env var to enable Bearer token auth.
+    When unset, all endpoints are open (backward compatible).
+"""
+
+import logging
+import os
+import secrets
+from collections.abc import Awaitable, Callable
+from typing import Any, cast
+
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Request, Response, Security
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.util import get_remote_address
+from starlette.datastructures import State
+
+from app.health import create_health_router
+from app.recommender import MovieRecommender
+
+try:
+    from prometheus_client import Counter, Histogram, generate_latest
+
+    _PROM_AVAILABLE = True
+except ImportError:
+    _PROM_AVAILABLE = False
+
+# ── App Setup ─────────────────────────────────────────────────────────────
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+if _PROM_AVAILABLE:
+    NGRECO_REQUEST_COUNT = Counter(
+        "ngreco_requests_total",
+        "Total HTTP requests",
+        ["method", "endpoint", "status"],
+    )
+    NGRECO_REQUEST_LATENCY = Histogram(
+        "ngreco_request_duration_seconds",
+        "HTTP request latency in seconds",
+        ["method", "endpoint"],
+        buckets=[0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0],
+    )
+    NGRECO_SEARCH_COUNT = Counter("ngreco_search_total", "Movie search requests")
+    NGRECO_RECOMMEND_COUNT = Counter("ngreco_recommend_total", "Recommendation requests")
+
+app = FastAPI(
+    title="MovieLens AI API",
+    description="MovieLens AI Recommendation Engine API. Provides movie search,\n"
+    "personalized recommendations, and dataset statistics.",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_tags=[
+        {
+            "name": "health",
+            "description": "Service health check endpoints",
+        },
+        {
+            "name": "movies",
+            "description": "Movie search and details",
+        },
+        {
+            "name": "recommendations",
+            "description": "Personalized movie recommendations",
+        },
+        {
+            "name": "analytics",
+            "description": "Dataset statistics and metadata",
+        },
+    ],
+)
+
+
+@app.middleware("http")
+async def track_metrics(request, call_next) -> Response:
+    import time as _time
+
+    request.state.start_time = _time.time()
+    response: Response = await call_next(request)
+    if _PROM_AVAILABLE:
+        path = request.url.path
+        NGRECO_REQUEST_COUNT.labels(
+            method=request.method, endpoint=path, status=response.status_code
+        ).inc()
+        if hasattr(request.state, "start_time"):
+            NGRECO_REQUEST_LATENCY.labels(method=request.method, endpoint=path).observe(
+                _time.time() - request.state.start_time
+            )
+    return response
+
+
+_allowed_origins = os.environ.get(
+    "NGRECO_CORS_ORIGINS", "http://localhost:8501,http://localhost:3000"
+).split(",")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_allowed_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
+
+
+@app.middleware("http")
+async def add_security_headers(request, call_next) -> Response:
+    """Add security headers to every response."""
+    response: Response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["X-XSS-Protection"] = "0"
+    response.headers["Permissions-Policy"] = (
+        "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    )
+    response.headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none';"
+    return response
+
+
+# Rate limiting
+limiter = Limiter(key_func=get_remote_address, default_limits=["60/minute"])
+app.state.limiter = limiter
+
+
+# slowapi's handler is typed for its own Request/State; cast to Starlette's
+# add_exception_handler signature (Request[State] | Exception).
+async def _rate_limit_handler(
+    request: Request[State], exc: RateLimitExceeded
+) -> Response | Awaitable[Response]:
+    return _rate_limit_exceeded_handler(request, exc)
+
+
+app.add_exception_handler(
+    RateLimitExceeded,
+    cast(
+        Callable[[Request[State], Exception], Response | Awaitable[Response]], _rate_limit_handler
+    ),
+)
+app.add_middleware(SlowAPIMiddleware)
+
+security = HTTPBearer(auto_error=False)
+
+# ── API v1 Router ─────────────────────────────────────────────────────────
+v1_router = APIRouter(prefix="/api/v1")
+
+# ── Auth ──────────────────────────────────────────────────────────────────
+
+
+async def verify_api_key(
+    credentials: HTTPAuthorizationCredentials | None = Security(security),
+) -> HTTPAuthorizationCredentials | None:
+    """Verify API key from Authorization header. Enabled when NEXT_GEN_RECO_API_KEY is set."""
+    api_key = os.environ.get("NEXT_GEN_RECO_API_KEY", "")
+    if not api_key:
+        return credentials  # No key configured — open access
+    if credentials is None:
+        raise HTTPException(status_code=401, detail="Missing Authorization header")
+    if not secrets.compare_digest(credentials.credentials, api_key):
+        raise HTTPException(status_code=403, detail="Invalid API key")
+    return credentials
+
+
+# ── Lazy-loaded recommender ───────────────────────────────────────────────
+
+_recommender: MovieRecommender | None = None
+
+
+def _get_recommender() -> MovieRecommender:
+    """Lazy-load the MovieRecommender (expensive init)."""
+    global _recommender
+    if _recommender is None:
+        logger.info("Loading MovieRecommender (first request)...")
+        _recommender = MovieRecommender(model_name="v1_test")
+        logger.info("MovieRecommender loaded.")
+    return _recommender
+
+
+def _recommender_ready() -> None:
+    """Readiness probe: the recommender model must be loaded to serve."""
+    rec = _get_recommender()
+    if rec.model_result is None:
+        raise RuntimeError("recommender model not loaded")
+
+
+# ── Endpoints ─────────────────────────────────────────────────────────────
+
+
+@app.get("/health")
+async def health() -> dict[str, object]:
+    """Health check endpoint."""
+    return {"status": "ok", "service": "movielens-ai-api"}
+
+
+@v1_router.get("/movies/search", dependencies=[Depends(verify_api_key)])
+async def search_movies(
+    q: str = Query(..., min_length=1, description="Search query"),
+    limit: int = Query(20, ge=1, le=100, description="Max results"),
+) -> list[dict[str, Any]]:
+    """Search movies by title."""
+    rec = _get_recommender()
+    if _PROM_AVAILABLE:
+        NGRECO_SEARCH_COUNT.inc()
+    results = rec.search_movies(q, limit=limit)
+    return results
+
+
+@v1_router.get("/movies/{movie_id}", dependencies=[Depends(verify_api_key)])
+async def get_movie(movie_id: int) -> dict[str, Any]:
+    """Get detailed info for a movie by ID."""
+    rec = _get_recommender()
+    info = rec.get_movie_info(movie_id)
+    if info is None:
+        raise HTTPException(status_code=404, detail=f"Movie {movie_id} not found")
+    return info
+
+
+@v1_router.get("/recommendations/{movie_id}", dependencies=[Depends(verify_api_key)])
+async def get_recommendations(
+    movie_id: int,
+    n: int = Query(10, ge=1, le=50, description="Number of recommendations"),
+) -> list[dict[str, Any]]:
+    """Get similar movie recommendations for a given movie ID."""
+    rec = _get_recommender()
+    info = rec.get_movie_info(movie_id)
+    if info is None:
+        raise HTTPException(status_code=404, detail=f"Movie {movie_id} not found")
+    if _PROM_AVAILABLE:
+        NGRECO_RECOMMEND_COUNT.inc()
+    results = rec.recommend(movie_id, n=n)
+    return results
+
+
+@v1_router.get("/stats", dependencies=[Depends(verify_api_key)])
+async def dataset_stats() -> dict[str, Any]:
+    """Return summary statistics about the MovieLens dataset."""
+    rec = _get_recommender()
+    return {
+        "total_movies": len(rec.movies),
+        "total_ratings": (
+            int(rec.movies["rating_count"].sum()) if "rating_count" in rec.movies.columns else 0
+        ),
+        "year_range": {
+            "min": int(rec.movies["year"].min()) if "year" in rec.movies.columns else 0,
+            "max": int(rec.movies["year"].max()) if "year" in rec.movies.columns else 0,
+        },
+        "model_loaded": rec.model_result is not None,
+    }
+
+
+app.include_router(v1_router)
+
+# Canonical readiness probes (app/health.py is synced from
+# shared/aegis_common/health.py):
+#   GET /health        — liveness (the bespoke /health above wins on path)
+#   GET /health/ready  — readiness, 503 until the recommender model is loaded
+app.include_router(create_health_router(checks={"recommender": _recommender_ready}))
+
+
+@app.get("/metrics")
+async def metrics() -> Response:
+    """Prometheus metrics endpoint."""
+    if not _PROM_AVAILABLE:
+        return Response(content=b"# metrics unavailable", media_type="text/plain")
+    return Response(content=generate_latest(), media_type="text/plain")
+
+
+# ── Main ──────────────────────────────────────────────────────────────────
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    # B104: hardcoded bind 0.0.0.0 is intentional — the API server must be reachable
+    # from any host on the deployment network; it is not exposed beyond a trusted VPC.
+    uvicorn.run(app, host="0.0.0.0", port=8000)  # nosec B104
