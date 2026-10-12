@@ -1,182 +1,221 @@
-# 🎬 NextGenReco
-
 <p align="center">
   <img src="https://img.shields.io/badge/NextGenReco-Movie%20Recommendations-red?style=for-the-badge" alt="NextGenReco Logo" />
 </p>
 
-<h1 align="center">🎬 NextGenReco</h1>
+<h1 align="center">NextGenReco</h1>
 
 <p align="center">
-  <strong>AI-Powered Movie Recommendations & Rating Predictions</strong>
+  <strong>Intelligent movie recommendation and rating prediction platform with interactive analytics and REST API serving.</strong>
 </p>
 
 <p align="center">
-  <a href="https://nextgenreco.streamlit.app"><img src="https://img.shields.io/badge/Live%20Demo-Try%20It%20Now-brightgreen?style=flat-square" alt="Live Demo" /></a>
   <a href="https://github.com/themanoj-025/Next-Gen-Reco/actions"><img src="https://img.shields.io/github/actions/workflow/status/themanoj-025/Next-Gen-Reco/ci.yml?style=flat-square&label=CI" alt="CI Status" /></a>
-  <a href="https://github.com/themanoj-025/Next-Gen-Reco/blob/main/LICENSE"><img src="https://img.shields.io/github/license/themanoj-025/Next-Gen-Reco?style=flat-square" alt="License" /></a>
-  <a href="https://github.com/themanoj-025/Next-Gen-Reco/stargazers"><img src="https://img.shields.io/github/stars/themanoj-025/Next-Gen-Reco?style=social" alt="Stars" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License MIT" /></a>
+  <a href="https://github.com/themanoj-025/Next-Gen-Reco/stargazers"><img src="https://img.shields.io/github/stars/themanoj-025/Next-Gen-Reco?style=social" alt="GitHub Stars" /></a>
+  <a href="https://github.com/themanoj-025/Next-Gen-Reco/issues"><img src="https://img.shields.io/github/issues/themanoj-025/Next-Gen-Reco?style=flat-square" alt="GitHub Issues" /></a>
+  <a href="https://github.com/themanoj-025/Next-Gen-Reco/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square" alt="PRs Welcome" /></a>
 </p>
 
 ---
 
-## 📋 Table of Contents
+## Overview
 
-- [What it does](#what-it-does)
-- [🚀 Live demo](#-live-demo)
-- [✨ Features](#-features)
-- [🧠 How it works](#-how-it-works)
-- [🏗️ Architecture](#️-architecture)
-- [🚀 Quick start](#-quick-start)
-- [📁 Project structure](#-project-structure)
-- [📊 Dataset](#-dataset)
-- [🗺️ Roadmap](#️-roadmap)
-- [🤝 Contributing](#-contributing)
-- [📬 Support](#-support)
-- [License](#license)
+NextGenReco delivers personalized film recommendations and rating predictions powered by content-based similarity models across the MovieLens dataset. The platform combines semantic genre and tag embeddings to calculate movie affinities, provides transparent breakdowns of feature drivers behind predicted ratings, and generates curated movie marathon lineups.
+
+It can be accessed via an interactive Streamlit dashboard or programmatically via a FastAPI inference server.
+
+> [!NOTE]
+> The recommendation engine runs completely offline with no cloud or external API requirements.
 
 ---
 
-## What it does
+## Table of Contents
 
-NextGenReco finds your favorite movies using content-based AI: given a movie (or a free-text query), it searches the catalog with predicted ratings, recommends similar films by genre/tags/ratings, breaks down which features drove each prediction, and lets you explore trends by decade, genre, and rating.
+- [Key Features](#key-features)
+- [Architecture](#architecture)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Installation & Quick Start](#installation--quick-start)
+- [API Reference](#api-reference)
+- [Configuration](#configuration)
+- [Testing](#testing)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [Security](#security)
+- [License](#license)
+- [Support](#support)
 
-> [!NOTE] The engine is content-based and runs entirely locally — no cloud or API keys are needed. The live demo is hosted on Streamlit Cloud.
+---
 
-## 🚀 Live demo
+## Key Features
 
-**Try it now:** [nextgenreco.streamlit.app](https://nextgenreco.streamlit.app)
+- **Semantic Title Search**: Fast catalog search with instant predicted user ratings and genre metadata.
+- **Content-Based Affinity Matching**: Vectorized cosine distance scoring computed across genre tags, release era, and global rating statistics.
+- **Explainable Rating Forecasts**: Visual breakdown of positive and negative feature attributions influencing every predicted score.
+- **Interactive Cinema Analytics**: Multi-tab exploratory dashboard featuring genre correlations, decade trends, and rating distribution comparisons.
+- **Movie Night Curator**: Generates personalized theme-based movie marathon lineups based on input mood preferences.
 
-## ✨ Features
+---
 
-| Feature | Description |
-| --- | --- |
-| 🔍 **Smart search** | Instant movie lookup with predicted ratings |
-| 🎯 **Similar movies** | Content-based recommendations using genres, tags, and ratings |
-| 📊 **Prediction breakdown** | See which features drove each prediction |
-| 📈 **Analysis charts** | Interactive genre distribution, rating comparisons, and decade trends |
-| 🏆 **Top picks** | Browse highest-rated movies by genre |
-| 📋 **Personal dashboard** | Track your ratings, watchlist, and stats |
-| 📅 **Decade explorer** | Browse movies by decade with genre trends |
-| 🎬 **Movie Night** | Generate curated marathon lineups |
-
-## 🧠 How it works
-
-```text
-NEXTGENRECO/
-├── app/
-│   ├── models.py           # Content-based recommender + ratings predictor
-│   ├── recommender.py      # Movie search + similar-movies logic
-│   ├── dashboard.py        # Streamlit app (8 pages)
-│   └── data/               # Loaded dataset + embeddings
-├── notebooks/              # Exploration + model cards
-├── requirements.txt
-└── README.md
-```
-
-The recommender builds a genre/tag/rating vector per movie, computes similarity against a catalog of 87K movies, and returns top-N neighbors plus a SHAP breakdown of the predicted rating.
-
-## 🏗️ Architecture
+## Architecture
 
 ```text
-NEXTGENRECO/
-├── app/
-│   ├── models.py           # ML models + prediction
-│   ├── recommender.py      # Search + neighbor search
-│   └── dashboard.py        # Streamlit UI
-├── data/                   # Dataset + metadata
-├── notebooks/              # Exploration + model cards
-├── tests/                  # pytest suite
-├── requirements.txt
-└── README.md
+               User Query / Film Selection
+                           │
+             ┌─────────────┴─────────────┐
+             ▼                           ▼
+    Streamlit Dashboard (app.py)    FastAPI Service (app/api_server.py)
+             │                           │
+             └─────────────┬─────────────┘
+                           │
+                           ▼
+          Content-Based Recommendation Engine
+            (app/model.py & recommender.py)
+                           │
+             ┌─────────────┴─────────────┐
+             ▼                           ▼
+  Nearest-Neighbor Similarity    Rating Prediction Model
+  (Genre & Tag Vector Space)    (Feature Attributions)
+             │                           │
+             └─────────────┬─────────────┘
+                           │
+                           ▼
+             Ranked Output & Visual Insights
 ```
 
-## 🚀 Quick start
+---
 
-### Prerequisites
-
-- Python 3.11 or newer
-- A machine with enough RAM to load the full 87K-movie catalog (the `bench` tier streams the catalog in chunks if your RAM is limited)
-
-### Install & run
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/themanoj-025/Next-Gen-Reco.git
-cd Next-Gen-Reco
-
-# 2. Create and activate a virtual environment
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\Activate
-
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Download the dataset (or let the app auto-seed it)
-#    The catalog is ~87K movies; run once and cache the embeddings.
-python -m app.data.download --out data/
-
-# 5. Run the app
-streamlit run app/dashboard.py
-```
-
-### Environment variables
-
-| Variable | Default | Required | Description |
-| --- | --- | --- | --- |
-| `NEXTGENRECO_DATA_DIR` | `data/` | No | Directory for the cached catalog |
-| `NEXTGENRECO_CACHEDIR` | `.cache/` | No | Local cache for intermediate embeddings |
-
-## 📁 Project structure
+## Project Structure
 
 ```text
 Next-Gen-Reco/
 ├── app/
-│   ├── models.py           # ML models + prediction
-│   ├── recommender.py      # Search + neighbor search
-│   └── dashboard.py        # Streamlit UI
-├── data/                   # Dataset + metadata
-├── notebooks/              # Exploration + model cards
-├── tests/                  # pytest suite
-├── requirements.txt
-└── README.md
+│   ├── ui/                 # Reusable Streamlit dashboard components
+│   ├── api_server.py       # FastAPI REST endpoints for predictions
+│   ├── circuit_breaker.py  # Error circuit breaker pattern
+│   ├── enrichment.py       # Metadata enhancement and data formatting
+│   ├── health.py           # Health and readiness check routes
+│   ├── model.py            # Feature transformation and ML pipeline
+│   └── recommender.py      # Nearest-neighbor recommendation queries
+├── data/                   # Seed catalog and cached vector models
+├── tests/                  # Pytest unit and recommendation test suite
+├── app.py                  # Main Streamlit application entry point
+├── Dockerfile              # Multi-stage container build specification
+├── docker-compose.yml      # Local development container orchestration
+├── pyproject.toml          # Build backend and Ruff configuration
+├── requirements.txt        # Runtime dependencies
+└── README.md               # Project documentation
 ```
 
-## 📊 Dataset
+---
 
-| Item | Value |
-| --- | --- |
-| Movies | 87,000+ |
-| Ratings | 32,000,000+ |
-| User tags | 2,000,000+ |
-| Format | Pickled per-movie vectors + a metadata DataFrame |
+## Prerequisites
 
-> [!IMPORTANT] The dataset metrics above are the project's reported figures and should be re-verified on re-run. If the benchmark numbers change, the README's claims must match the `README`'s own `data/` snapshot, not a re-run on new data.
+- **Python**: `>= 3.11`
+- **Memory**: Minimum 2 GB RAM recommended for loading vectorized film catalog embeddings
 
-## 🗺️ Roadmap
+---
 
-> [!CAUTION] Checked items are built and verified. Unchecked items are tracked in the issue tracker.
+## Installation & Quick Start
 
-- [x] Movie search with predicted ratings
-- [x] Similar-movie recommendations
-- [x] Prediction breakdown (feature contributions)
-- [x] Analysis charts (genre, rating, decade)
-- [x] Top-picks by genre
-- [x] Personal dashboard (ratings, watchlist, stats)
-- [x] Decade explorer
-- [x] Movie Night lineup generator
-- [ ] Collaborative filtering (tracked public issue)
+### 1. Clone & Setup Environment
 
-## 🤝 Contributing
+```bash
+# Clone the repository
+git clone https://github.com/themanoj-025/Next-Gen-Reco.git
+cd Next-Gen-Reco
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md).
+# Create and activate virtual environment
+python -m venv .venv
+# Linux/macOS: source .venv/bin/activate
+# Windows: .venv\Scripts\Activate.ps1
 
-## 📬 Support
+# Install dependencies
+pip install -r requirements.txt
+```
 
-- 🐛 [Report a bug](https://github.com/themanoj-025/Next-Gen-Reco/issues)
-- 💡 [Request a feature](https://github.com/themanoj-025/Next-Gen-Reco/issues)
-- 📧 Email the maintainer via the issue tracker
+### 2. Configure Environment
+
+```bash
+cp .env.example .env
+```
+
+### 3. Run the Application
+
+**Run Streamlit Interactive Interface**:
+```bash
+streamlit run app.py
+```
+*Access the UI at http://localhost:8501.*
+
+**Run FastAPI Service**:
+```bash
+uvicorn app.api_server:app --host 0.0.0.0 --port 8000 --reload
+```
+*Access Swagger documentation at http://localhost:8000/docs.*
+
+---
+
+## API Reference
+
+The FastAPI service exposes the following endpoints:
+
+| Method | Path | Description |
+| :--- | :--- | :--- |
+| `GET` | `/health` | Service health status |
+| `POST` | `/api/v1/recommend` | Retrieve top similar movie recommendations |
+| `POST` | `/api/v1/predict-rating`| Predict expected score for user/movie pair |
+
+---
+
+## Configuration
+
+| Environment Variable | Default | Purpose |
+| :--- | :--- | :--- |
+| `NEXTGENRECO_DATA_DIR` | `data/` | Path to dataset and pickled embedding vectors |
+| `NEXTGENRECO_CACHEDIR` | `.cache/` | Local directory for intermediate computation caches |
+
+---
+
+## Testing
+
+```bash
+# Execute pytest suite
+pytest tests/ -v
+```
+
+---
+
+## Roadmap
+
+- [x] Content-based recommendation pipeline
+- [x] Multi-tab interactive Streamlit dashboard
+- [x] FastAPI REST serving endpoints
+- [x] Movie night marathon generator
+- [ ] Collaborative filtering neural hybrid model <!-- TODO: Track via GitHub issue -->
+- [ ] Direct TMDB poster API enrichment integration <!-- TODO: Track via GitHub issue -->
+
+---
+
+## Contributing
+
+Contributions are welcomed! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
+
+---
+
+## Security
+
+Please report vulnerabilities following the instructions in [SECURITY.md](SECURITY.md).
+
+---
 
 ## License
 
-MIT License — see [LICENSE](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
 
+---
+
+## Support
+
+- 🐛 **Issue Tracker**: [GitHub Issues](https://github.com/themanoj-025/Next-Gen-Reco/issues)
+- 💡 **Discussions & Feedback**: [GitHub Pull Requests](https://github.com/themanoj-025/Next-Gen-Reco/pulls)
