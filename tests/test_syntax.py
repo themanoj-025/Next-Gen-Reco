@@ -1,26 +1,16 @@
-import nbformat as nbf
-import structlog
+import logging
 
-logger = structlog.get_logger("test_syntax")
+import pytest
 
-
-def md_cell(source) -> nbf.NotebookNode:
-    cell: nbf.NotebookNode = nbf.v4.new_markdown_cell(source)
-    return cell
+logger = logging.getLogger("test_syntax")
 
 
-def nb_cell(source) -> nbf.NotebookNode:
-    cell: nbf.NotebookNode = nbf.v4.new_code_cell(source)
-    return cell
-
-
-cells1 = []
-cells1.append(
-    md_cell(
-        """# MovieLens Dataset Analysis
-
----"""
-    )
-)
-cells1.append(nb_cell("""import pandas as pd"""))
-logger.info("cells_created", count=len(cells1))
+def test_notebook_syntax() -> None:
+    try:
+        import nbformat as nbf
+    except ImportError:
+        pytest.skip("nbformat not installed")
+        return
+    cell1 = nbf.v4.new_markdown_cell("# MovieLens Dataset Analysis\n\n---")
+    cell2 = nbf.v4.new_code_cell("import pandas as pd")
+    assert cell1 is not None and cell2 is not None

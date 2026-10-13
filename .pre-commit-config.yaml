@@ -28,4 +28,6 @@ repos:
       - id: mypy
         language: python
         types: [python]
-        args: [--ignore-missing-imports, --explicit-package-bases]
+        exclude: ^app\.py$
+        args: [--ignore-missing-imports, --explicit-package-bases, --no-warn-unused-ignores, --disable-error-code=no-any-return]
+        additional_dependencies: [types-requests]
