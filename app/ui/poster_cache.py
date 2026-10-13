@@ -16,7 +16,6 @@ import logging
 import re
 import time
 from pathlib import Path
-from typing import cast
 
 from app._paths import CACHE_DIR
 
@@ -76,7 +75,9 @@ class PosterTTLCache:
                 raw = json.load(f)
             # Only trust dict[str, {url, ts}] shapes; anything else is corrupt.
             if isinstance(raw, dict):
-                self._data = {k: v for k, v in raw.items() if isinstance(v, dict) and "url" in v and "ts" in v}
+                self._data = {
+                    k: v for k, v in raw.items() if isinstance(v, dict) and "url" in v and "ts" in v
+                }
             else:
                 self._data = {}
         except FileNotFoundError:
