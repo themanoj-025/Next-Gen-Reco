@@ -198,17 +198,13 @@ class TestPredictRating:
 
     def test_returns_float(self) -> None:
         rf, scaler, feature_cols, num_cols = self._make_model()
-        movie_row = pd.Series(
-            {"movieId": 1, "genre_list": ["Action", "Comedy"], "year": 2000, "rating_count": 100}
-        )
+        movie_row = pd.Series({"movieId": 1, "genre_list": ["Action", "Comedy"], "year": 2000, "rating_count": 100})
         result = predict_rating(movie_row, rf, scaler, feature_cols, num_cols)
         assert isinstance(result, float)
 
     def test_returns_value_in_range(self) -> None:
         rf, scaler, feature_cols, num_cols = self._make_model()
-        movie_row = pd.Series(
-            {"movieId": 1, "genre_list": ["Action", "Comedy"], "year": 2000, "rating_count": 100}
-        )
+        movie_row = pd.Series({"movieId": 1, "genre_list": ["Action", "Comedy"], "year": 2000, "rating_count": 100})
         result = predict_rating(movie_row, rf, scaler, feature_cols, num_cols)
         assert 0.0 <= result <= 5.0
 
@@ -220,17 +216,13 @@ class TestPredictRating:
 
     def test_none_year(self) -> None:
         rf, scaler, feature_cols, num_cols = self._make_model()
-        movie_row = pd.Series(
-            {"movieId": 1, "genre_list": ["Action"], "year": None, "rating_count": 50}
-        )
+        movie_row = pd.Series({"movieId": 1, "genre_list": ["Action"], "year": None, "rating_count": 50})
         result = predict_rating(movie_row, rf, scaler, feature_cols, num_cols)
         assert isinstance(result, float)
 
     def test_with_tag_pivot(self) -> None:
         rf, scaler, feature_cols, num_cols = self._make_model()
-        movie_row = pd.Series(
-            {"movieId": 1, "genre_list": ["Action"], "year": 2000, "rating_count": 50}
-        )
+        movie_row = pd.Series({"movieId": 1, "genre_list": ["Action"], "year": 2000, "rating_count": 50})
         tag_pivot = pd.DataFrame({"movieId": [1], "genre_action": [0.5], "genre_comedy": [0.2]})
         result = predict_rating(movie_row, rf, scaler, feature_cols, num_cols, tag_pivot=tag_pivot)
         assert isinstance(result, float)

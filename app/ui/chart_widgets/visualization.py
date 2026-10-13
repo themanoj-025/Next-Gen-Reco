@@ -114,9 +114,7 @@ def render_visualization_charts(movie_id: int, info: dict, recs: list) -> None:
             )
 
             fig2 = go.Figure()
-            colors_list = [
-                "#f7971e" if t == "This Movie" else "rgba(96,165,250,0.5)" for t in all_data["Type"]
-            ]
+            colors_list = ["#f7971e" if t == "This Movie" else "rgba(96,165,250,0.5)" for t in all_data["Type"]]
             fig2.add_trace(
                 go.Bar(
                     x=all_data["Movie"],

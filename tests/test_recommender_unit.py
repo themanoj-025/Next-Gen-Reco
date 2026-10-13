@@ -24,10 +24,7 @@ class TestCoreMixinHelpers:
         mock = MockCore()
         assert CoreMixin._normalize_title(cast(CoreMixin, mock), "The Matrix!") == "the matrix"
         assert CoreMixin._normalize_title(cast(CoreMixin, mock), "  Hello World  ") == "hello world"
-        assert (
-            CoreMixin._normalize_title(cast(CoreMixin, mock), "Star Wars: Episode IV")
-            == "star wars episode iv"
-        )
+        assert CoreMixin._normalize_title(cast(CoreMixin, mock), "Star Wars: Episode IV") == "star wars episode iv"
 
     def test_tokenize(self) -> None:
         from app.recommender_pkg.core import CoreMixin
