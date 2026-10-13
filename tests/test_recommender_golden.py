@@ -113,9 +113,7 @@ class TestEnsembleBehavior:
         """With tag+rating+year weights off, genre similarity drives ranking —
         Toy Story's nearest neighbours by one-hot genre overlap are other
         five-genre family films."""
-        recs = recommender.recommend(
-            1, n=5, tag_weight=0.0, rating_weight=0.0, year_weight=0.0, diversify=False
-        )
+        recs = recommender.recommend(1, n=5, tag_weight=0.0, rating_weight=0.0, year_weight=0.0, diversify=False)
         # Toy Story = Adventure|Animation|Children|Comedy|Fantasy; expect the
         # other five-genre animated titles to dominate the pure-genre ranking.
         top_genres = [set(r["genres"]) for r in recs[:3]]
