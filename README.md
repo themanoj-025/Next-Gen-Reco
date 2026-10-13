@@ -128,7 +128,7 @@ streamlit run app/dashboard.py
 
 ## 📁 Project structure
 
-```
+```text
 Next-Gen-Reco/
 ├── app/
 │   ├── models.py           # ML models + prediction
