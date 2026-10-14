@@ -93,9 +93,7 @@ async def track_metrics(request, call_next) -> Response:
     response: Response = await call_next(request)
     if _PROM_AVAILABLE:
         path = request.url.path
-        NGRECO_REQUEST_COUNT.labels(
-            method=request.method, endpoint=path, status=response.status_code
-        ).inc()
+        NGRECO_REQUEST_COUNT.labels(method=request.method, endpoint=path, status=response.status_code).inc()
         if hasattr(request.state, "start_time"):
             NGRECO_REQUEST_LATENCY.labels(method=request.method, endpoint=path).observe(
                 _time.time() - request.state.start_time
@@ -103,9 +101,7 @@ async def track_metrics(request, call_next) -> Response:
     return response
 
 
-_allowed_origins = os.environ.get(
-    "NGRECO_CORS_ORIGINS", "http://localhost:8501,http://localhost:3000"
-).split(",")
+_allowed_origins = os.environ.get("NGRECO_CORS_ORIGINS", "http://localhost:8501,http://localhost:3000").split(",")
 
 app.add_middleware(
     CORSMiddleware,
@@ -124,9 +120,7 @@ async def add_security_headers(request, call_next) -> Response:
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["X-XSS-Protection"] = "0"
-    response.headers["Permissions-Policy"] = (
-        "camera=(), microphone=(), geolocation=(), interest-cohort=()"
-    )
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
     response.headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none';"
     return response
 
@@ -138,17 +132,13 @@ app.state.limiter = limiter
 
 # slowapi's handler is typed for its own Request/State; cast to Starlette's
 # add_exception_handler signature (Request[State] | Exception).
-async def _rate_limit_handler(
-    request: Request[State], exc: RateLimitExceeded
-) -> Response | Awaitable[Response]:
+async def _rate_limit_handler(request: Request[State], exc: RateLimitExceeded) -> Response | Awaitable[Response]:
     return _rate_limit_exceeded_handler(request, exc)
 
 
 app.add_exception_handler(
     RateLimitExceeded,
-    cast(
-        Callable[[Request[State], Exception], Response | Awaitable[Response]], _rate_limit_handler
-    ),
+    cast(Callable[[Request[State], Exception], Response | Awaitable[Response]], _rate_limit_handler),
 )
 app.add_middleware(SlowAPIMiddleware)
 
@@ -250,9 +240,7 @@ async def dataset_stats() -> dict[str, Any]:
     rec = _get_recommender()
     return {
         "total_movies": len(rec.movies),
-        "total_ratings": (
-            int(rec.movies["rating_count"].sum()) if "rating_count" in rec.movies.columns else 0
-        ),
+        "total_ratings": (int(rec.movies["rating_count"].sum()) if "rating_count" in rec.movies.columns else 0),
         "year_range": {
             "min": int(rec.movies["year"].min()) if "year" in rec.movies.columns else 0,
             "max": int(rec.movies["year"].max()) if "year" in rec.movies.columns else 0,
