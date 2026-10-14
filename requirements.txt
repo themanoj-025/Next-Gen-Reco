@@ -6,7 +6,7 @@ joblib>=1.6.0
 plotly>=7.1.0
 python-dotenv>=1.2.4
 requests>=2.34.2
-pyarrow>=10.0.0
+pyarrow>=26.0.0
 
 # API observability
 fastapi>=0.143.0
