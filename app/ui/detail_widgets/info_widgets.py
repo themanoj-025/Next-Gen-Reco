@@ -42,16 +42,10 @@ def render_similar_movies(movie_id: int, info: dict, recs: list) -> None:
             for g in r["genres"][:3]
         )
 
-        wl_badge = (
-            ' <span class="sc-badge">📋</span>'
-            if r["movieId"] in st.session_state.watchlist
-            else ""
-        )
+        wl_badge = ' <span class="sc-badge">📋</span>' if r["movieId"] in st.session_state.watchlist else ""
         ur_badge = ""
         if r["movieId"] in st.session_state.user_ratings:
-            ur_badge = (
-                f' <span class="sc-badge">⭐{st.session_state.user_ratings[r["movieId"]]}</span>'
-            )
+            ur_badge = f' <span class="sc-badge">⭐{st.session_state.user_ratings[r["movieId"]]}</span>'
 
         st.markdown(
             f"""

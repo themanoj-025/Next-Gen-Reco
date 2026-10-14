@@ -60,9 +60,7 @@ def render_movie_night() -> None:
                 help="If checked, favors action/adventure/thriller movies",
             )
 
-        generate_clicked = st.button(
-            "🎬 Generate Movie Night!", use_container_width=True, type="primary"
-        )
+        generate_clicked = st.button("🎬 Generate Movie Night!", use_container_width=True, type="primary")
 
     if generate_clicked:
         genre_param = genre if genre != "Any Genre" else None
@@ -153,9 +151,7 @@ def render_movie_night() -> None:
             )
             runtime_html = f"<span>⏱ {runtime_str}</span>" if runtime_str else ""
             director_html = (
-                f"<span>🎬 {director}</span>"
-                if director and director.lower() not in ("unknown", "nan", "")
-                else ""
+                f"<span>🎬 {director}</span>" if director and director.lower() not in ("unknown", "nan", "") else ""
             )
             actors_html = f"<span>🎭 {actors[0] if actors else ''}</span>" if actors else ""
 
