@@ -160,7 +160,7 @@ journey
 graph TD
     User["Cinephile / Media Consumer"] -->|"Web Browser HTTPS"| NextGenReco["Next-Gen-Reco System Boundary"]
     ClientApp["External Streaming App"] -->|"HTTP POST /recommend"| NextGenReco
-    
+
     NextGenReco -->|"Fetches Posters & Plots"| TMDb["The Movie Database (TMDb) API"]
     NextGenReco -->|"Backup Metadata"| OMDb["Open Movie Database (OMDb) API"]
     NextGenReco -->|"Telemetry Scraping"| Prometheus["Prometheus Monitoring"]
@@ -632,55 +632,55 @@ Production deployment is achieved via containerized Docker environments hosting 
 
 ## <a id="exam"></a>§EXAM — Cold-Reader Verification Exam (25 Questions)
 
-1. **Q: What is the Python runtime requirement for Next-Gen-Reco?**  
+1. **Q: What is the Python runtime requirement for Next-Gen-Reco?**
    *A:* Python >= 3.10. Reference: [`pyproject.toml`](pyproject.toml).
-2. **Q: How many total tracked files exist in the Next-Gen-Reco repository?**  
+2. **Q: How many total tracked files exist in the Next-Gen-Reco repository?**
    *A:* 191 files. Reference: [§APP](#app).
-3. **Q: How many automated test functions exist across how many test files?**  
+3. **Q: How many automated test functions exist across how many test files?**
    *A:* 387 test functions across 21 test files. Reference: [`tests/`](tests/).
-4. **Q: What benchmark dataset powers the recommendation engine?**  
+4. **Q: What benchmark dataset powers the recommendation engine?**
    *A:* MovieLens 32M (87K+ movies, 32M ratings, 2M tags). Reference: [`README.md`](README.md).
-5. **Q: What are the exact weight percentages of the 4-factor hybrid affinity score?**  
+5. **Q: What are the exact weight percentages of the 4-factor hybrid affinity score?**
    *A:* 50% Genre + 20% Tags + 10% Year Proximity + 20% Predicted Rating. Reference: [`README.md`](README.md).
-6. **Q: What machine learning algorithms predict user ratings?**  
+6. **Q: What machine learning algorithms predict user ratings?**
    *A:* Random Forest & Gradient Boosting regressors. Reference: [`model.py`](model.py).
-7. **Q: What external APIs are used to enrich movies with posters and plot overviews?**  
+7. **Q: What external APIs are used to enrich movies with posters and plot overviews?**
    *A:* The Movie Database (TMDb) and Open Movie Database (OMDb). Reference: [`enrichment.py`](enrichment.py).
-8. **Q: What framework powers the interactive discovery dashboard?**  
+8. **Q: What framework powers the interactive discovery dashboard?**
    *A:* Streamlit. Reference: [`app.py`](app.py).
-9. **Q: What framework powers the asynchronous REST API?**  
+9. **Q: What framework powers the asynchronous REST API?**
    *A:* FastAPI. Reference: [`api_server.py`](api_server.py).
-10. **Q: How many endpoints are exposed by the FastAPI server?**  
+10. **Q: How many endpoints are exposed by the FastAPI server?**
     *A:* 4 endpoints. Reference: [§API](#api).
-11. **Q: What sparse matrix format stores high-dimensional TF-IDF vectors?**  
+11. **Q: What sparse matrix format stores high-dimensional TF-IDF vectors?**
     *A:* Compressed Sparse Row (`scipy.sparse.csr_matrix`). Reference: [`data_loader.py`](data_loader.py).
-12. **Q: What module implements multi-tier disk caching for media assets?**  
+12. **Q: What module implements multi-tier disk caching for media assets?**
     *A:* `poster_cache.py`. Reference: [`poster_cache.py`](poster_cache.py).
-13. **Q: What total lines of code exist across the codebase?**  
+13. **Q: What total lines of code exist across the codebase?**
     *A:* 1,755,537 lines of code. Reference: [§META](#meta).
-14. **Q: What git commit hash was verified for this documentation?**  
+14. **Q: What git commit hash was verified for this documentation?**
     *A:* `69273af` (`69273afcdba8120d3fdefeea076c4eb6b4c2fa52`). Reference: [§META](#meta).
-15. **Q: What git tree hash represents the verified repository state?**  
+15. **Q: What git tree hash represents the verified repository state?**
     *A:* `565077dfad72c17806f00d72c744c6302b165ee2`. Reference: [§META](#meta).
-16. **Q: What test file executes poster cache tests?**  
+16. **Q: What test file executes poster cache tests?**
     *A:* `tests/test_poster_cache.py`. Reference: [`tests/test_poster_cache.py`](tests/test_poster_cache.py).
-17. **Q: What endpoint exposes Prometheus operational telemetry?**  
+17. **Q: What endpoint exposes Prometheus operational telemetry?**
     *A:* `/metrics`. Reference: [`api_server.py`](api_server.py).
-18. **Q: What linter is configured for the codebase?**  
+18. **Q: What linter is configured for the codebase?**
     *A:* Ruff. Reference: [`pyproject.toml`](pyproject.toml).
-19. **Q: How does the system handle TMDb API downtime or network loss?**  
+19. **Q: How does the system handle TMDb API downtime or network loss?**
     *A:* It serves cached posters from disk or gracefully falls back to a clean placeholder SVG without crashing. Reference: [§RESILIENCE](#resilience).
-20. **Q: What is the target latency for a top-10 recommendation query?**  
+20. **Q: What is the target latency for a top-10 recommendation query?**
     *A:* Under 25 ms (measured 12.8 ms). Reference: [§PERF](#perf).
-21. **Q: What scale are predicted movie ratings evaluated on?**  
+21. **Q: What scale are predicted movie ratings evaluated on?**
     *A:* 0.5 to 5.0 stars. Reference: [§WHAT](#what).
-22. **Q: What distance metric evaluates tag similarities?**  
+22. **Q: What distance metric evaluates tag similarities?**
     *A:* Cosine similarity on sparse TF-IDF vectors. Reference: [§TLDR](#tldr).
-23. **Q: Does Next-Gen-Reco require a persistent SQL database for its core recommendation engine?**  
+23. **Q: Does Next-Gen-Reco require a persistent SQL database for its core recommendation engine?**
     *A:* No, it operates using compressed sparse matrices and disk caches. Reference: [§ERD](#erd).
-24. **Q: Where are environment variable templates stored?**  
+24. **Q: Where are environment variable templates stored?**
     *A:* In `.env.example`. Reference: [`.env.example`](.env.example).
-25. **Q: How many files are cataloged with 100% manifest coverage in Appendix A?**  
+25. **Q: How many files are cataloged with 100% manifest coverage in Appendix A?**
     *A:* All 191 tracked files. Reference: [§APP](#app).
 
 ---
