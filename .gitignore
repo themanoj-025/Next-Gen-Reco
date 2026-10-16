@@ -1,62 +1,107 @@
-__pycache__/
-*.py[cod]
-*.class
-.cache/
-env/
-.env
-venv/
-.venv/
-.vscode/*
-!.vscode/settings.json
-.idea/
-*.ipynb
-.DS_Store
-nul
-checksums.txt
-README.txt
-split_app.py
+# ==============================================================================
+# Next-Gen-Reco - Security & Production .gitignore
+# ==============================================================================
 
-# ═══ Streamlit Cloud specific ignores ═══════════════════════════════════
-# Ignore secrets file (contains API keys) — NEVER commit this!
+# ------------------------------------------------------------------------------
+# 1. SECRETS & ENVIRONMENT VARIABLES (CRITICAL)
+# ------------------------------------------------------------------------------
+.env
+.env.*
+*.env
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.staging
+.env.production
+!.env.example
+!.env.template
+!.env.sample
+
+# Streamlit secrets (NEVER commit!)
 .streamlit/secrets.toml
-# Ignore local user data (generated at runtime)
+.streamlit/secrets.toml.local
+!.streamlit/secrets.toml.template
+!.streamlit/secrets.toml.example
 .movie_user_data.json
 
-# Node.js
-node_modules/
+# Private keys, certificates & credentials
+*.pem
+*.key
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.pkcs12
+*.cer
+*.crt
+*.der
+*.id_rsa
+id_rsa*
+id_ed25519*
+id_ecdsa*
+id_dsa*
 
-# Database files
-*.db
-*.db-shm
-*.db-wal
+# Cloud & service credentials
+credentials.json
+client_secret*.json
+service-account*.json
+service_account*.json
+serviceAccountKey*.json
+google-services.json
+GoogleService-Info.plist
+.aws/
+.azure/
+.gcp/
+gcloud/
+.act-secrets
+*.publishsettings
 
-# Logs
-logs/
-*.log
+# Authentication tokens & configs
+.netrc
+.pypirc
+.npmrc
+*token*.json
+token.pickle
+auth*.json
 
-# ═══ Model files ════════════════════════════════════════════════════════
-# Only ignore specific generated/junk model files, NOT production models
-# Production models in models/v1_test/ are tracked in git for deployment
-*.bak.joblib
-*.tmp.joblib
-models/scratch*
+# ------------------------------------------------------------------------------
+# 2. PYTHON RUNTIME, BUILDS & VIRTUAL ENVIRONMENTS
+# ------------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.class
+*.so
+.Python
+dist/
+build/
+*.egg-info/
 
-# ═══ Large data files ═══════════════════════════════════════════════════
+# Virtual environments
+env/
+venv/
+.venv/
+ENV/
+.venv*/
+env.bak/
+venv.bak/
+
+# ------------------------------------------------------------------------------
+# 3. LARGE DATA & MODEL ARTIFACTS
+# ------------------------------------------------------------------------------
 # ratings.csv is 857MB — must NOT be tracked in git
 data/ratings.csv
-# Full MovieLens 32M dataset (not used by the app, only for training)
+# Full MovieLens 32M dataset
 data/rating_*.csv
 data/genome*
 
-# ═══ Local config (not secrets) — .streamlit/config.toml IS tracked ════
-.streamlit/*.local.toml
+# The migrated CSVs stay on disk locally but are no longer tracked in git
+data/movies.csv
+data/tags.csv
+data/ND/movies.csv
 
-.gemini/
-.cursorrules
-
-CLAUDE.md
-
-# === ML model artifacts (general patterns) ===
+# ML model artifacts (general patterns)
 *.pkl
 *.h5
 *.pt
@@ -64,37 +109,91 @@ CLAUDE.md
 *.parquet
 mlruns/
 
-# Parquet data files ARE tracked — migrated from the tracked CSVs
-# (scripts/migrate_to_parquet.py); the blanket *.parquet rule above only
-# applies to generated caches like .cache/tag_pivot_*.parquet.
+# Specific generated/junk model files
+*.bak.joblib
+*.tmp.joblib
+models/scratch*
+
+# Negation exceptions: Parquet siblings migrated from tracked CSVs ARE tracked
 !data/*.parquet
 !data/ND/*.parquet
 
-# The migrated CSVs stay on disk locally (rollback / re-migration) but are
-# no longer tracked — their Parquet siblings are the source of truth now.
-# data/links.csv and data/ND/main_data.csv were NOT migrated and stay tracked.
-data/movies.csv
-data/tags.csv
-data/ND/movies.csv
-
 # Production models in models/v1_test/ are tracked in git for deployment
-# (used by the Docker image build via COPY models/). Only ignore scratch.
 !models/v1_test/*.joblib
 
-# Runtime balance log
-radar_balance.txt
+# ------------------------------------------------------------------------------
+# 4. LOGS & DATABASE FILES
+# ------------------------------------------------------------------------------
+logs/
+*.log
+*.dump
+*.stackdump
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+*.sqlite
+*.sqlite3
 
-# Test coverage artifacts
+# ------------------------------------------------------------------------------
+# 5. TESTING & CODE QUALITY
+# ------------------------------------------------------------------------------
+.cache/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
 .coverage
 .coverage.*
 htmlcov/
 coverage.xml
+radar_balance.txt
+
+# ------------------------------------------------------------------------------
+# 6. IDE, EDITORS & JUPYTER
+# ------------------------------------------------------------------------------
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.vscode/*.local.*
+.vscode/mcp.json
+.idea/
+*.ipynb
+*.swp
+*.swo
+*~
+split_app.py
+checksums.txt
+README.txt
+.streamlit/*.local.toml
+
+# ------------------------------------------------------------------------------
+# 7. OS FILES & TEMPORARIES
+# ------------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+nul
+*.tmp
+*.temp
+*.bak
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
 # =====================================================================
-# KEEP: AI provenance & transparency files — these must remain
-# visible to any repository viewer. Do not add rules above this block
-# that would shadow a directory these files live in without also
-# adding a negation here. Verified with `git check-ignore -v`.
+# KEEP: AI provenance & transparency files — must remain visible
 # =====================================================================
 !AI_DISCLOSURE.md
 !AI_USAGE.md
