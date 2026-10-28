@@ -36,7 +36,7 @@ def read_table(
     path: str | Path,
     *,
     dtype: dict | None = None,
-    low_memory: bool | None = None,
+    low_memory: bool = True,
     chunksize: int | None = None,
 ) -> pd.DataFrame:
     """Read a table from Parquet when available, else CSV.
