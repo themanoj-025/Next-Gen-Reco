@@ -12,7 +12,7 @@ Next-Gen-Reco/
 ├── .gitignore / .dockerignore / .editorconfig / .gitattributes
 ├── .streamlit/                    # Streamlit config (dark theme)
 ├── .vscode/settings.json
-├── AGENTS.md · LICENSE · README.md · PROJECT_ANALYSIS.md · PROJECT_OVERVIEW.md
+├── LICENSE · README.md · PROJECT_ANALYSIS.md · PROJECT_OVERVIEW.md
 ├── app.py                         # Streamlit entry bootstrap (Cloud/Docker contract; RUN-only)
 ├── app/                           # Importable application package (takes precedence over app.py)
 │   ├── __init__.py
