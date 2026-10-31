@@ -745,7 +745,6 @@ Production deployment is achieved via containerized Docker environments hosting 
 | [`.github/ISSUE_TEMPLATE/bug_report.md`](.github/ISSUE_TEMPLATE/bug_report.md) | `.md` | 36 | 890 | GitHub Actions CI/CD automation workflow |
 | [`.github/ISSUE_TEMPLATE/feature_request.md`](.github/ISSUE_TEMPLATE/feature_request.md) | `.md` | 29 | 849 | GitHub Actions CI/CD automation workflow |
 | [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) | `.md` | 45 | 1454 | GitHub Actions CI/CD automation workflow |
-| [`.github/copilot-instructions.md`](.github/copilot-instructions.md) | `.md` | 19 | 677 | GitHub Actions CI/CD automation workflow |
 | [`.github/dependabot.yml`](.github/dependabot.yml) | `.yml` | 34 | 666 | GitHub Actions CI/CD automation workflow |
 | [`.github/labeler.yml`](.github/labeler.yml) | `.yml` | 21 | 602 | GitHub Actions CI/CD automation workflow |
 | [`.github/scripts/check_lockfile.py`](.github/scripts/check_lockfile.py) | `.py` | 214 | 7174 | GitHub Actions CI/CD automation workflow |
@@ -773,8 +772,6 @@ Production deployment is achieved via containerized Docker environments hosting 
 | [`.streamlit/config.toml`](.streamlit/config.toml) | `.toml` | 13 | 266 | Configuration or static asset |
 | [`.streamlit/secrets.toml.template`](.streamlit/secrets.toml.template) | `.template` | 21 | 1416 | Configuration or static asset |
 | [`.vscode/settings.json`](.vscode/settings.json) | `.json` | 17 | 465 | Configuration or static asset |
-| [`AGENTS.md`](AGENTS.md) | `.md` | 73 | 1881 | Documentation asset |
-| [`AI_DISCLOSURE.md`](AI_DISCLOSURE.md) | `.md` | 67 | 2576 | Documentation asset |
 | [`CHANGELOG.md`](CHANGELOG.md) | `.md` | 40 | 1378 | Documentation asset |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | `.md` | 27 | 828 | Documentation asset |
 | [`Dockerfile`](Dockerfile) | `no-ext` | 110 | 4109 | Configuration or static asset |
@@ -784,7 +781,6 @@ Production deployment is achieved via containerized Docker environments hosting 
 | [`PROJECT_ANALYSIS.md`](PROJECT_ANALYSIS.md) | `.md` | 18 | 888 | Documentation asset |
 | [`README.md`](README.md) | `.md` | 344 | 13374 | Documentation asset |
 | [`SECURITY.md`](SECURITY.md) | `.md` | 25 | 989 | Documentation asset |
-| [`ai-provenance.json`](ai-provenance.json) | `.json` | 64 | 1690 | Configuration or static asset |
 | [`app.py`](app.py) | `.py` | 301 | 12056 | Recommendation, enrichment, or UI script |
 | [`app/__init__.py`](app/__init__.py) | `.py` | 1 | 41 | Recommendation, enrichment, or UI script |
 | [`app/_paths.py`](app/_paths.py) | `.py` | 20 | 649 | Recommendation, enrichment, or UI script |
