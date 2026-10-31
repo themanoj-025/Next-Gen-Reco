@@ -921,4 +921,3 @@ Production deployment is achieved via containerized Docker environments hosting 
 | [`tests/test_recommender_unit.py`](tests/test_recommender_unit.py) | `.py` | 115 | 4346 | Automated test suite component |
 | [`tests/test_syntax.py`](tests/test_syntax.py) | `.py` | 16 | 435 | Automated test suite component |
 | [`uv.lock`](uv.lock) | `.lock` | 8 | 134 | Dependency manifest or lockfile |
-
