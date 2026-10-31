@@ -832,8 +832,8 @@ Production deployment is achieved via containerized Docker environments hosting 
 | [`app/ui/styles_css.py`](app/ui/styles_css.py) | `.py` | 591 | 45396 | Recommendation, enrichment, or UI script |
 | [`app/ui/styles_themes.py`](app/ui/styles_themes.py) | `.py` | 75 | 3183 | Recommendation, enrichment, or UI script |
 | [`app/utils.py`](app/utils.py) | `.py` | 11 | 349 | Recommendation, enrichment, or UI script |
-| [`audit/dependabot-agent/2026-08-13-run.md`](audit/dependabot-agent/2026-08-13-run.md) | `.md` | 20 | 1393 | Documentation asset |
-| [`audit/dependabot-agent/2026-08-15-run.md`](audit/dependabot-agent/2026-08-15-run.md) | `.md` | 25 | 2095 | Documentation asset |
+| [`docs/audit/dependabot-agent/2026-08-13-run.md`](docs/audit/dependabot-agent/2026-08-13-run.md) | `.md` | 20 | 1393 | Documentation asset |
+| [`docs/audit/dependabot-agent/2026-08-15-run.md`](docs/audit/dependabot-agent/2026-08-15-run.md) | `.md` | 25 | 2095 | Documentation asset |
 | [`data/ND/main_data.csv`](data/ND/main_data.csv) | `.csv` | 6011 | 1039404 | Dataset artifact or index file |
 | [`data/ND/movies.parquet`](data/ND/movies.parquet) | `.parquet` | 84049 | 7842122 | Dataset artifact or index file |
 | [`data/ND/reviews.txt`](data/ND/reviews.txt) | `.txt` | 7086 | 454626 | Dataset artifact or index file |
@@ -921,3 +921,4 @@ Production deployment is achieved via containerized Docker environments hosting 
 | [`tests/test_recommender_unit.py`](tests/test_recommender_unit.py) | `.py` | 115 | 4346 | Automated test suite component |
 | [`tests/test_syntax.py`](tests/test_syntax.py) | `.py` | 16 | 435 | Automated test suite component |
 | [`uv.lock`](uv.lock) | `.lock` | 8 | 134 | Dependency manifest or lockfile |
+
