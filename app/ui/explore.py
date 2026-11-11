@@ -105,9 +105,9 @@ def render_mood_explorer() -> None:
                     unsafe_allow_html=True,
                 )
 
-                cols = st.columns(4)
+                grid_cols = st.columns(4)
                 for i, (_, row) in enumerate(sample.iterrows()):
-                    with cols[i % 4]:
+                    with grid_cols[i % 4]:
                         mid = row["movieId"]
                         info = rec.get_movie_info(mid)
                         if info:
