@@ -118,13 +118,13 @@ Recommender systems in streaming media encounter classic structural dilemmas:
 
 | Capability Area | Feature | Implementation Module | Technical Characteristics |
 | :--- | :--- | :--- | :--- |
-| **Hybrid Similarity** | 4-Factor Weighted Ranking | [`model.py`](model.py) | 50% Genre + 20% Tags + 10% Year + 20% Rating composite score |
-| **Rating Prediction** | Supervised Regressors | [`model.py`](model.py) | Random Forest & Gradient Boosting predicting ratings on a 0.5-5.0 scale |
-| **Metadata Enrichment** | Poster & Plot Fetching | [`enrichment.py`](enrichment.py) | Async TMDb / OMDb API client with persistent disk cache |
-| **Vector Search** | TF-IDF Tag Similarity | [`data_loader.py`](data_loader.py) | Sparse TF-IDF tag matrix computation with cosine similarity |
+| **Hybrid Similarity** | 4-Factor Weighted Ranking | [`app/model.py`](app/model.py) | 50% Genre + 20% Tags + 10% Year + 20% Rating composite score |
+| **Rating Prediction** | Supervised Regressors | [`app/model.py`](app/model.py) | Random Forest & Gradient Boosting predicting ratings on a 0.5-5.0 scale |
+| **Metadata Enrichment** | Poster & Plot Fetching | [`app/enrichment.py`](app/enrichment.py) | Async TMDb / OMDb API client with persistent disk cache |
+| **Vector Search** | TF-IDF Tag Similarity | [`app/data/loader.py`](app/data/loader.py) | Sparse TF-IDF tag matrix computation with cosine similarity |
 | **Interactive UI** | Streamlit Web Cockpit | [`app.py`](app.py) | Movie poster gallery, similarity dials, search bar, and detail modal |
-| **REST API Serving** | Asynchronous FastAPI | [`api_server.py`](api_server.py) | High-throughput endpoints for `/recommend`, `/predict-rating`, `/health` |
-| **Cache Management** | Multi-Tier Disk Cache | [`poster_cache.py`](poster_cache.py) | LRU memory + SQLite/JSON disk cache preventing external API rate limits |
+| **REST API Serving** | Asynchronous FastAPI | [`app/api_server.py`](app/api_server.py) | High-throughput endpoints for `/recommend`, `/predict-rating`, `/health` |
+| **Cache Management** | Multi-Tier Disk Cache | [`app/ui/poster_cache.py`](app/ui/poster_cache.py) | LRU memory + SQLite/JSON disk cache preventing external API rate limits |
 
 ---
 
@@ -371,12 +371,12 @@ Next-Gen-Reco/
 
 | Subsystem | File Path | Primary Responsibilities | Key Functions / Classes |
 | :--- | :--- | :--- | :--- |
-| **Recommendation**| [`model.py`](model.py) | Hybrid similarity engine & rating prediction | `HybridRecommender`, `get_similar_movies()` |
-| **Ingestion** | [`data_loader.py`](data_loader.py) | Ingests MovieLens CSVs, builds sparse matrices | `load_movielens_data()`, `build_matrices()` |
-| **Enrichment** | [`enrichment.py`](enrichment.py) | External TMDb and OMDb API metadata fetching | `TMDbClient`, `fetch_poster()` |
-| **Caching** | [`poster_cache.py`](poster_cache.py) | Multi-tier LRU disk cache for media | `PosterCache`, `get()`, `set()` |
+| **Recommendation**| [`app/model.py`](app/model.py) | Hybrid similarity engine & rating prediction | `HybridRecommender`, `get_similar_movies()` |
+| **Ingestion** | [`app/data/loader.py`](app/data/loader.py) | Ingests MovieLens CSVs, builds sparse matrices | `load_movielens_data()`, `build_matrices()` |
+| **Enrichment** | [`app/enrichment.py`](app/enrichment.py) | External TMDb and OMDb API metadata fetching | `TMDbClient`, `fetch_poster()` |
+| **Caching** | [`app/ui/poster_cache.py`](app/ui/poster_cache.py) | Multi-tier LRU disk cache for media | `PosterCache`, `get()`, `set()` |
 | **Dashboard** | [`app.py`](app.py) | Streamlit interactive discovery dashboard | `main()`, poster grid layout |
-| **API Serving** | [`api_server.py`](api_server.py) | Asynchronous FastAPI microservice | `app`, `/recommend`, `/predict-rating` |
+| **API Serving** | [`app/api_server.py`](app/api_server.py) | Asynchronous FastAPI microservice | `app`, `/recommend`, `/predict-rating` |
 
 ---
 
@@ -475,9 +475,9 @@ Security controls are evaluated using STRIDE threat analysis:
 
 | STRIDE Category | Threat Vector | Mitigation Strategy | Implemented Component |
 | :--- | :--- | :--- | :--- |
-| **Tampering** | Parameter boundary violation | Strict Pydantic input schemas and typing | [`api_server.py`](api_server.py) |
-| **Information Disclosure** | Leakage of API keys | API keys restricted to server-side environment variables | [`enrichment.py`](enrichment.py) |
-| **Denial of Service** | Exhausting TMDb API quotas | Multi-tier persistent disk caching | [`poster_cache.py`](poster_cache.py) |
+| **Tampering** | Parameter boundary violation | Strict Pydantic input schemas and typing | [`app/api_server.py`](app/api_server.py) |
+| **Information Disclosure** | Leakage of API keys | API keys restricted to server-side environment variables | [`app/enrichment.py`](app/enrichment.py) |
+| **Denial of Service** | Exhausting TMDb API quotas | Multi-tier persistent disk caching | [`app/ui/poster_cache.py`](app/ui/poster_cache.py) |
 
 ---
 
@@ -643,19 +643,19 @@ Production deployment is achieved via containerized Docker environments hosting 
 5. **Q: What are the exact weight percentages of the 4-factor hybrid affinity score?**
    *A:* 50% Genre + 20% Tags + 10% Year Proximity + 20% Predicted Rating. Reference: [`README.md`](README.md).
 6. **Q: What machine learning algorithms predict user ratings?**
-   *A:* Random Forest & Gradient Boosting regressors. Reference: [`model.py`](model.py).
+   *A:* Random Forest & Gradient Boosting regressors. Reference: [`app/model.py`](app/model.py).
 7. **Q: What external APIs are used to enrich movies with posters and plot overviews?**
-   *A:* The Movie Database (TMDb) and Open Movie Database (OMDb). Reference: [`enrichment.py`](enrichment.py).
+   *A:* The Movie Database (TMDb) and Open Movie Database (OMDb). Reference: [`app/enrichment.py`](app/enrichment.py).
 8. **Q: What framework powers the interactive discovery dashboard?**
    *A:* Streamlit. Reference: [`app.py`](app.py).
 9. **Q: What framework powers the asynchronous REST API?**
-   *A:* FastAPI. Reference: [`api_server.py`](api_server.py).
+   *A:* FastAPI. Reference: [`app/api_server.py`](app/api_server.py).
 10. **Q: How many endpoints are exposed by the FastAPI server?**
     *A:* 4 endpoints. Reference: [§API](#api).
 11. **Q: What sparse matrix format stores high-dimensional TF-IDF vectors?**
-    *A:* Compressed Sparse Row (`scipy.sparse.csr_matrix`). Reference: [`data_loader.py`](data_loader.py).
+    *A:* Compressed Sparse Row (`scipy.sparse.csr_matrix`). Reference: [`app/data/loader.py`](app/data/loader.py).
 12. **Q: What module implements multi-tier disk caching for media assets?**
-    *A:* `poster_cache.py`. Reference: [`poster_cache.py`](poster_cache.py).
+    *A:* `poster_cache.py`. Reference: [`app/ui/poster_cache.py`](app/ui/poster_cache.py).
 13. **Q: What total lines of code exist across the codebase?**
     *A:* 1,755,537 lines of code. Reference: [§META](#meta).
 14. **Q: What git commit hash was verified for this documentation?**
@@ -665,7 +665,7 @@ Production deployment is achieved via containerized Docker environments hosting 
 16. **Q: What test file executes poster cache tests?**
     *A:* `tests/test_poster_cache.py`. Reference: [`tests/test_poster_cache.py`](tests/test_poster_cache.py).
 17. **Q: What endpoint exposes Prometheus operational telemetry?**
-    *A:* `/metrics`. Reference: [`api_server.py`](api_server.py).
+    *A:* `/metrics`. Reference: [`app/api_server.py`](app/api_server.py).
 18. **Q: What linter is configured for the codebase?**
     *A:* Ruff. Reference: [`pyproject.toml`](pyproject.toml).
 19. **Q: How does the system handle TMDb API downtime or network loss?**
@@ -749,7 +749,6 @@ Production deployment is achieved via containerized Docker environments hosting 
 | [`.github/labeler.yml`](.github/labeler.yml) | `.yml` | 21 | 602 | GitHub Actions CI/CD automation workflow |
 | [`.github/scripts/check_lockfile.py`](.github/scripts/check_lockfile.py) | `.py` | 214 | 7174 | GitHub Actions CI/CD automation workflow |
 | [`.github/scripts/lint_readme.py`](.github/scripts/lint_readme.py) | `.py` | 164 | 5674 | GitHub Actions CI/CD automation workflow |
-| [`.github/workflows/ai-disclosure-check.yml`](.github/workflows/ai-disclosure-check.yml) | `.yml` | 81 | 3777 | GitHub Actions CI/CD automation workflow |
 | [`.github/workflows/auto-label.yml`](.github/workflows/auto-label.yml) | `.yml` | 22 | 644 | GitHub Actions CI/CD automation workflow |
 | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) | `.yml` | 351 | 12554 | GitHub Actions CI/CD automation workflow |
 | [`.github/workflows/codeql.yml`](.github/workflows/codeql.yml) | `.yml` | 60 | 1740 | GitHub Actions CI/CD automation workflow |
@@ -830,8 +829,6 @@ Production deployment is achieved via containerized Docker environments hosting 
 | [`app/ui/styles_css.py`](app/ui/styles_css.py) | `.py` | 591 | 45396 | Recommendation, enrichment, or UI script |
 | [`app/ui/styles_themes.py`](app/ui/styles_themes.py) | `.py` | 75 | 3183 | Recommendation, enrichment, or UI script |
 | [`app/utils.py`](app/utils.py) | `.py` | 11 | 349 | Recommendation, enrichment, or UI script |
-| [`docs/audit/dependabot-agent/2026-08-13-run.md`](docs/audit/dependabot-agent/2026-08-13-run.md) | `.md` | 20 | 1393 | Documentation asset |
-| [`docs/audit/dependabot-agent/2026-08-15-run.md`](docs/audit/dependabot-agent/2026-08-15-run.md) | `.md` | 25 | 2095 | Documentation asset |
 | [`data/ND/main_data.csv`](data/ND/main_data.csv) | `.csv` | 6011 | 1039404 | Dataset artifact or index file |
 | [`data/ND/movies.parquet`](data/ND/movies.parquet) | `.parquet` | 84049 | 7842122 | Dataset artifact or index file |
 | [`data/ND/reviews.txt`](data/ND/reviews.txt) | `.txt` | 7086 | 454626 | Dataset artifact or index file |
@@ -845,14 +842,7 @@ Production deployment is achieved via containerized Docker environments hosting 
 | [`docs/DEVELOPER_GUIDE.md`](docs/DEVELOPER_GUIDE.md) | `.md` | 3 | 74 | Technical documentation asset |
 | [`docs/DISASTER-RECOVERY.md`](docs/DISASTER-RECOVERY.md) | `.md` | 42 | 1206 | Technical documentation asset |
 | [`docs/README.md`](docs/README.md) | `.md` | 64 | 2954 | Technical documentation asset |
-| [`docs/ai/PROVENANCE.md`](docs/ai/PROVENANCE.md) | `.md` | 41 | 1363 | Technical documentation asset |
-| [`docs/ai/README.md`](docs/ai/README.md) | `.md` | 45 | 1529 | Technical documentation asset |
-| [`docs/ai/transcripts/README.md`](docs/ai/transcripts/README.md) | `.md` | 36 | 1357 | Technical documentation asset |
 | [`docs/architecture.md`](docs/architecture.md) | `.md` | 89 | 6021 | Technical documentation asset |
-| [`docs/audit/cleanup-audit-2026-08-13.md`](docs/audit/cleanup-audit-2026-08-13.md) | `.md` | 51 | 2124 | Technical documentation asset |
-| [`docs/audit/cleanup-audit-2026-08-15-code.md`](docs/audit/cleanup-audit-2026-08-15-code.md) | `.md` | 62 | 3746 | Technical documentation asset |
-| [`docs/audit/cleanup-audit-2026-08-15.md`](docs/audit/cleanup-audit-2026-08-15.md) | `.md` | 66 | 1561 | Technical documentation asset |
-| [`docs/audit/dependabot-inventory-2026-08-16.md`](docs/audit/dependabot-inventory-2026-08-16.md) | `.md` | 234 | 20262 | Technical documentation asset |
 | [`docs/community/CHANGELOG.md`](docs/community/CHANGELOG.md) | `.md` | 55 | 2098 | Technical documentation asset |
 | [`docs/community/CODE_OF_CONDUCT.md`](docs/community/CODE_OF_CONDUCT.md) | `.md` | 132 | 5608 | Technical documentation asset |
 | [`docs/community/CONTRIBUTING.md`](docs/community/CONTRIBUTING.md) | `.md` | 123 | 4005 | Technical documentation asset |
@@ -861,9 +851,6 @@ Production deployment is achieved via containerized Docker environments hosting 
 | [`docs/design/AppFlow.md`](docs/design/AppFlow.md) | `.md` | 107 | 3309 | Technical documentation asset |
 | [`docs/design/Design.md`](docs/design/Design.md) | `.md` | 105 | 3201 | Technical documentation asset |
 | [`docs/folder_structure.md`](docs/folder_structure.md) | `.md` | 67 | 3885 | Technical documentation asset |
-| [`docs/migration/file_move_ledger.md`](docs/migration/file_move_ledger.md) | `.md` | 47 | 2289 | Technical documentation asset |
-| [`docs/migration/migration_summary.md`](docs/migration/migration_summary.md) | `.md` | 43 | 1989 | Technical documentation asset |
-| [`docs/migration/old_tree_to_new_tree.md`](docs/migration/old_tree_to_new_tree.md) | `.md` | 62 | 3003 | Technical documentation asset |
 | [`docs/module_dependency.md`](docs/module_dependency.md) | `.md` | 55 | 3029 | Technical documentation asset |
 | [`docs/package_overview.md`](docs/package_overview.md) | `.md` | 62 | 3033 | Technical documentation asset |
 | [`docs/product/PRD.md`](docs/product/PRD.md) | `.md` | 138 | 6333 | Technical documentation asset |

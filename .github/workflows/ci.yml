@@ -214,7 +214,6 @@ jobs:
             --exclude 'https?://.*static\.streamlit\.io'
             --exclude 'https?://.*\{.*\}.*'
             '**/*.md'
-        continue-on-error: true
 
   security-audit:
     timeout-minutes: 10

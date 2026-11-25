@@ -113,7 +113,7 @@ Include in your report:
 ## TMDB Integration
 
 Movie posters are optional. To enable:
-1. Get a free API key from [themoviedb.org](https://www.themoviedb.org/settings/api).
+1. Get a free API key from [TMDB Developer Docs](https://developer.themoviedb.org/docs/getting-started) (via your account's API settings page).
 2. Copy `.streamlit/secrets.toml.template` to `.streamlit/secrets.toml`.
 3. Add your key: `TMDB_API_KEY = "your_key_here"`.
 4. The app will automatically use posters when available.

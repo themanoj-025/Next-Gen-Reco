@@ -25,10 +25,14 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     DEBIAN_FRONTEND=noninteractive
 
-# tini for PID-1 signal handling
+# tini for PID-1 signal handling.
+# Also pull in patched base-OS packages: the CI Trivy gate fails on HIGH/CRITICAL
+# findings, and libzstd1 (CVE-2026-124851) is only fixed in the deb13u1 point
+# release, which the pinned python:3.15-slim base image predates.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         tini \
         curl \
+    && apt-get install -y --no-install-recommends --only-upgrade libzstd1 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
